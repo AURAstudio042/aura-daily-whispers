@@ -28,14 +28,15 @@ export const Route = createFileRoute("/")({
 
 function BugunPage() {
   const [u, , ready] = useUser();
+  const city = userCity(u);
+  const weather = dailyWeather(city);
+  const { pack } = useDailyPack(u, { temp: weather.temp, cond: weather.cond });
+
   if (!ready) return <div className="min-h-screen" />;
   if (!u) return <Onboarding />;
 
   const name = userName(u);
-  const city = userCity(u);
   const z = zodiacOf(u);
-  const weather = dailyWeather(city);
-  const { pack } = useDailyPack(u, { temp: weather.temp, cond: weather.cond });
 
   const horo = pack?.horoscope ?? dailyHoroscope(z, u.mood);
   const colors = pack?.colors ?? dailyColors(u.style, u.mood);
