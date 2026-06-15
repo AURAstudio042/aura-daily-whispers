@@ -25,21 +25,19 @@ const DailyPackSchema = z.object({
   outfit: z.object({
     top: z.string().min(1),
     bottom: z.string().min(1),
-    shoe: z.string().min(1),
-    access: z.string().min(1),
-    lip: z.string().min(1),
-    jewelry: z.string().min(1),
-    harmony: z.string().min(1),
-    inspiration: z.string().min(1),
+    shoes: z.string().min(1),
+    accessory: z.string().min(1),
   }),
+  makeup: z.string().min(1),
+  colorNote: z.string().min(1),
+  styleInspo: z.string().min(1),
   stone: z.object({
     name: z.string().min(1),
     meaning: z.string().min(1),
-    tags: z.array(z.string()).min(1).max(4),
   }),
   scent: z.object({
-    scents: z.array(z.string()).min(2).max(3),
-    feel: z.string().min(1),
+    names: z.string().min(1),
+    feeling: z.string().min(1),
   }),
   quote: z.object({
     text: z.string().min(1),
@@ -62,12 +60,12 @@ function extractJson(text: string): string {
 export const generateDailyPack = createServerFn({ method: "POST" })
   .inputValidator((data: unknown) => InputSchema.parse(data))
   .handler(async ({ data }): Promise<{ pack: DailyPack | null }> => {
-    const key = process.env.LOVABLE_API_KEY;
-    if (!key) return { pack: null };
-
     try {
+      const key = process.env.LOVABLE_API_KEY;
+      if (!key) return { pack: null };
+
       const gateway = createLovableAiGatewayProvider(key);
-      const system = `Sen AURA'sın — kullanıcılara her gün kişiselleştirilmiş, sıcak, şiirsel ve özgün günlük ritüel içeriği üreten Türkçe bir asistan. Tüm çıktın Türkçe olmalı. Yanıtın YALNIZCA geçerli bir JSON nesnesi olmalı, markdown veya açıklama olmadan.`;
+      const system = `Sen AURA'sın — kullanıcılara her gün kişiselleştirilmiş, sıcak, şiirsel ve özgün günlük ritüel içeriği üreten Türkçe bir asistan. Tüm çıktın Türkçe olmalı. Asla genel ifadeler kullanma — kullanıcının burcuna, ruh haline, stiline, şehrine ve havasına özgü, kişisel ve spesifik içerik üret. Yanıtın YALNIZCA geçerli bir JSON nesnesi olmalı, markdown veya açıklama olmadan.`;
 
       const user = `Kullanıcı: ${data.name}
 Burç: ${data.zodiac}
@@ -76,39 +74,37 @@ Stil: ${data.style ?? "belirtilmemiş"}
 Şehir: ${data.city}
 Hava: ${data.weather.temp}°C, ${data.weather.cond}
 
-Aşağıdaki şemaya tam olarak uyan bir JSON üret:
+Aşağıdaki yapıya tam olarak uyan bir JSON üret:
 
 {
-  "greeting": "Kullanıcının adını içeren, sıcak ve kişisel bir günaydın cümlesi (1 cümle)",
-  "horoscope": "${data.zodiac} burcuna ve ruh haline özel, asla genel olmayan, burç özelliklerini doğal biçimde işleyen 2-3 cümlelik bir günlük yorum",
-  "colors": [{ "name": "Türkçe renk adı", "hex": "#rrggbb" }, ... 3-5 renk],
+  "greeting": "Günaydın, ${data.name} ✨ [kısa, sıcak bir enerji cümlesi]",
+  "horoscope": "[${data.zodiac} burcuna ve ruh haline özel, asla genel olmayan, burç özelliklerini doğal biçimde işleyen 2-3 cümlelik kişisel yorum]",
+  "colors": [{"name": "Türkçe renk adı", "hex": "#rrggbb"}, ... 3-5 renk],
   "outfit": {
-    "top": "üst parça (havaya ve stile uygun)",
+    "top": "üst parça (havaya, stile, ruh haline uygun)",
     "bottom": "alt parça",
-    "shoe": "ayakkabı",
-    "access": "aksesuar",
-    "lip": "ruj tonu",
-    "jewelry": "takı (altın/gümüş vb)",
-    "harmony": "renk uyumu hakkında 1 cümle",
-    "inspiration": "stil ilham cümlesi"
+    "shoes": "ayakkabı",
+    "accessory": "aksesuar"
   },
+  "makeup": "[makyaj ve aksesuar önerisi — ruj tonu ve takı dahil, 1-2 cümle]",
+  "colorNote": "[bugünkü renk paletinin uyum notu, 1 cümle]",
+  "styleInspo": "[stilini özetleyen şiirsel bir ilham cümlesi]",
   "stone": {
     "name": "Taş adı",
-    "meaning": "Anlam hakkında 1 kısa cümle",
-    "tags": ["2-4 anahtar kelime"]
+    "meaning": "Bugüne özel kısa bir anlam cümlesi"
   },
   "scent": {
-    "scents": ["2-3 koku notası"],
-    "feel": "Kokunun hissi hakkında 1 cümle"
+    "names": "2-3 koku notası (örn. 'Bergamot, yasemin, beyaz misk')",
+    "feeling": "Kokunun bıraktığı his hakkında 1 cümle"
   },
   "quote": {
-    "text": "Gerçek bir filozof/şair/yazar/güçlü anonim sözden alıntı (Türkçe)",
-    "author": "Yazar adı (anonim için 'Anonim')",
-    "category": "Kategori (örn. Felsefi, Şiir, İlham)"
+    "text": "Gerçek bir filozof, şair, yazar veya güçlü bir anonim sözünden Türkçe alıntı",
+    "author": "Yazar adı (mutlaka belirt; bilinmiyorsa 'Anonim')",
+    "category": "Kategori (Felsefi, Şiir, İlham, Bilgelik vb)"
   }
 }
 
-Hava ${data.weather.temp}°C ve ${data.weather.cond} — kıyafet önerisi mutlaka buna uygun olsun. Yağmurluysa su geçirmez, soğuksa katmanlı, sıcaksa hafif öner.`;
+Hava ${data.weather.temp}°C ve ${data.weather.cond} — kıyafet önerisi mutlaka buna uygun olsun. Yağmurluysa su geçirmez katman, soğuksa katmanlı sıcak parçalar, sıcaksa hafif kumaşlar öner.`;
 
       const result = await generateText({
         model: gateway("google/gemini-3-flash-preview"),
@@ -116,11 +112,15 @@ Hava ${data.weather.temp}°C ve ${data.weather.cond} — kıyafet önerisi mutla
         prompt: user,
       });
 
-      const jsonText = extractJson(result.text);
-      const parsed = JSON.parse(jsonText);
-      const validated = DailyPackSchema.safeParse(parsed);
-      if (!validated.success) return { pack: null };
-      return { pack: validated.data };
+      try {
+        const jsonText = extractJson(result.text);
+        const parsed = JSON.parse(jsonText);
+        const validated = DailyPackSchema.safeParse(parsed);
+        if (!validated.success) return { pack: null };
+        return { pack: validated.data };
+      } catch {
+        return { pack: null };
+      }
     } catch {
       return { pack: null };
     }
