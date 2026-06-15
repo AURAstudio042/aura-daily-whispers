@@ -86,7 +86,7 @@ export const generateDailyPack = createServerFn({ method: "POST" })
     const prompt = `Bugünün kişisel paketini hazırla ve sonucu JSON formatında döndür:\n\n${context}`;
 
     const { experimental_output } = await generateText({
-      model: gateway("openai/gpt-5-mini"),
+      model: gateway("google/gemini-3-flash-preview"),
       system,
       prompt,
       experimental_output: Output.object({ schema: DailyPackSchema }),
