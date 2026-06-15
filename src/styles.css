@@ -89,41 +89,74 @@
 }
 
 @utility aura-card {
-  background: linear-gradient(180deg, rgba(26, 20, 40, 0.85), rgba(17, 13, 28, 0.85));
-  border: 1px solid rgba(183, 148, 212, 0.12);
-  border-radius: 1.25rem;
-  backdrop-filter: blur(12px);
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(183, 148, 212, 0.06);
+  position: relative;
+  background:
+    radial-gradient(120% 80% at 0% 0%, rgba(139, 92, 246, 0.10), transparent 55%),
+    radial-gradient(120% 80% at 100% 100%, rgba(212, 176, 120, 0.05), transparent 55%),
+    linear-gradient(180deg, rgba(28, 22, 44, 0.92), rgba(15, 11, 24, 0.92));
+  border: 1px solid rgba(183, 148, 212, 0.14);
+  border-radius: 1.5rem;
+  backdrop-filter: blur(14px) saturate(140%);
+  box-shadow:
+    0 10px 40px rgba(0, 0, 0, 0.5),
+    0 1px 0 rgba(255, 255, 255, 0.04) inset,
+    0 0 0 1px rgba(255, 255, 255, 0.02) inset;
 }
 
 @utility aura-card-dark {
-  background: linear-gradient(180deg, #0d0917 0%, #050309 100%);
-  border: 1px solid rgba(183, 148, 212, 0.18);
-  border-radius: 1.25rem;
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(183, 148, 212, 0.08);
+  position: relative;
+  background:
+    radial-gradient(80% 60% at 50% 0%, rgba(139, 92, 246, 0.18), transparent 60%),
+    linear-gradient(180deg, #0d0917 0%, #050309 100%);
+  border: 1px solid rgba(183, 148, 212, 0.22);
+  border-radius: 1.5rem;
+  box-shadow:
+    0 16px 50px rgba(0, 0, 0, 0.7),
+    0 1px 0 rgba(255, 255, 255, 0.06) inset;
 }
 
 @utility section-label {
   font-family: var(--font-sans);
   font-size: 0.65rem;
-  letter-spacing: 0.35em;
+  letter-spacing: 0.4em;
   text-transform: uppercase;
   color: var(--aura-muted);
   font-weight: 500;
 }
 
 @utility aura-btn {
-  background: linear-gradient(135deg, #8b5cf6 0%, #b794d4 100%);
-  color: #08060f;
+  background: linear-gradient(135deg, #8b5cf6 0%, #b794d4 50%, #d4b078 130%);
+  color: #ffffff;
   font-weight: 500;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.15em;
   border-radius: 999px;
-  padding: 0.875rem 1.5rem;
-  box-shadow: 0 8px 24px rgba(139, 92, 246, 0.35);
+  padding: 0.95rem 1.5rem;
+  box-shadow:
+    0 10px 30px rgba(139, 92, 246, 0.45),
+    0 1px 0 rgba(255, 255, 255, 0.25) inset;
   transition: transform 0.2s, box-shadow 0.2s;
 }
 @utility aura-btn-hover {
-  &:hover { transform: translateY(-1px); box-shadow: 0 12px 32px rgba(139, 92, 246, 0.5); }
+  &:hover { transform: translateY(-1px); box-shadow: 0 14px 36px rgba(139, 92, 246, 0.6), 0 1px 0 rgba(255,255,255,0.3) inset; }
+}
+
+@utility aura-divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(183, 148, 212, 0.25), transparent);
+}
+
+@utility aura-glow {
+  position: absolute;
+  pointer-events: none;
+  border-radius: 9999px;
+  filter: blur(60px);
+  opacity: 0.6;
+}
+
+@utility pill-light {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  color: #ffffff;
 }
 
 @keyframes aura-pulse {
