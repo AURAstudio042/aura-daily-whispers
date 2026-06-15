@@ -30,7 +30,7 @@ function BugunPage() {
   const [u, , ready] = useUser();
   const city = userCity(u);
   const weather = dailyWeather(city);
-  const { pack } = useDailyPack(u, { temp: weather.temp, cond: weather.cond });
+  const { pack, loading } = useDailyPack(u, { temp: weather.temp, cond: weather.cond });
 
   if (!ready) return <div className="min-h-screen" />;
   if (!u) return <Onboarding />;
@@ -40,14 +40,29 @@ function BugunPage() {
 
   const horo = pack?.horoscope ?? dailyHoroscope(z, u.mood);
   const colors = pack?.colors ?? dailyColors(u.style, u.mood);
-  const outfitAI = pack?.outfit;
   const outfitMock = dailyOutfit(z, u.style, u.mood);
-  const outfit = outfitAI ?? outfitMock;
+  const outfit = {
+    top: pack?.outfit.top ?? outfitMock.top,
+    bottom: pack?.outfit.bottom ?? outfitMock.bottom,
+    shoe: pack?.outfit.shoes ?? outfitMock.shoe,
+    access: pack?.outfit.accessory ?? outfitMock.access,
+    lip: outfitMock.lip,
+    jewelry: outfitMock.jewelry,
+    harmony: pack?.colorNote ?? outfitMock.harmony,
+    inspiration: pack?.styleInspo ?? outfitMock.inspiration,
+    makeup: pack?.makeup ?? null as string | null,
+  };
   const stoneMock = dailyStone(z, u.mood);
-  const stone = pack?.stone
-    ? { kind: stoneMock.kind, name: pack.stone.name, meaning: pack.stone.meaning, tags: pack.stone.tags }
-    : stoneMock;
-  const scent = pack?.scent ?? dailyScent(u.mood);
+  const stone = {
+    kind: stoneMock.kind,
+    name: pack?.stone.name ?? stoneMock.name,
+    meaning: pack?.stone.meaning ?? stoneMock.meaning,
+    tags: stoneMock.tags,
+  };
+  const scentMock = dailyScent(u.mood);
+  const scent = pack?.scent
+    ? { scents: pack.scent.names.split(/[,·]\s*/).map((s) => s.trim()).filter(Boolean), feel: pack.scent.feeling }
+    : { scents: scentMock.scents, feel: scentMock.feel };
   const quote = pack?.quote ?? dailyQuote();
   const morning = pack?.greeting ?? greetingHint(z);
 
@@ -64,7 +79,7 @@ function BugunPage() {
           <div className="min-w-0">
             <p className="section-label">A · U · R · A · GÜNLÜK RİTÜELİN</p>
             <h1 className="mt-3 text-[42px] leading-[1.05] font-light text-white">Günaydın,<br/>{name} <span className="text-[color:var(--aura-lavender)]">✦</span></h1>
-            <p className="mt-3 text-[15px] italic text-[color:var(--aura-soft)]">{morning}</p>
+            <p className="mt-3 text-[15px] italic text-[color:var(--aura-soft)]">{morning}{loading && <span className="ml-2 text-[11px] not-italic tracking-[0.2em] uppercase text-[color:var(--aura-muted)]">✦ aura örülüyor…</span>}</p>
           </div>
           <div className="shrink-0 grid h-14 w-14 place-items-center rounded-full border border-[color:var(--border)] bg-white/[0.03] text-2xl text-white backdrop-blur-md" aria-label={`Burç: ${z}`}>
             {ZODIAC_SYMBOL[z]}
@@ -123,7 +138,7 @@ function BugunPage() {
         <Sep />
         <p className="text-[11px] tracking-[0.3em] uppercase text-[color:var(--aura-muted)]">Makyaj & Detay</p>
         <p className="mt-1 text-[14px] text-[color:var(--aura-soft)]">
-          Ruj: <span className="text-white">{outfit.lip}</span> · Takı: <span className="text-white">{outfit.jewelry}</span>
+          {outfit.makeup ?? <>Ruj: <span className="text-white">{outfit.lip}</span> · Takı: <span className="text-white">{outfit.jewelry}</span></>}
         </p>
         <Sep />
         <p className="text-[11px] tracking-[0.3em] uppercase text-[color:var(--aura-muted)]">Renk Uyumu</p>
