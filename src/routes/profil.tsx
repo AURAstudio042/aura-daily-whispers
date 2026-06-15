@@ -85,7 +85,7 @@ function SettingRow({ label, value, locked, onClick }: { label: string; value: s
       >
         <span className="text-[14px] text-white">{label}</span>
         <span className="flex items-center gap-2 text-[12px] text-[color:var(--aura-soft)]">
-          {locked && <span className="rounded-full bg-[color:var(--aura-lavender)]/15 px-2 py-0.5 text-[9px] tracking-wider text-[color:var(--aura-lavender)]">AURA+</span>}
+          {locked && <span className="rounded-full bg-gradient-to-r from-[#8b5cf6] to-[#b794d4] px-2 py-0.5 text-[9px] font-medium tracking-wider text-white">AURA+</span>}
           {value}
           <span className="text-[color:var(--aura-muted)]">›</span>
         </span>
