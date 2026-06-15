@@ -14,6 +14,7 @@ import {
   dailyQuote,
   dailyWeather,
 } from "@/lib/aura/data";
+import { useDailyPack } from "@/lib/aura/useDailyPack";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -27,19 +28,51 @@ export const Route = createFileRoute("/")({
 
 function BugunPage() {
   const [u, , ready] = useUser();
+  const packState = useDailyPack(u);
   if (!ready) return <div className="min-h-screen" />;
   if (!u) return <Onboarding />;
 
   const name = userName(u);
   const city = userCity(u);
   const z = zodiacOf(u);
-  const horo = dailyHoroscope(z, u.mood);
-  const colors = dailyColors(u.style, u.mood);
-  const outfit = dailyOutfit(z, u.style, u.mood);
-  const stone = dailyStone(z, u.mood);
-  const scent = dailyScent(u.mood);
-  const quote = dailyQuote();
   const weather = dailyWeather(city);
+
+  // Prefer AI-generated pack; fall back to deterministic mock if loading/erroring.
+  const aiPack =
+    packState.status === "ready"
+      ? packState.pack
+      : packState.status === "loading"
+      ? packState.cached
+      : packState.status === "error"
+      ? packState.cached
+      : undefined;
+
+  const horo = aiPack?.horoscope ?? dailyHoroscope(z, u.mood);
+  const colors = aiPack?.colors ?? dailyColors(u.style, u.mood);
+  const mockOutfit = dailyOutfit(z, u.style, u.mood);
+  const outfit = aiPack
+    ? {
+        top: aiPack.outfit.top,
+        bottom: aiPack.outfit.bottom,
+        shoe: aiPack.outfit.shoe,
+        access: aiPack.outfit.access,
+        lip: aiPack.outfit.lip,
+        jewelry: aiPack.outfit.jewelry,
+        harmony: aiPack.outfit.harmony,
+        inspiration: aiPack.styleInspiration,
+      }
+    : mockOutfit;
+  const stoneMock = dailyStone(z, u.mood);
+  const stone = aiPack
+    ? { kind: stoneMock.kind, name: aiPack.stone.name, meaning: aiPack.stone.meaning, tags: aiPack.stone.tags }
+    : stoneMock;
+  const scent = aiPack
+    ? { scents: aiPack.scent.notes, feel: aiPack.scent.feel }
+    : dailyScent(u.mood);
+  const quote = aiPack?.quote ?? dailyQuote();
+  const morning = aiPack?.morningMessage ?? greetingHint(z);
+  const isLoadingAI = packState.status === "loading";
+
 
   return (
     <AuraShell>
@@ -51,7 +84,10 @@ function BugunPage() {
           <div className="min-w-0">
             <p className="section-label">A · U · R · A · GÜNLÜK RİTÜELİN</p>
             <h1 className="mt-3 text-[42px] leading-[1.05] font-light text-white">Günaydın,<br/>{name} <span className="text-[color:var(--aura-lavender)]">✦</span></h1>
-            <p className="mt-3 text-[15px] italic text-[color:var(--aura-soft)]">{greetingHint(z)}</p>
+            <p className="mt-3 text-[15px] italic text-[color:var(--aura-soft)]">{morning}</p>
+            {isLoadingAI && (
+              <p className="mt-2 text-[10px] tracking-[0.3em] uppercase text-[color:var(--aura-muted)]">✦ AURA bugünün için ilham örüyor…</p>
+            )}
           </div>
           <div className="shrink-0 grid h-14 w-14 place-items-center rounded-full border border-[color:var(--border)] bg-white/[0.03] text-2xl text-white backdrop-blur-md" aria-label={`Burç: ${z}`}>
             {ZODIAC_SYMBOL[z]}
