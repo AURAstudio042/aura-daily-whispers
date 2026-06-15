@@ -62,7 +62,7 @@ export function ShareSignature() {
 
 export function Tag({ children }: { children: ReactNode }) {
   return (
-    <span className="rounded-full border border-[color:var(--border)] px-3 py-1 text-[10px] tracking-[0.25em] uppercase text-[color:var(--aura-soft)]">
+    <span className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1 text-[10px] tracking-[0.25em] uppercase text-white backdrop-blur-md">
       {children}
     </span>
   );
