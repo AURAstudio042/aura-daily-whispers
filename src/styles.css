@@ -4,20 +4,6 @@
 
 @custom-variant dark (&:is(.dark *));
 
-/*
- * Design system definition.
- *
- * The @theme inline block maps CSS custom properties to Tailwind utility
- * classes (e.g. --color-primary -> bg-primary, text-primary).
- *
- * The :root and .dark blocks define the actual color values using oklch.
- * All colors MUST use oklch format.
- *
- * To add a new semantic color:
- * 1. Add the variable to :root (light value) and .dark (dark value)
- * 2. Register it in @theme inline as --color-<name>: var(--<name>)
- */
-
 @theme inline {
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
@@ -25,7 +11,6 @@
   --radius-xl: calc(var(--radius) + 4px);
   --radius-2xl: calc(var(--radius) + 8px);
   --radius-3xl: calc(var(--radius) + 12px);
-  --radius-4xl: calc(var(--radius) + 16px);
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -45,100 +30,127 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
-  --color-ring-offset-background: var(--background);
-  --color-chart-1: var(--chart-1);
-  --color-chart-2: var(--chart-2);
-  --color-chart-3: var(--chart-3);
-  --color-chart-4: var(--chart-4);
-  --color-chart-5: var(--chart-5);
-  --color-sidebar: var(--sidebar);
-  --color-sidebar-foreground: var(--sidebar-foreground);
-  --color-sidebar-primary: var(--sidebar-primary);
-  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-  --color-sidebar-accent: var(--sidebar-accent);
-  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-  --color-sidebar-border: var(--sidebar-border);
-  --color-sidebar-ring: var(--sidebar-ring);
+  --color-aura-deep: var(--aura-deep);
+  --color-aura-soft: var(--aura-soft);
+  --color-aura-muted: var(--aura-muted);
+  --color-aura-lavender: var(--aura-lavender);
+  --color-aura-purple: var(--aura-purple);
+  --color-aura-gold: var(--aura-gold);
+  --font-serif: "Cormorant Garamond", serif;
+  --font-sans: "Jost", sans-serif;
 }
 
 :root {
-  --radius: 0.625rem;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.129 0.042 264.695);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.129 0.042 264.695);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.129 0.042 264.695);
-  --primary: oklch(0.208 0.042 265.755);
-  --primary-foreground: oklch(0.984 0.003 247.858);
-  --secondary: oklch(0.968 0.007 247.896);
-  --secondary-foreground: oklch(0.208 0.042 265.755);
-  --muted: oklch(0.968 0.007 247.896);
-  --muted-foreground: oklch(0.554 0.046 257.417);
-  --accent: oklch(0.968 0.007 247.896);
-  --accent-foreground: oklch(0.208 0.042 265.755);
-  --destructive: oklch(0.577 0.245 27.325);
-  --destructive-foreground: oklch(0.984 0.003 247.858);
-  --border: oklch(0.929 0.013 255.508);
-  --input: oklch(0.929 0.013 255.508);
-  --ring: oklch(0.704 0.04 256.788);
-  --chart-1: oklch(0.646 0.222 41.116);
-  --chart-2: oklch(0.6 0.118 184.704);
-  --chart-3: oklch(0.398 0.07 227.392);
-  --chart-4: oklch(0.828 0.189 84.429);
-  --chart-5: oklch(0.769 0.188 70.08);
-  --sidebar: oklch(0.984 0.003 247.858);
-  --sidebar-foreground: oklch(0.129 0.042 264.695);
-  --sidebar-primary: oklch(0.208 0.042 265.755);
-  --sidebar-primary-foreground: oklch(0.984 0.003 247.858);
-  --sidebar-accent: oklch(0.968 0.007 247.896);
-  --sidebar-accent-foreground: oklch(0.208 0.042 265.755);
-  --sidebar-border: oklch(0.929 0.013 255.508);
-  --sidebar-ring: oklch(0.704 0.04 256.788);
+  --radius: 1rem;
+  --background: #08060f;
+  --foreground: #ffffff;
+  --card: #110d1c;
+  --card-foreground: #ffffff;
+  --popover: #110d1c;
+  --popover-foreground: #ffffff;
+  --primary: #b794d4;
+  --primary-foreground: #08060f;
+  --secondary: #1a1428;
+  --secondary-foreground: #c0b0d0;
+  --muted: #1a1428;
+  --muted-foreground: #7a6a8a;
+  --accent: #2a1f3d;
+  --accent-foreground: #c0b0d0;
+  --destructive: #c84a4a;
+  --destructive-foreground: #ffffff;
+  --border: rgba(183, 148, 212, 0.15);
+  --input: rgba(183, 148, 212, 0.2);
+  --ring: #b794d4;
+
+  --aura-deep: #08060f;
+  --aura-soft: #c0b0d0;
+  --aura-muted: #7a6a8a;
+  --aura-lavender: #b794d4;
+  --aura-purple: #8b5cf6;
+  --aura-gold: #d4b078;
 }
 
 .dark {
-  --background: oklch(0.129 0.042 264.695);
-  --foreground: oklch(0.984 0.003 247.858);
-  --card: oklch(0.208 0.042 265.755);
-  --card-foreground: oklch(0.984 0.003 247.858);
-  --popover: oklch(0.208 0.042 265.755);
-  --popover-foreground: oklch(0.984 0.003 247.858);
-  --primary: oklch(0.929 0.013 255.508);
-  --primary-foreground: oklch(0.208 0.042 265.755);
-  --secondary: oklch(0.279 0.041 260.031);
-  --secondary-foreground: oklch(0.984 0.003 247.858);
-  --muted: oklch(0.279 0.041 260.031);
-  --muted-foreground: oklch(0.704 0.04 256.788);
-  --accent: oklch(0.279 0.041 260.031);
-  --accent-foreground: oklch(0.984 0.003 247.858);
-  --destructive: oklch(0.704 0.191 22.216);
-  --destructive-foreground: oklch(0.984 0.003 247.858);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.551 0.027 264.364);
-  --chart-1: oklch(0.488 0.243 264.376);
-  --chart-2: oklch(0.696 0.17 162.48);
-  --chart-3: oklch(0.769 0.188 70.08);
-  --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: oklch(0.208 0.042 265.755);
-  --sidebar-foreground: oklch(0.984 0.003 247.858);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.984 0.003 247.858);
-  --sidebar-accent: oklch(0.279 0.041 260.031);
-  --sidebar-accent-foreground: oklch(0.984 0.003 247.858);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.551 0.027 264.364);
+  --background: #08060f;
 }
 
 @layer base {
-  * {
-    border-color: var(--color-border);
-  }
-
+  * { border-color: var(--color-border); }
+  html, body { background-color: var(--color-background); color: var(--color-foreground); }
   body {
-    background-color: var(--color-background);
-    color: var(--color-foreground);
+    font-family: var(--font-sans);
+    background-image:
+      radial-gradient(ellipse at top, rgba(139, 92, 246, 0.18), transparent 50%),
+      radial-gradient(ellipse at bottom right, rgba(183, 148, 212, 0.12), transparent 50%);
+    background-attachment: fixed;
+    min-height: 100vh;
   }
+  h1, h2, h3, h4, h5, .serif { font-family: var(--font-serif); letter-spacing: 0.01em; }
 }
+
+@utility aura-card {
+  background: linear-gradient(180deg, rgba(26, 20, 40, 0.85), rgba(17, 13, 28, 0.85));
+  border: 1px solid rgba(183, 148, 212, 0.12);
+  border-radius: 1.25rem;
+  backdrop-filter: blur(12px);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(183, 148, 212, 0.06);
+}
+
+@utility aura-card-dark {
+  background: linear-gradient(180deg, #0d0917 0%, #050309 100%);
+  border: 1px solid rgba(183, 148, 212, 0.18);
+  border-radius: 1.25rem;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(183, 148, 212, 0.08);
+}
+
+@utility section-label {
+  font-family: var(--font-sans);
+  font-size: 0.65rem;
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  color: var(--aura-muted);
+  font-weight: 500;
+}
+
+@utility aura-btn {
+  background: linear-gradient(135deg, #8b5cf6 0%, #b794d4 100%);
+  color: #08060f;
+  font-weight: 500;
+  letter-spacing: 0.1em;
+  border-radius: 999px;
+  padding: 0.875rem 1.5rem;
+  box-shadow: 0 8px 24px rgba(139, 92, 246, 0.35);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+@utility aura-btn-hover {
+  &:hover { transform: translateY(-1px); box-shadow: 0 12px 32px rgba(139, 92, 246, 0.5); }
+}
+
+@keyframes aura-pulse {
+  0%, 100% { opacity: 0.4; transform: scale(1); }
+  50% { opacity: 0.7; transform: scale(1.05); }
+}
+@keyframes aura-fade-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes aura-flip {
+  from { transform: rotateY(180deg); opacity: 0; }
+  to { transform: rotateY(0); opacity: 1; }
+}
+
+@utility animate-aura-pulse { animation: aura-pulse 4s ease-in-out infinite; }
+@utility animate-aura-fade-in { animation: aura-fade-in 0.6s ease-out both; }
+@utility animate-aura-flip { animation: aura-flip 0.8s ease-out both; }
+
+/* Gem styles */
+@utility gem {
+  width: 88px; height: 88px; border-radius: 50%; position: relative;
+  box-shadow: 0 0 40px currentColor, inset -8px -12px 24px rgba(0,0,0,0.4), inset 8px 12px 24px rgba(255,255,255,0.15);
+}
+@utility gem-aquamarine { background: radial-gradient(circle at 35% 30%, #b8f0ee, #5fbfc7 50%, #1e5a6b 100%); color: rgba(95, 191, 199, 0.5); }
+@utility gem-amethyst { background: radial-gradient(circle at 35% 30%, #d8b4fe, #9b6cd1 50%, #4a2470 100%); color: rgba(155, 108, 209, 0.5); }
+@utility gem-rose { background: radial-gradient(circle at 35% 30%, #ffd8e0, #f4a3b8 50%, #8a3a52 100%); color: rgba(244, 163, 184, 0.5); }
+@utility gem-carnelian { background: radial-gradient(circle at 35% 30%, #ffc4a0, #e07a4a 50%, #7a2a18 100%); color: rgba(224, 122, 74, 0.5); }
+@utility gem-onyx { background: radial-gradient(circle at 35% 30%, #4a4458, #1a1428 50%, #000000 100%); color: rgba(74, 68, 88, 0.6); }
+@utility gem-citrine { background: radial-gradient(circle at 35% 30%, #fff0a8, #e8c25a 50%, #8a6a1a 100%); color: rgba(232, 194, 90, 0.5); }
