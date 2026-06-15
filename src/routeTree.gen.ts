@@ -10,11 +10,17 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as HaftalikRouteImport } from './routes/haftalik'
+import { Route as ArsivRouteImport } from './routes/arsiv'
 import { Route as IndexRouteImport } from './routes/index'
 
 const HaftalikRoute = HaftalikRouteImport.update({
   id: '/haftalik',
   path: '/haftalik',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ArsivRoute = ArsivRouteImport.update({
+  id: '/arsiv',
+  path: '/arsiv',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -25,27 +31,31 @@ const IndexRoute = IndexRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/arsiv': typeof ArsivRoute
   '/haftalik': typeof HaftalikRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/arsiv': typeof ArsivRoute
   '/haftalik': typeof HaftalikRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/arsiv': typeof ArsivRoute
   '/haftalik': typeof HaftalikRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/haftalik'
+  fullPaths: '/' | '/arsiv' | '/haftalik'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/haftalik'
-  id: '__root__' | '/' | '/haftalik'
+  to: '/' | '/arsiv' | '/haftalik'
+  id: '__root__' | '/' | '/arsiv' | '/haftalik'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ArsivRoute: typeof ArsivRoute
   HaftalikRoute: typeof HaftalikRoute
 }
 
@@ -56,6 +66,13 @@ declare module '@tanstack/react-router' {
       path: '/haftalik'
       fullPath: '/haftalik'
       preLoaderRoute: typeof HaftalikRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/arsiv': {
+      id: '/arsiv'
+      path: '/arsiv'
+      fullPath: '/arsiv'
+      preLoaderRoute: typeof ArsivRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -70,6 +87,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ArsivRoute: ArsivRoute,
   HaftalikRoute: HaftalikRoute,
 }
 export const routeTree = rootRouteImport
