@@ -44,18 +44,20 @@ function BugunPage() {
   return (
     <AuraShell>
       {/* HEADER */}
-      <header className="relative mb-6 animate-aura-fade-in">
-        <div className="flex items-start justify-between">
-          <div>
+      <header className="relative mb-7 animate-aura-fade-in">
+        <div className="aura-glow -left-10 -top-16 h-56 w-56 bg-[#8b5cf6]/40" />
+        <div className="aura-glow -right-12 top-10 h-40 w-40 bg-[#b794d4]/25" />
+        <div className="relative flex items-start justify-between">
+          <div className="min-w-0">
             <p className="section-label">A · U · R · A · GÜNLÜK RİTÜELİN</p>
-            <h1 className="mt-3 text-4xl font-light text-white">Günaydın, {name} <span className="text-[color:var(--aura-lavender)]">✦</span></h1>
-            <p className="mt-2 text-[15px] italic text-[color:var(--aura-soft)]">{greetingHint(z)}</p>
+            <h1 className="mt-3 text-[42px] leading-[1.05] font-light text-white">Günaydın,<br/>{name} <span className="text-[color:var(--aura-lavender)]">✦</span></h1>
+            <p className="mt-3 text-[15px] italic text-[color:var(--aura-soft)]">{greetingHint(z)}</p>
           </div>
-          <div className="rounded-full border border-[color:var(--border)] p-3 text-2xl text-[color:var(--aura-lavender)]" aria-label={`Burç: ${z}`}>
+          <div className="shrink-0 grid h-14 w-14 place-items-center rounded-full border border-[color:var(--border)] bg-white/[0.03] text-2xl text-white backdrop-blur-md" aria-label={`Burç: ${z}`}>
             {ZODIAC_SYMBOL[z]}
           </div>
         </div>
-        <div className="mt-4 flex flex-wrap gap-2">
+        <div className="relative mt-5 flex flex-wrap gap-2">
           <Tag>{city}</Tag>
           <Tag>{z}</Tag>
           {u.mood && <Tag>{u.mood}</Tag>}
