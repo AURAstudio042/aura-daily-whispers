@@ -14,6 +14,7 @@ import {
   dailyQuote,
   dailyWeather,
 } from "@/lib/aura/data";
+import { useDailyPack } from "@/lib/aura/useDailyPack";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -34,14 +35,20 @@ function BugunPage() {
   const city = userCity(u);
   const z = zodiacOf(u);
   const weather = dailyWeather(city);
+  const { pack } = useDailyPack(u, { temp: weather.temp, cond: weather.cond });
 
-  const horo = dailyHoroscope(z, u.mood);
-  const colors = dailyColors(u.style, u.mood);
-  const outfit = dailyOutfit(z, u.style, u.mood);
-  const stone = dailyStone(z, u.mood);
-  const scent = dailyScent(u.mood);
-  const quote = dailyQuote();
-  const morning = greetingHint(z);
+  const horo = pack?.horoscope ?? dailyHoroscope(z, u.mood);
+  const colors = pack?.colors ?? dailyColors(u.style, u.mood);
+  const outfitAI = pack?.outfit;
+  const outfitMock = dailyOutfit(z, u.style, u.mood);
+  const outfit = outfitAI ?? outfitMock;
+  const stoneMock = dailyStone(z, u.mood);
+  const stone = pack?.stone
+    ? { kind: stoneMock.kind, name: pack.stone.name, meaning: pack.stone.meaning, tags: pack.stone.tags }
+    : stoneMock;
+  const scent = pack?.scent ?? dailyScent(u.mood);
+  const quote = pack?.quote ?? dailyQuote();
+  const morning = pack?.greeting ?? greetingHint(z);
 
 
 
