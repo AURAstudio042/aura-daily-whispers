@@ -83,7 +83,7 @@ export const generateDailyPack = createServerFn({ method: "POST" })
 
     const system = `Sen AURA'sın — kullanıcıya kendini özel hisstirmeyi amaçlayan, sıcak, şefkatli ve şiirsel bir günlük yaşam yoldaşısın. TÜM çıktılar Türkçe olmalı. Kibar, samimi, kişisel bir ton kullan. Klişelerden kaçın. Kullanıcının burcu, ruh hali, stili ve hava durumunu içselleştirerek yaz. Kıyafet önerisi hava durumuna uygun olmalı (yağmurda su geçirmez, soğukta katmanlı, sıcakta hafif). Renk hex kodları geçerli olmalı.`;
 
-    const prompt = `Bugünün kişisel paketini hazırla:\n\n${context}`;
+    const prompt = `Bugünün kişisel paketini hazırla ve sonucu JSON formatında döndür:\n\n${context}`;
 
     const { experimental_output } = await generateText({
       model: gateway("openai/gpt-5-mini"),
