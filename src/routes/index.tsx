@@ -128,7 +128,7 @@ function BugunPage() {
             <p className="mt-1 text-[13px] text-[color:var(--aura-soft)]">{stone.meaning}</p>
             <div className="mt-3 flex flex-wrap gap-2">
               {stone.tags.map((t) => (
-                <span key={t} className="rounded-full bg-[color:var(--aura-lavender)]/10 px-2.5 py-1 text-[10px] tracking-wider text-[color:var(--aura-lavender)]">
+                <span key={t} className="pill-light rounded-full px-2.5 py-1 text-[10px] tracking-[0.15em] uppercase">
                   {t}
                 </span>
               ))}
