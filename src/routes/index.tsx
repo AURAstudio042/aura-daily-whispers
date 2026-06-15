@@ -35,7 +35,7 @@ function BugunPage() {
   const z = zodiacOf(u);
   const horo = dailyHoroscope(z, u.mood);
   const colors = dailyColors(u.style, u.mood);
-  const outfit = dailyOutfit(z + (u.style ?? ""));
+  const outfit = dailyOutfit(z, u.style, u.mood);
   const stone = dailyStone(z, u.mood);
   const scent = dailyScent(u.mood);
   const quote = dailyQuote();
