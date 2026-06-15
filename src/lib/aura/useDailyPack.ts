@@ -6,13 +6,19 @@ import { zodiacOf } from "./store";
 
 function todayStamp(): string {
   const d = new Date();
-  return `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`;
+  const mm = String(d.getMonth() + 1).padStart(2, "0");
+  const dd = String(d.getDate()).padStart(2, "0");
+  return `${d.getFullYear()}-${mm}-${dd}`;
+}
+
+function userIdOf(u: AuraUser): string {
+  return `${u.name}_${u.birthDate}`.replace(/[^a-zA-Z0-9_-]/g, "");
 }
 
 function cacheKey(u: AuraUser): string {
-  const sig = `${u.name}|${u.birthDate}|${u.city}|${u.style}|${u.mood ?? ""}`;
-  return `aura:pack:${todayStamp()}:${sig}`;
+  return `aura_daily_${userIdOf(u)}_${todayStamp()}`;
 }
+
 
 export function useDailyPack(
   user: AuraUser | null,
