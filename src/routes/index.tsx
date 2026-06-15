@@ -138,7 +138,7 @@ function BugunPage() {
         <Sep />
         <p className="text-[11px] tracking-[0.3em] uppercase text-[color:var(--aura-muted)]">Makyaj & Detay</p>
         <p className="mt-1 text-[14px] text-[color:var(--aura-soft)]">
-          Ruj: <span className="text-white">{outfit.lip}</span> · Takı: <span className="text-white">{outfit.jewelry}</span>
+          {outfit.makeup ?? <>Ruj: <span className="text-white">{outfit.lip}</span> · Takı: <span className="text-white">{outfit.jewelry}</span></>}
         </p>
         <Sep />
         <p className="text-[11px] tracking-[0.3em] uppercase text-[color:var(--aura-muted)]">Renk Uyumu</p>
