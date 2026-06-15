@@ -9,10 +9,16 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as ProfilRouteImport } from './routes/profil'
 import { Route as HaftalikRouteImport } from './routes/haftalik'
 import { Route as ArsivRouteImport } from './routes/arsiv'
 import { Route as IndexRouteImport } from './routes/index'
 
+const ProfilRoute = ProfilRouteImport.update({
+  id: '/profil',
+  path: '/profil',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const HaftalikRoute = HaftalikRouteImport.update({
   id: '/haftalik',
   path: '/haftalik',
@@ -33,34 +39,45 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/arsiv': typeof ArsivRoute
   '/haftalik': typeof HaftalikRoute
+  '/profil': typeof ProfilRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/arsiv': typeof ArsivRoute
   '/haftalik': typeof HaftalikRoute
+  '/profil': typeof ProfilRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/arsiv': typeof ArsivRoute
   '/haftalik': typeof HaftalikRoute
+  '/profil': typeof ProfilRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/arsiv' | '/haftalik'
+  fullPaths: '/' | '/arsiv' | '/haftalik' | '/profil'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/arsiv' | '/haftalik'
-  id: '__root__' | '/' | '/arsiv' | '/haftalik'
+  to: '/' | '/arsiv' | '/haftalik' | '/profil'
+  id: '__root__' | '/' | '/arsiv' | '/haftalik' | '/profil'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ArsivRoute: typeof ArsivRoute
   HaftalikRoute: typeof HaftalikRoute
+  ProfilRoute: typeof ProfilRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/profil': {
+      id: '/profil'
+      path: '/profil'
+      fullPath: '/profil'
+      preLoaderRoute: typeof ProfilRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/haftalik': {
       id: '/haftalik'
       path: '/haftalik'
@@ -89,6 +106,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ArsivRoute: ArsivRoute,
   HaftalikRoute: HaftalikRoute,
+  ProfilRoute: ProfilRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

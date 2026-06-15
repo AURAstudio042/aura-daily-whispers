@@ -257,7 +257,7 @@ export function dailyWeather(city: string) {
   const temp = 8 + (seedFor("temp-" + city) % 22);
   return { ...w, temp, city };
 }
-function seedFor2(salt: string) { return Math.abs([...salt].reduce((a, c) => (a * 31 + c.charCodeAt(0)) | 0, 0)); }
+
 
 // ── Greeting
 export function greetingHint(z: ZodiacKey): string {
