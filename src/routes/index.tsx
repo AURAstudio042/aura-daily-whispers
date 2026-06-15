@@ -30,7 +30,7 @@ function BugunPage() {
   const [u, , ready] = useUser();
   const city = userCity(u);
   const weather = dailyWeather(city);
-  const { pack } = useDailyPack(u, { temp: weather.temp, cond: weather.cond });
+  const { pack, loading } = useDailyPack(u, { temp: weather.temp, cond: weather.cond });
 
   if (!ready) return <div className="min-h-screen" />;
   if (!u) return <Onboarding />;
@@ -40,14 +40,29 @@ function BugunPage() {
 
   const horo = pack?.horoscope ?? dailyHoroscope(z, u.mood);
   const colors = pack?.colors ?? dailyColors(u.style, u.mood);
-  const outfitAI = pack?.outfit;
   const outfitMock = dailyOutfit(z, u.style, u.mood);
-  const outfit = outfitAI ?? outfitMock;
+  const outfit = {
+    top: pack?.outfit.top ?? outfitMock.top,
+    bottom: pack?.outfit.bottom ?? outfitMock.bottom,
+    shoe: pack?.outfit.shoes ?? outfitMock.shoe,
+    access: pack?.outfit.accessory ?? outfitMock.access,
+    lip: outfitMock.lip,
+    jewelry: outfitMock.jewelry,
+    harmony: pack?.colorNote ?? outfitMock.harmony,
+    inspiration: pack?.styleInspo ?? outfitMock.inspiration,
+    makeup: pack?.makeup ?? null as string | null,
+  };
   const stoneMock = dailyStone(z, u.mood);
-  const stone = pack?.stone
-    ? { kind: stoneMock.kind, name: pack.stone.name, meaning: pack.stone.meaning, tags: pack.stone.tags }
-    : stoneMock;
-  const scent = pack?.scent ?? dailyScent(u.mood);
+  const stone = {
+    kind: stoneMock.kind,
+    name: pack?.stone.name ?? stoneMock.name,
+    meaning: pack?.stone.meaning ?? stoneMock.meaning,
+    tags: stoneMock.tags,
+  };
+  const scentMock = dailyScent(u.mood);
+  const scent = pack?.scent
+    ? { scents: pack.scent.names.split(/[,·]\s*/).map((s) => s.trim()).filter(Boolean), feel: pack.scent.feeling }
+    : { scents: scentMock.scents, feel: scentMock.feel };
   const quote = pack?.quote ?? dailyQuote();
   const morning = pack?.greeting ?? greetingHint(z);
 
