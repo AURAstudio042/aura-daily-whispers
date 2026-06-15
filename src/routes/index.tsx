@@ -14,7 +14,6 @@ import {
   dailyQuote,
   dailyWeather,
 } from "@/lib/aura/data";
-import { useDailyPack } from "@/lib/aura/useDailyPack";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -28,7 +27,6 @@ export const Route = createFileRoute("/")({
 
 function BugunPage() {
   const [u, , ready] = useUser();
-  const packState = useDailyPack(u);
   if (!ready) return <div className="min-h-screen" />;
   if (!u) return <Onboarding />;
 
@@ -37,41 +35,15 @@ function BugunPage() {
   const z = zodiacOf(u);
   const weather = dailyWeather(city);
 
-  // Prefer AI-generated pack; fall back to deterministic mock if loading/erroring.
-  const aiPack =
-    packState.status === "ready"
-      ? packState.pack
-      : packState.status === "loading"
-      ? packState.cached
-      : packState.status === "error"
-      ? packState.cached
-      : undefined;
+  const horo = dailyHoroscope(z, u.mood);
+  const colors = dailyColors(u.style, u.mood);
+  const outfit = dailyOutfit(z, u.style, u.mood);
+  const stone = dailyStone(z, u.mood);
+  const scent = dailyScent(u.mood);
+  const quote = dailyQuote();
+  const morning = greetingHint(z);
 
-  const horo = aiPack?.horoscope ?? dailyHoroscope(z, u.mood);
-  const colors = aiPack?.colors ?? dailyColors(u.style, u.mood);
-  const mockOutfit = dailyOutfit(z, u.style, u.mood);
-  const outfit = aiPack
-    ? {
-        top: aiPack.outfit.top,
-        bottom: aiPack.outfit.bottom,
-        shoe: aiPack.outfit.shoe,
-        access: aiPack.outfit.access,
-        lip: aiPack.outfit.lip,
-        jewelry: aiPack.outfit.jewelry,
-        harmony: aiPack.outfit.harmony,
-        inspiration: aiPack.styleInspiration,
-      }
-    : mockOutfit;
-  const stoneMock = dailyStone(z, u.mood);
-  const stone = aiPack
-    ? { kind: stoneMock.kind, name: aiPack.stone.name, meaning: aiPack.stone.meaning, tags: aiPack.stone.tags }
-    : stoneMock;
-  const scent = aiPack
-    ? { scents: aiPack.scent.notes, feel: aiPack.scent.feel }
-    : dailyScent(u.mood);
-  const quote = aiPack?.quote ?? dailyQuote();
-  const morning = aiPack?.morningMessage ?? greetingHint(z);
-  const isLoadingAI = packState.status === "loading";
+
 
 
   return (
