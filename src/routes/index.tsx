@@ -84,7 +84,10 @@ function BugunPage() {
           <div className="min-w-0">
             <p className="section-label">A · U · R · A · GÜNLÜK RİTÜELİN</p>
             <h1 className="mt-3 text-[42px] leading-[1.05] font-light text-white">Günaydın,<br/>{name} <span className="text-[color:var(--aura-lavender)]">✦</span></h1>
-            <p className="mt-3 text-[15px] italic text-[color:var(--aura-soft)]">{greetingHint(z)}</p>
+            <p className="mt-3 text-[15px] italic text-[color:var(--aura-soft)]">{morning}</p>
+            {isLoadingAI && (
+              <p className="mt-2 text-[10px] tracking-[0.3em] uppercase text-[color:var(--aura-muted)]">✦ AURA bugünün için ilham örüyor…</p>
+            )}
           </div>
           <div className="shrink-0 grid h-14 w-14 place-items-center rounded-full border border-[color:var(--border)] bg-white/[0.03] text-2xl text-white backdrop-blur-md" aria-label={`Burç: ${z}`}>
             {ZODIAC_SYMBOL[z]}
