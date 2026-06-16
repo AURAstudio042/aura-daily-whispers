@@ -16,7 +16,10 @@ export type RewardsSummary = {
 
 const TRIAL_DAYS_PER_MILESTONE = 7;
 const MILESTONE_EVERY = 4;
-const SITE_URL = "https://aura.lovable.app";
+const SITE_URL =
+  (typeof process !== "undefined" && process.env?.PUBLIC_SITE_URL) ||
+  "https://aura.lovable.app";
+
 
 function mondayOfWeekUTC(d = new Date()): string {
   const day = d.getUTCDay(); // 0=Sun
@@ -171,13 +174,25 @@ export const redeemReferral = createServerFn({ method: "POST" })
       .eq("referrer_id", referrerId);
     const total = count ?? 0;
     if (total > 0 && total % MILESTONE_EVERY === 0) {
-      const ends = new Date(Date.now() + TRIAL_DAYS_PER_MILESTONE * 86400000);
-      await supabase.from("aura_plus_trials").insert({
-        user_id: referrerId,
-        ends_at: ends.toISOString(),
-        source: "referral_milestone",
-      });
+      // Idempotency: tag each milestone with a deterministic source so a
+      // re-run (race / retry) cannot grant the same milestone twice.
+      const milestoneSource = `referral_milestone_${total / MILESTONE_EVERY}`;
+      const { data: existingTrial } = await supabase
+        .from("aura_plus_trials")
+        .select("id")
+        .eq("user_id", referrerId)
+        .eq("source", milestoneSource)
+        .maybeSingle();
+      if (!existingTrial) {
+        const ends = new Date(Date.now() + TRIAL_DAYS_PER_MILESTONE * 86400000);
+        await supabase.from("aura_plus_trials").insert({
+          user_id: referrerId,
+          ends_at: ends.toISOString(),
+          source: milestoneSource,
+        });
+      }
     }
+
 
     return { ok: true };
   });

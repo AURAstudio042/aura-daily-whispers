@@ -35,33 +35,33 @@ export const getAdminStats = createServerFn({ method: "GET" })
     const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
     const startOfLastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1).toISOString();
 
-    const [total, today, profilesAll] = await Promise.all([
+    const [total, today, active7Res, active30Res, freeCount, plusCount, premiumCount, thisMonthRes, lastMonthRes] = await Promise.all([
       supabaseAdmin.from("profiles").select("id", { count: "exact", head: true }),
       supabaseAdmin.from("profiles").select("id", { count: "exact", head: true }).gte("created_at", startOfToday),
-      supabaseAdmin.from("profiles").select("tier, updated_at, city, zodiac_sign, style_type, created_at"),
+      supabaseAdmin.from("profiles").select("id", { count: "exact", head: true }).gte("updated_at", d7),
+      supabaseAdmin.from("profiles").select("id", { count: "exact", head: true }).gte("updated_at", d30),
+      supabaseAdmin.from("profiles").select("id", { count: "exact", head: true }).or("tier.eq.free,tier.is.null"),
+      supabaseAdmin.from("profiles").select("id", { count: "exact", head: true }).in("tier", ["plus", "aura+"]),
+      supabaseAdmin.from("profiles").select("id", { count: "exact", head: true }).eq("tier", "premium"),
+      supabaseAdmin.from("profiles").select("id", { count: "exact", head: true }).gte("created_at", startOfMonth),
+      supabaseAdmin.from("profiles").select("id", { count: "exact", head: true }).gte("created_at", startOfLastMonth).lt("created_at", startOfMonth),
     ]);
 
-    const profiles = profilesAll.data ?? [];
-    const active7 = profiles.filter((p: any) => p.updated_at && p.updated_at >= d7).length;
-    const active30 = profiles.filter((p: any) => p.updated_at && p.updated_at >= d30).length;
-    const tiers = { free: 0, plus: 0, premium: 0 };
-    for (const p of profiles as any[]) {
-      const t = (p.tier ?? "free") as "free" | "plus" | "premium";
-      tiers[t] = (tiers[t] ?? 0) + 1;
-    }
-    const totalCount = total.count ?? profiles.length;
-
-    const thisMonthNew = profiles.filter((p: any) => p.created_at >= startOfMonth).length;
-    const lastMonthNew = profiles.filter(
-      (p: any) => p.created_at >= startOfLastMonth && p.created_at < startOfMonth,
-    ).length;
+    const tiers = {
+      free: freeCount.count ?? 0,
+      plus: plusCount.count ?? 0,
+      premium: premiumCount.count ?? 0,
+    };
+    const totalCount = total.count ?? 0;
+    const thisMonthNew = thisMonthRes.count ?? 0;
+    const lastMonthNew = lastMonthRes.count ?? 0;
     const growthPct = lastMonthNew === 0 ? (thisMonthNew > 0 ? 100 : 0) : ((thisMonthNew - lastMonthNew) / lastMonthNew) * 100;
 
     return {
       totalUsers: totalCount,
       todayNew: today.count ?? 0,
-      active7,
-      active30,
+      active7: active7Res.count ?? 0,
+      active30: active30Res.count ?? 0,
       tiers,
       revenue: {
         plusCount: tiers.plus,
@@ -75,6 +75,7 @@ export const getAdminStats = createServerFn({ method: "GET" })
       },
     };
   });
+
 
 export const getUserMap = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
