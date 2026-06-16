@@ -11,6 +11,11 @@ export type AuraUser = {
   mood?: Mood;
   undertone?: string;
   hair?: string;
+  relationshipStatus?: string;
+  gender?: string;
+  lifeFocus?: string[];
+  hasChildren?: boolean;
+  hasPets?: boolean;
   createdAt: string;
 };
 
