@@ -1,9 +1,14 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
+import { useServerFn } from "@tanstack/react-start";
 
 import { AuraShell, SectionLabel } from "@/components/aura/Shell";
 import { Onboarding } from "@/components/aura/Onboarding";
 import { AuthScreen } from "@/components/aura/AuthScreen";
+import { RewardsCard } from "@/components/aura/RewardsCard";
+import { ReferralCard } from "@/components/aura/ReferralCard";
 import { useUser, userName, userCity, zodiacOf, clearUser } from "@/lib/aura/store";
+import { getRewardsSummary, type RewardsSummary } from "@/lib/aura/rewards.functions";
 
 export const Route = createFileRoute("/profil")({
   head: () => ({ meta: [{ title: "Profil ✦ AURA" }, { name: "description", content: "Profilin, ayarların ve AURA+ üyelik." }] }),
@@ -12,6 +17,14 @@ export const Route = createFileRoute("/profil")({
 
 function ProfilPage() {
   const [u, , ready, authed] = useUser();
+  const [rewards, setRewards] = useState<RewardsSummary | null>(null);
+  const fetchSummary = useServerFn(getRewardsSummary);
+
+  useEffect(() => {
+    if (!authed) return;
+    fetchSummary().then((s) => setRewards(s as RewardsSummary)).catch(() => {});
+  }, [authed, fetchSummary]);
+
   if (!ready) return <div className="min-h-screen" />;
   if (!authed) return <AuthScreen />;
   if (!u) return <Onboarding />;
@@ -37,6 +50,25 @@ function ProfilPage() {
           <span className="rounded-full border border-[color:var(--border)] px-3 py-1 text-[10px] tracking-[0.2em] uppercase text-[color:var(--aura-soft)]">{dateLabel}</span>
         </div>
       </header>
+
+      {/* Ödüllerim */}
+      {rewards && (
+        <RewardsCard
+          tarotCredits={rewards.tarotCreditsAvailable}
+          referralCount={rewards.referralCount}
+          trialDays={rewards.trialDaysEarned}
+          activeTrialEndsAt={rewards.activeTrialEndsAt}
+        />
+      )}
+
+      {/* Referral */}
+      {rewards && (
+        <ReferralCard
+          code={rewards.referralCode}
+          url={rewards.referralUrl}
+          count={rewards.referralCount}
+        />
+      )}
 
       {/* AURA+ */}
       <section
