@@ -35,6 +35,8 @@ function BugunPage() {
   const city = userCity(u);
   const mock = dailyWeather(city);
   const live = useDailyWeather(u?.city);
+  const shareRef = useRef<HTMLDivElement>(null);
+  const [sharing, setSharing] = useState(false);
   const weather = live
     ? { icon: live.icon, cond: live.cond, temp: live.temp, city: live.city, note: weatherNote(live) }
     : mock;
@@ -78,8 +80,6 @@ function BugunPage() {
 
 
 
-  const shareRef = useRef<HTMLDivElement>(null);
-  const [sharing, setSharing] = useState(false);
 
   const onShareAll = async () => {
     if (sharing) return;
