@@ -1,4 +1,6 @@
 import { createServerFn } from "@tanstack/react-start";
+import { z } from "zod";
+import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 export type LiveWeather = {
   temp: number;
@@ -27,8 +29,11 @@ const ICONS: Record<string, string> = {
   Tornado: "🌪️",
 };
 
+const InputSchema = z.object({ city: z.string().min(1).max(100) });
+
 export const fetchWeather = createServerFn({ method: "POST" })
-  .inputValidator((data: { city: string }) => data)
+  .middleware([requireSupabaseAuth])
+  .inputValidator((data: unknown) => InputSchema.parse(data))
   .handler(async ({ data }): Promise<{ weather: LiveWeather | null }> => {
     try {
       const key = process.env.OPENWEATHERMAP_API_KEY;
