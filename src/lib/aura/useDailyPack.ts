@@ -49,6 +49,11 @@ export function useDailyPack(
         style: user.style,
         city: user.city,
         weather,
+        relationshipStatus: user.relationshipStatus,
+        gender: user.gender,
+        lifeFocus: user.lifeFocus,
+        hasChildren: user.hasChildren,
+        hasPets: user.hasPets,
       },
     })
       .then((res) => {
