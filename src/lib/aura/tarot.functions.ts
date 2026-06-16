@@ -4,6 +4,7 @@ import { generateText } from "ai";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { createLovableAiGatewayProvider } from "@/lib/ai-gateway.server";
 import { TAROT_CATEGORIES, TAROT_DECK, pickCard, tarotLimitFor, type TarotLimit } from "./tarot-data";
+import { buildPersonalizationGuidance } from "./data";
 
 const CategoryEnum = z.enum(
   TAROT_CATEGORIES.map((c) => c.key) as [string, ...string[]],
