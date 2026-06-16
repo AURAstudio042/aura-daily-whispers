@@ -90,11 +90,6 @@ function ProfilPage() {
         <SettingRow label="Stil Tercihlerim" value={u.style} />
         <SettingRow label="Tema" value="Dark Luxury ✦" />
         <SettingRow label="Taş & Koku Arşivi" value="AURA+" locked />
-        <SettingRow
-          label="Mystic Card"
-          value={mystic ? "Açık" : "Reklam izle"}
-          onClick={() => setMystic(true)}
-        />
       </ul>
 
       <button
