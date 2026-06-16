@@ -59,6 +59,14 @@ async function ensureCode(supabase: any, userId: string): Promise<string> {
   return code;
 }
 
+// Privileged writes: users cannot self-grant rewards via RLS, so any
+// reward issuance must go through the service-role client after the
+// server has validated the request.
+async function getAdmin() {
+  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  return supabaseAdmin;
+}
+
 export const getRewardsSummary = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }): Promise<RewardsSummary> => {
