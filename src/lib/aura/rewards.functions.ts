@@ -16,7 +16,10 @@ export type RewardsSummary = {
 
 const TRIAL_DAYS_PER_MILESTONE = 7;
 const MILESTONE_EVERY = 4;
-const SITE_URL = "https://aura.lovable.app";
+const SITE_URL =
+  (typeof process !== "undefined" && process.env?.PUBLIC_SITE_URL) ||
+  "https://aura.lovable.app";
+
 
 function mondayOfWeekUTC(d = new Date()): string {
   const day = d.getUTCDay(); // 0=Sun
