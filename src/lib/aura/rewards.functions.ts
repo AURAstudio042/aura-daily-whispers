@@ -175,13 +175,14 @@ export const redeemReferral = createServerFn({ method: "POST" })
     const referrerId = codeRow.user_id as string;
     if (referrerId === userId) return { ok: false, reason: "self" };
 
-    const { error: insErr } = await supabase.from("referrals").insert({
+    const { error: insErr } = await admin.from("referrals").insert({
       referrer_id: referrerId,
       referred_user_id: userId,
       code,
       rewarded_at: new Date().toISOString(),
     });
     if (insErr) return { ok: false, reason: "error" };
+
 
     // Grant credits: 1 for referrer, 1 welcome for new user (privileged)
     await admin.from("bonus_tarot_credits").insert([
