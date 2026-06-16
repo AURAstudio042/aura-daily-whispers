@@ -18,7 +18,11 @@ export const Route = createFileRoute("/stilist")({
   component: StylistPage,
 });
 
-type Msg = { role: "user" | "assistant"; content: string };
+type Msg = {
+  role: "user" | "assistant";
+  content: string;
+  image?: string;
+};
 
 const SAMPLE_PROMPTS = [
   "Düğüne ne giyeyim? 💒",
@@ -37,14 +41,41 @@ function timeOfDayLabel(): string {
   return "gece";
 }
 
+async function fileToCompressedDataUrl(file: File, maxDim = 1280, quality = 0.82): Promise<string> {
+  const buf = await file.arrayBuffer();
+  const blob = new Blob([buf], { type: file.type || "image/jpeg" });
+  const url = URL.createObjectURL(blob);
+  try {
+    const img = await new Promise<HTMLImageElement>((resolve, reject) => {
+      const i = new Image();
+      i.onload = () => resolve(i);
+      i.onerror = reject;
+      i.src = url;
+    });
+    const scale = Math.min(1, maxDim / Math.max(img.width, img.height));
+    const w = Math.max(1, Math.round(img.width * scale));
+    const h = Math.max(1, Math.round(img.height * scale));
+    const canvas = document.createElement("canvas");
+    canvas.width = w;
+    canvas.height = h;
+    const ctx = canvas.getContext("2d")!;
+    ctx.drawImage(img, 0, 0, w, h);
+    return canvas.toDataURL("image/jpeg", quality);
+  } finally {
+    URL.revokeObjectURL(url);
+  }
+}
+
 function StylistPage() {
   const [u, , ready, authed] = useUser();
   const weather = useDailyWeather(u?.city);
   const [tier, setTier] = useState<string | null>(null);
   const [messages, setMessages] = useState<Msg[]>([]);
   const [input, setInput] = useState("");
+  const [pendingImage, setPendingImage] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const fileRef = useRef<HTMLInputElement>(null);
 
   const fetchStatus = useServerFn(getStylistStatus);
   const ask = useServerFn(askStylist);
@@ -65,24 +96,35 @@ function StylistPage() {
   const isPremium = tier === "premium";
   const name = userName(u);
 
-  const send = async (text: string) => {
+  const send = async (text: string, imageDataUrl?: string | null) => {
     const t = text.trim();
-    if (!t || loading) return;
-    const nextMessages: Msg[] = [...messages, { role: "user", content: t }];
+    const img = imageDataUrl ?? pendingImage;
+    if ((!t && !img) || loading) return;
+
+    const userMsg: Msg = {
+      role: "user",
+      content: t || (img ? "Bu kombinim için ne düşünüyorsun?" : ""),
+      image: img ?? undefined,
+    };
+    const nextMessages: Msg[] = [...messages, userMsg];
     setMessages(nextMessages);
     setInput("");
+    setPendingImage(null);
     setLoading(true);
     try {
       const r = await ask({
         data: {
-          message: t,
-          history: messages.slice(-10),
+          message: userMsg.content,
+          imageDataUrl: img ?? undefined,
+          history: messages.slice(-10).map((m) => ({ role: m.role, content: m.content })),
           context: {
             name,
             style: u.style,
             zodiac: zodiacOf(u),
             city: userCity(u),
-            weather: weather ? `${weather.icon} ${Math.round(weather.temp)}°C · ${weather.cond} · ${weatherNote(weather)}` : undefined,
+            weather: weather
+              ? `${weather.icon} ${Math.round(weather.temp)}°C · ${weather.cond} · ${weatherNote(weather)}`
+              : undefined,
             timeOfDay: timeOfDayLabel(),
           },
         },
@@ -92,10 +134,30 @@ function StylistPage() {
     } catch {
       setMessages([
         ...nextMessages,
-        { role: "assistant", content: "Şu an bağlantı kurulamıyor, birazdan tekrar dene." },
+        {
+          role: "assistant",
+          content: img
+            ? "Fotoğrafı analiz edemedim, tekrar dener misin?"
+            : "Şu an bağlantı kurulamıyor, birazdan tekrar dene.",
+        },
       ]);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handlePhotoPick = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file) return;
+    try {
+      const dataUrl = await fileToCompressedDataUrl(file);
+      setPendingImage(dataUrl);
+    } catch {
+      setMessages((m) => [
+        ...m,
+        { role: "assistant", content: "Fotoğrafı okuyamadım, tekrar dener misin?" },
+      ]);
     }
   };
 
@@ -121,7 +183,7 @@ function StylistPage() {
           <div className="serif text-6xl text-white/40">✦</div>
           <p className="serif mt-4 text-[22px] italic text-white">Stilist sahnede değil.</p>
           <p className="mt-2 text-[13px] text-[color:var(--aura-soft)]">
-            AI Stilist yalnızca AURA Premium üyelerine açıktır. Kişisel kombin önerileri, renk paleti ve aksesuar dokunuşları için kilidi aç.
+            AI Stilist yalnızca AURA Premium üyelerine açıktır. Kişisel kombin önerileri, fotoğraf analizi, renk paleti ve aksesuar dokunuşları için kilidi aç.
           </p>
           <Link to="/profil" className="aura-btn aura-btn-hover mt-5 inline-block px-6 text-[12px]">
             ✦ AURA Premium ile Aç ✦
@@ -156,7 +218,7 @@ function StylistPage() {
                 <div>
                   <div className="serif text-5xl text-[color:var(--aura-lavender)]/70">✦</div>
                   <p className="mt-3 text-[13px] italic text-[color:var(--aura-soft)]">
-                    Bir şey sor, AURA sana özel bir kombin önersin.
+                    Bir şey sor ya da kombinini paylaş, AURA sana özel bir yorum yapsın.
                   </p>
                 </div>
               </div>
@@ -170,13 +232,22 @@ function StylistPage() {
                 >
                   {m.role === "user" ? (
                     <div
-                      className="max-w-[82%] rounded-2xl rounded-tr-sm px-4 py-2.5 text-[13px] leading-relaxed text-white shadow-lg"
+                      className="max-w-[82%] overflow-hidden rounded-2xl rounded-tr-sm text-[13px] leading-relaxed text-white shadow-lg"
                       style={{
                         background: "linear-gradient(135deg, #8b5cf6 0%, #b794d4 100%)",
                         boxShadow: "0 8px 24px rgba(139,92,246,0.25)",
                       }}
                     >
-                      {m.content}
+                      {m.image && (
+                        <img
+                          src={m.image}
+                          alt="Kombin"
+                          className="block max-h-72 w-full object-cover"
+                        />
+                      )}
+                      {m.content && (
+                        <div className="px-4 py-2.5">{m.content}</div>
+                      )}
                     </div>
                   ) : (
                     <div
@@ -196,11 +267,50 @@ function StylistPage() {
                     className="max-w-[60%] rounded-2xl rounded-tl-sm border border-[color:var(--border)] px-4 py-3 text-[12px] italic text-[color:var(--aura-soft)]"
                     style={{ background: "linear-gradient(160deg, #0b0716 0%, #1a0f2e 100%)" }}
                   >
-                    ✦ AURA düşünüyor…
+                    ✦ AURA {pendingImage || messages[messages.length - 1]?.image ? "kombinine bakıyor" : "düşünüyor"}…
                   </div>
                 </div>
               )}
             </div>
+          </div>
+
+          {/* Pending image preview */}
+          {pendingImage && (
+            <div className="mb-2 flex items-center gap-3 rounded-2xl border border-[color:var(--border)] bg-white/[0.03] p-2 animate-aura-fade-in">
+              <img src={pendingImage} alt="Seçilen kombin" className="h-14 w-14 rounded-xl object-cover" />
+              <div className="flex-1 text-[11px] text-[color:var(--aura-soft)]">
+                Kombinin hazır. Bir not ekleyebilir ya da direkt gönderebilirsin.
+              </div>
+              <button
+                onClick={() => setPendingImage(null)}
+                className="rounded-full border border-[color:var(--border)] px-3 py-1 text-[10px] tracking-[0.2em] uppercase text-[color:var(--aura-muted)] hover:text-white"
+              >
+                Vazgeç
+              </button>
+            </div>
+          )}
+
+          {/* Photo button */}
+          <div className="mb-2">
+            <button
+              type="button"
+              onClick={() => fileRef.current?.click()}
+              disabled={loading}
+              className="inline-flex items-center gap-2 rounded-full border border-[color:var(--aura-lavender)]/40 bg-[color:var(--aura-purple)]/15 px-4 py-2 text-[11px] text-white transition hover:border-[color:var(--aura-lavender)]/80 disabled:opacity-50"
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
+                <circle cx="12" cy="13" r="4" />
+              </svg>
+              Kombinini Paylaş 📸
+            </button>
+            <input
+              ref={fileRef}
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={handlePhotoPick}
+            />
           </div>
 
           {/* Composer */}
@@ -215,12 +325,12 @@ function StylistPage() {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               disabled={loading}
-              placeholder="Bir şey sor..."
+              placeholder={pendingImage ? "Bir not ekle (opsiyonel)..." : "Bir şey sor..."}
               className="flex-1 rounded-full border border-[color:var(--border)] bg-white/[0.04] px-4 py-3 text-[13px] text-white placeholder:text-[color:var(--aura-muted)] outline-none focus:border-[color:var(--aura-lavender)]/60"
             />
             <button
               type="submit"
-              disabled={loading || !input.trim()}
+              disabled={loading || (!input.trim() && !pendingImage)}
               className="aura-btn aura-btn-hover px-5 py-3 text-[12px] disabled:opacity-50"
             >
               {loading ? "..." : "Gönder"}
