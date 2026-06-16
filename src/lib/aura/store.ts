@@ -46,6 +46,11 @@ function rowToUser(row: Record<string, unknown>): AuraUser {
     style: ((row.style_type as StyleType) ?? "Klasik") as StyleType,
     undertone: (row.skin_tone as string) ?? undefined,
     hair: (row.hair_color as string) ?? undefined,
+    relationshipStatus: (row.relationship_status as string) ?? undefined,
+    gender: (row.gender as string) ?? undefined,
+    lifeFocus: Array.isArray(row.life_focus) ? (row.life_focus as string[]) : undefined,
+    hasChildren: typeof row.has_children === "boolean" ? (row.has_children as boolean) : undefined,
+    hasPets: typeof row.has_pets === "boolean" ? (row.has_pets as boolean) : undefined,
     createdAt: (row.created_at as string) ?? new Date().toISOString(),
   };
 }
