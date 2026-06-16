@@ -118,10 +118,31 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <ReferralCapture />
+      <PageViewTracker />
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
       <Outlet />
     </QueryClientProvider>
   );
+}
+
+function PageViewTracker() {
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const last = useRef<string>("");
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (pathname.startsWith("/admin")) return;
+    if (last.current === pathname) return;
+    last.current = pathname;
+    (async () => {
+      try {
+        const { supabase } = await import("@/integrations/supabase/client");
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return;
+        await supabase.from("page_views").insert({ user_id: user.id, route: pathname });
+      } catch { /* ignore */ }
+    })();
+  }, [pathname]);
+  return null;
 }
 
 const REF_STORAGE_KEY = "aura:pending-ref";
