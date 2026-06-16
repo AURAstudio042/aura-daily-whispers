@@ -73,12 +73,21 @@ export const generateDailyPack = createServerFn({ method: "POST" })
       const gateway = createLovableAiGatewayProvider(key);
       const system = `Sen AURA'sın — kullanıcılara her gün kişiselleştirilmiş, sıcak, şiirsel ve özgün günlük ritüel içeriği üreten Türkçe bir asistan. Tüm çıktın Türkçe olmalı. Asla genel ifadeler kullanma — kullanıcının burcuna, ruh haline, stiline, şehrine ve havasına özgü, kişisel ve spesifik içerik üret. Yanıtın YALNIZCA geçerli bir JSON nesnesi olmalı, markdown veya açıklama olmadan.`;
 
+      const personalization = buildPersonalizationGuidance({
+        relationshipStatus: data.relationshipStatus,
+        gender: data.gender,
+        lifeFocus: data.lifeFocus,
+        hasChildren: data.hasChildren,
+        hasPets: data.hasPets,
+      });
+
       const user = `Kullanıcı: ${data.name}
 Burç: ${data.zodiac}
 Ruh hali: ${data.mood ?? "belirtilmemiş"}
 Stil: ${data.style ?? "belirtilmemiş"}
 Şehir: ${data.city}
 Hava: ${data.weather.temp}°C, ${data.weather.cond}
+${personalization ? "\n" + personalization + "\n" : ""}
 
 Aşağıdaki yapıya tam olarak uyan bir JSON üret:
 
