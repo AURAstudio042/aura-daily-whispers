@@ -128,6 +128,49 @@ function ArsivPage() {
         ))}
       </ul>
 
+      <SectionLabel n="☕" title="Kahve Fallarım" />
+      {coffees.length === 0 ? (
+        <p className="aura-card mb-6 p-5 text-[13px] text-[color:var(--aura-muted)]">
+          Henüz kahve falın yok.{" "}
+          <Link to="/kahve" className="text-[#d4a373] underline">
+            Fincanını çevir
+          </Link>
+          .
+        </p>
+      ) : (
+        <ul className="mb-6 space-y-3">
+          {coffees.slice(0, 10).map((r) => (
+            <li key={r.id} className="aura-card p-4">
+              <div className="flex gap-3">
+                {r.photo_url ? (
+                  <img
+                    src={r.photo_url}
+                    alt="Fincan"
+                    className="h-16 w-16 shrink-0 rounded-lg border border-white/10 object-cover"
+                  />
+                ) : (
+                  <div className="grid h-16 w-16 shrink-0 place-items-center rounded-lg border border-white/10 text-2xl">
+                    ☕
+                  </div>
+                )}
+                <div className="min-w-0 flex-1">
+                  <p className="text-[10px] tracking-[0.25em] uppercase text-[#d4a373]">
+                    {new Date(r.created_at).toLocaleDateString("tr-TR", {
+                      day: "2-digit",
+                      month: "long",
+                      year: "numeric",
+                    })}
+                  </p>
+                  <p className="mt-1 line-clamp-4 whitespace-pre-line text-[12px] text-[color:var(--aura-soft)]">
+                    {r.reading.replace(/^☕[^\n]*\n+/, "").slice(0, 240)}…
+                  </p>
+                </div>
+              </div>
+            </li>
+          ))}
+        </ul>
+      )}
+
       <SectionLabel n="♥" title="Kaydettiklerin" />
       {favs.length === 0 ? (
         <p className="aura-card p-5 text-[13px] text-[color:var(--aura-muted)]">Henüz favori söz yok. Beğendiğin bir sözü kaydet, burada görürsün.</p>
