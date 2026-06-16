@@ -112,7 +112,6 @@ const AnalyzeInput = z.object({
     .string()
     .max(12_000_000)
     .regex(/^data:image\/(png|jpeg|jpg|webp|heic|heif);base64,/i),
-  adWatched: z.boolean().optional(),
   context: z
     .object({
       name: z.string().optional(),
@@ -121,6 +120,41 @@ const AnalyzeInput = z.object({
     })
     .optional(),
 });
+
+// Server-issued, single-use ad grant for the free-tier coffee gate.
+// Replaces the client-controlled `adWatched` boolean so a free user cannot
+// receive a reading without going through the timed ad flow.
+export const claimCoffeeAd = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }): Promise<{ ok: boolean; reason?: "not_free" | "too_soon" | "already_pending" }> => {
+    const { supabase, userId } = context;
+    const tier = await fetchTier(supabase, userId);
+    if (tier !== "free") return { ok: false, reason: "not_free" };
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    // Reject if an unconsumed grant already exists (prevents stockpiling)
+    const { data: pending } = await supabaseAdmin
+      .from("coffee_ad_grants")
+      .select("id")
+      .eq("user_id", userId)
+      .is("consumed_at", null)
+      .limit(1)
+      .maybeSingle();
+    if (pending) return { ok: false, reason: "already_pending" };
+    // Min 4s between claims (the client countdown is 5s)
+    const { data: recent } = await supabaseAdmin
+      .from("coffee_ad_grants")
+      .select("created_at")
+      .eq("user_id", userId)
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    if (recent?.created_at && Date.now() - new Date(recent.created_at as string).getTime() < 4000) {
+      return { ok: false, reason: "too_soon" };
+    }
+    await supabaseAdmin.from("coffee_ad_grants").insert({ user_id: userId });
+    return { ok: true };
+  });
+
 
 async function uploadPhoto(
   supabase: any,
