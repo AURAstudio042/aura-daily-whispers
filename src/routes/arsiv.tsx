@@ -22,6 +22,15 @@ function ArsivPage() {
   const favs = useFavs();
   const now = new Date();
   const [month, setMonth] = useState(now.getMonth());
+  const [coffees, setCoffees] = useState<CoffeeReadingRow[]>([]);
+  const listCoffees = useServerFn(listCoffeeReadings);
+
+  useEffect(() => {
+    if (authed && u) {
+      listCoffees().then((rows) => setCoffees((rows as CoffeeReadingRow[]) ?? [])).catch(() => {});
+    }
+  }, [authed, u, listCoffees]);
+
 
   const days = useMemo(() => {
     const year = now.getFullYear();
