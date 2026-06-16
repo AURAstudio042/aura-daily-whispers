@@ -41,6 +41,7 @@ function KahvePage() {
   const [u, , ready, authed] = useUser();
   const statusFn = useServerFn(getCoffeeStatus);
   const analyzeFn = useServerFn(analyzeCoffeeReading);
+  const claimAdFn = useServerFn(claimCoffeeAd);
   const listFn = useServerFn(listCoffeeReadings);
 
   const [status, setStatus] = useState<CoffeeStatus | null>(null);
