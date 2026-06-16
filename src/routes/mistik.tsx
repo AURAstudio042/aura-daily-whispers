@@ -103,7 +103,9 @@ function MistikPage() {
     if (unlimited) { drawCard(); return; }
     setAdWatching(true);
     // Mock ad: 3s wait, then draw
-    setTimeout(async () => {
+    if (adTimerRef.current) clearTimeout(adTimerRef.current);
+    adTimerRef.current = setTimeout(async () => {
+      adTimerRef.current = null;
       setAdWatching(false);
       await drawCard();
     }, 3000);
