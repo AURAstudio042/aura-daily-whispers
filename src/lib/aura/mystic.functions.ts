@@ -27,6 +27,7 @@ function extractJson(text: string): string {
 }
 
 export const generateMysticCard = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => InputSchema.parse(d))
   .handler(async ({ data }): Promise<MysticCardContent> => {
     try {
