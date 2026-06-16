@@ -327,10 +327,3 @@ function QuoteCard({ q }: { q: { text: string; author?: string; category: string
     </section>
   );
 }
-          </button>
-        </div>
-      </div>
-      <p className="mt-4 text-right text-[10px] tracking-[0.35em] text-[color:var(--aura-muted)]">— AURA ✨</p>
-    </section>
-  );
-}
