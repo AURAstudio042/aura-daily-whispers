@@ -131,6 +131,10 @@ function BugunPage() {
         </div>
       </div>
 
+      <NotifPermissionBanner name={name} hint={morning} />
+
+
+
       {/* 01 HOROSCOPE */}
       <Card shareTitle="Günlük Yorumun" shareText={horo}>
         <SectionLabel n="01" title="Günlük Yorumun" />
