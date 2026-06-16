@@ -89,6 +89,12 @@ function ProfilPage() {
           >
             ✦ AI Stilist'i Aç
           </Link>
+          <Link
+            to="/mektup"
+            className="rounded-full border border-white/40 px-4 py-2.5 text-[11px] tracking-[0.15em] text-white/90 hover:bg-white/10"
+          >
+            ✦ Gelecekteki Kendinden Mektup
+          </Link>
         </div>
       </section>
 
