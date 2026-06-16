@@ -5,6 +5,7 @@ import { Onboarding } from "@/components/aura/Onboarding";
 import { AuthScreen } from "@/components/aura/AuthScreen";
 import { useUser, userName, userCity, zodiacOf, toggleFav, useFavs } from "@/lib/aura/store";
 import { shareNodeAsStory } from "@/lib/aura/share";
+import { NotifPermissionBanner } from "@/components/aura/NotifPermissionBanner";
 import {
   ZODIAC_SYMBOL,
   greetingHint,
@@ -129,6 +130,10 @@ function BugunPage() {
           <p className="text-[12px] text-[color:var(--aura-muted)]">{weather.note}</p>
         </div>
       </div>
+
+      <NotifPermissionBanner name={name} hint={morning} />
+
+
 
       {/* 01 HOROSCOPE */}
       <Card shareTitle="Günlük Yorumun" shareText={horo}>
