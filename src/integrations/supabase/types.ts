@@ -86,6 +86,27 @@ export type Database = {
         }
         Relationships: []
       }
+      coffee_ad_grants: {
+        Row: {
+          consumed_at: string | null
+          created_at: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          consumed_at?: string | null
+          created_at?: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          consumed_at?: string | null
+          created_at?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       coffee_readings: {
         Row: {
           created_at: string
