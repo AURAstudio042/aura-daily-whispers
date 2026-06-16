@@ -19,7 +19,7 @@ export function weatherNote(w: LiveWeather): string {
   if (rainy) return "Şemsiyeni ve su geçirmez ayakkabını unutma. 🌧️";
   if (w.temp <= 10) return "Katmanlı giyinmek bugün iyi fikir. 🧥";
   if (w.temp >= 25) return "Hafif ve nefes alan kumaşlar tercih et. ☀️";
-  if (w.windSpeed >= 6 || w.main === "Squall") return "Saçını topla, hafif bir eşarp işine yarar. 💨";
+  if (w.windSpeed >= 6 || w.main === "Squall") return "Saçını topla, ince bir fular işine yarar. 💨";
   return "Bugün için hafif bir katman yeterli olabilir. ✦";
 }
 
