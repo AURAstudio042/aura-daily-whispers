@@ -1,9 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { AuraShell, SectionLabel, ShareSignature, Tag } from "@/components/aura/Shell";
 import { Onboarding } from "@/components/aura/Onboarding";
 import { AuthScreen } from "@/components/aura/AuthScreen";
 import { useUser, userName, userCity, zodiacOf, toggleFav, useFavs } from "@/lib/aura/store";
+import { shareNodeAsStory } from "@/lib/aura/share";
 import {
   ZODIAC_SYMBOL,
   greetingHint,
