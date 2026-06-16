@@ -23,7 +23,7 @@ export function AuraShell({ children }: { children: ReactNode }) {
     <div className="relative mx-auto min-h-screen w-full max-w-md pb-24 text-foreground">
       <div className="px-5 pt-6">{children}</div>
       <nav className="fixed bottom-0 left-1/2 z-50 w-full max-w-md -translate-x-1/2 border-t border-[color:var(--border)] bg-[#08060f]/85 backdrop-blur-xl">
-        <ul className="grid grid-cols-4">
+        <ul className="grid grid-cols-5">
           {TABS.map((t) => {
             const active = t.to === "/" ? pathname === "/" : pathname.startsWith(t.to);
             return (
