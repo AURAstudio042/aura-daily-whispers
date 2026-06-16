@@ -13,6 +13,7 @@ const TABS = [
   { to: "/", label: "Bugün", d: "M12 3l2.39 4.84L19.8 8.6l-3.9 3.8.92 5.36L12 15.27l-4.82 2.53.92-5.36L4.2 8.6l5.41-.76L12 3z" },
   { to: "/haftalik", label: "Haftalık", d: "M4 6h16M4 12h16M4 18h10" },
   { to: "/arsiv", label: "Arşiv", d: "M3 7h18v4H3zM5 11v9h14v-9M10 15h4" },
+  { to: "/mistik", label: "Mistik", d: "M12 3a6 6 0 016 6c0 3-2 4.5-2 7H8c0-2.5-2-4-2-7a6 6 0 016-6zM9 19h6M10 22h4" },
   { to: "/profil", label: "Profil", d: "M12 12a4 4 0 100-8 4 4 0 000 8zM4 21c0-4 4-6 8-6s8 2 8 6" },
 ] as const;
 
