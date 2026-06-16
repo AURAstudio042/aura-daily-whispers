@@ -1,10 +1,12 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { useEffect, useMemo, useState } from "react";
+import { useServerFn } from "@tanstack/react-start";
 import { AuraShell, SectionLabel } from "@/components/aura/Shell";
 import { Onboarding } from "@/components/aura/Onboarding";
 import { AuthScreen } from "@/components/aura/AuthScreen";
 import { useUser, useFavs, zodiacOf } from "@/lib/aura/store";
 import { dailyColors, dailyStone, dailyScent, QUOTES, pick } from "@/lib/aura/data";
+import { listCoffeeReadings, type CoffeeReadingRow } from "@/lib/aura/coffee.functions";
 
 export const Route = createFileRoute("/arsiv")({
   head: () => ({ meta: [{ title: "Arşiv ✦ AURA" }, { name: "description", content: "Geçmiş AURA günlerin ve kaydettiğin sözler." }] }),
