@@ -14,7 +14,99 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      daily_content: {
+        Row: {
+          content: Json
+          created_at: string
+          date: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          content: Json
+          created_at?: string
+          date: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          content?: Json
+          created_at?: string
+          date?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          birth_date: string | null
+          birth_time: string | null
+          city: string | null
+          created_at: string
+          hair_color: string | null
+          id: string
+          name: string | null
+          notification_time: string
+          skin_tone: string | null
+          style_type: string | null
+          updated_at: string
+          zodiac_sign: string | null
+        }
+        Insert: {
+          birth_date?: string | null
+          birth_time?: string | null
+          city?: string | null
+          created_at?: string
+          hair_color?: string | null
+          id: string
+          name?: string | null
+          notification_time?: string
+          skin_tone?: string | null
+          style_type?: string | null
+          updated_at?: string
+          zodiac_sign?: string | null
+        }
+        Update: {
+          birth_date?: string | null
+          birth_time?: string | null
+          city?: string | null
+          created_at?: string
+          hair_color?: string | null
+          id?: string
+          name?: string | null
+          notification_time?: string
+          skin_tone?: string | null
+          style_type?: string | null
+          updated_at?: string
+          zodiac_sign?: string | null
+        }
+        Relationships: []
+      }
+      saved_quotes: {
+        Row: {
+          id: string
+          quote_author: string | null
+          quote_text: string
+          saved_at: string
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          quote_author?: string | null
+          quote_text: string
+          saved_at?: string
+          user_id: string
+        }
+        Update: {
+          id?: string
+          quote_author?: string | null
+          quote_text?: string
+          saved_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
