@@ -68,6 +68,33 @@ export type Database = {
         }
         Relationships: []
       }
+      monthly_analyses: {
+        Row: {
+          content: Json
+          created_at: string
+          id: string
+          month: number
+          user_id: string
+          year: number
+        }
+        Insert: {
+          content: Json
+          created_at?: string
+          id?: string
+          month: number
+          user_id: string
+          year: number
+        }
+        Update: {
+          content?: Json
+          created_at?: string
+          id?: string
+          month?: number
+          user_id?: string
+          year?: number
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           birth_date: string | null
