@@ -217,12 +217,26 @@ GÜNÜN MESAJI:
 
 Eğer fotoğrafta kahve fincanı yoksa veya telve şekilleri hiç seçilemiyorsa, sadece şunu döndür: ${UNCLEAR_MARK}`;
 
+    const { data: prof } = await context.supabase
+      .from("profiles")
+      .select("relationship_status, gender, life_focus, has_children, has_pets")
+      .eq("id", context.userId)
+      .maybeSingle();
+    const personalization = buildPersonalizationGuidance({
+      relationshipStatus: prof?.relationship_status ?? undefined,
+      gender: prof?.gender ?? undefined,
+      lifeFocus: (prof?.life_focus as string[] | null) ?? undefined,
+      hasChildren: prof?.has_children ?? undefined,
+      hasPets: prof?.has_pets ?? undefined,
+    });
+
     const userContext = `Kullanıcı bilgileri:
 - İsim: ${c.name ?? "—"}
 - Burç: ${c.zodiac ?? "—"}
 - Ruh hali: ${c.mood ?? "—"}
+${personalization ? "\n" + personalization + "\n" : ""}
+Bu kullanıcının kahve fincanı fotoğrafını incele ve falını oku. Burç enerjisine doğal biçimde değin (zorlama). Yaşam bağlamına (ilişki, odak) doğal, ima yoluyla değin — asla doğrudan etiketleme. Spesifik ol — fincanın neresinde ne gördüğünü söyle (sol taraf, dip, kenar gibi).`;
 
-Bu kullanıcının kahve fincanı fotoğrafını incele ve falını oku. Burç enerjisine doğal biçimde değin (zorlama). Spesifik ol — fincanın neresinde ne gördüğünü söyle (sol taraf, dip, kenar gibi).`;
 
     try {
       const gateway = createLovableAiGatewayProvider(key);
