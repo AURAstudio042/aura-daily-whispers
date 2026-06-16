@@ -1,14 +1,23 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
+import { toast } from "sonner";
 
 import { AuraShell, SectionLabel } from "@/components/aura/Shell";
 import { Onboarding } from "@/components/aura/Onboarding";
 import { AuthScreen } from "@/components/aura/AuthScreen";
 import { RewardsCard } from "@/components/aura/RewardsCard";
 import { ReferralCard } from "@/components/aura/ReferralCard";
-import { useUser, userName, userCity, zodiacOf, clearUser } from "@/lib/aura/store";
+import { useUser, userName, userCity, zodiacOf, clearUser, saveUser } from "@/lib/aura/store";
 import { getRewardsSummary, type RewardsSummary } from "@/lib/aura/rewards.functions";
+import { STYLES, type StyleType } from "@/lib/aura/data";
+
+const NOTIF_TIME_KEY = "aura:notif-time";
+
+export const Route = createFileRoute("/profil")({
+  head: () => ({ meta: [{ title: "Profil ✦ AURA" }, { name: "description", content: "Profilin, ayarların ve AURA+ üyelik." }] }),
+  component: ProfilPage,
+});
 
 export const Route = createFileRoute("/profil")({
   head: () => ({ meta: [{ title: "Profil ✦ AURA" }, { name: "description", content: "Profilin, ayarların ve AURA+ üyelik." }] }),
