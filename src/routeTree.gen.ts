@@ -17,6 +17,7 @@ import { Route as MektupRouteImport } from './routes/mektup'
 import { Route as KahveRouteImport } from './routes/kahve'
 import { Route as HaftalikRouteImport } from './routes/haftalik'
 import { Route as ArsivRouteImport } from './routes/arsiv'
+import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 
 const TarotRoute = TarotRouteImport.update({
@@ -59,6 +60,11 @@ const ArsivRoute = ArsivRouteImport.update({
   path: '/arsiv',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -67,6 +73,7 @@ const IndexRoute = IndexRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
   '/arsiv': typeof ArsivRoute
   '/haftalik': typeof HaftalikRoute
   '/kahve': typeof KahveRoute
@@ -78,6 +85,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
   '/arsiv': typeof ArsivRoute
   '/haftalik': typeof HaftalikRoute
   '/kahve': typeof KahveRoute
@@ -90,6 +98,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
   '/arsiv': typeof ArsivRoute
   '/haftalik': typeof HaftalikRoute
   '/kahve': typeof KahveRoute
@@ -103,6 +112,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/admin'
     | '/arsiv'
     | '/haftalik'
     | '/kahve'
@@ -114,6 +124,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/admin'
     | '/arsiv'
     | '/haftalik'
     | '/kahve'
@@ -125,6 +136,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/admin'
     | '/arsiv'
     | '/haftalik'
     | '/kahve'
@@ -137,6 +149,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AdminRoute: typeof AdminRoute
   ArsivRoute: typeof ArsivRoute
   HaftalikRoute: typeof HaftalikRoute
   KahveRoute: typeof KahveRoute
@@ -205,6 +218,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ArsivRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -217,6 +237,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AdminRoute: AdminRoute,
   ArsivRoute: ArsivRoute,
   HaftalikRoute: HaftalikRoute,
   KahveRoute: KahveRoute,
