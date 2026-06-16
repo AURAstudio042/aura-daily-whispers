@@ -7,6 +7,7 @@ import { Onboarding } from "@/components/aura/Onboarding";
 import { useUser, userName, zodiacOf } from "@/lib/aura/store";
 import {
   analyzeCoffeeReading,
+  claimCoffeeAd,
   getCoffeeStatus,
   listCoffeeReadings,
   type CoffeeStatus,
@@ -40,6 +41,7 @@ function KahvePage() {
   const [u, , ready, authed] = useUser();
   const statusFn = useServerFn(getCoffeeStatus);
   const analyzeFn = useServerFn(analyzeCoffeeReading);
+  const claimAdFn = useServerFn(claimCoffeeAd);
   const listFn = useServerFn(listCoffeeReadings);
 
   const [status, setStatus] = useState<CoffeeStatus | null>(null);
@@ -85,7 +87,7 @@ function KahvePage() {
   if (!authed) return <AuthScreen />;
   if (!u) return <Onboarding />;
 
-  const runAnalysis = async (dataUrl: string, adWatched: boolean) => {
+  const runAnalysis = async (dataUrl: string) => {
     setAnalyzing(true);
     setError(null);
     setReading(null);
@@ -93,7 +95,6 @@ function KahvePage() {
       const res = (await analyzeFn({
         data: {
           imageDataUrl: dataUrl,
-          adWatched,
           context: {
             name: userName(u),
             zodiac: zodiacOf(u),
@@ -121,7 +122,19 @@ function KahvePage() {
     }
   };
 
-  const startAdAndAnalyze = (dataUrl: string) => {
+
+  const startAdAndAnalyze = async (dataUrl: string) => {
+    // Claim a server-side ad grant first; server validates and rate-limits.
+    try {
+      const claim = (await claimAdFn()) as { ok: boolean };
+      if (!claim?.ok) {
+        setError("Reklam doğrulanamadı, lütfen tekrar dene.");
+        return;
+      }
+    } catch {
+      setError("Reklam doğrulanamadı, lütfen tekrar dene.");
+      return;
+    }
     setAdWatching(true);
     setAdCountdown(5);
     if (adIntervalRef.current) clearInterval(adIntervalRef.current);
@@ -133,13 +146,14 @@ function KahvePage() {
             adIntervalRef.current = null;
           }
           setAdWatching(false);
-          runAnalysis(dataUrl, true);
+          runAnalysis(dataUrl);
           return 0;
         }
         return s - 1;
       });
     }, 1000);
   };
+
 
   const onFilePicked = async (file: File | null) => {
     if (!file) return;
@@ -161,7 +175,7 @@ function KahvePage() {
       if (status.requiresAd) {
         startAdAndAnalyze(dataUrl);
       } else {
-        runAnalysis(dataUrl, false);
+        runAnalysis(dataUrl);
       }
     } catch {
       setError("Fotoğrafı analiz edemedim. Lütfen daha net bir fotoğraf dene.");
