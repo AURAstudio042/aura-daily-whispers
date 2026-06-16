@@ -7,6 +7,7 @@ import { Onboarding } from "@/components/aura/Onboarding";
 import { useUser, userName, zodiacOf } from "@/lib/aura/store";
 import {
   analyzeCoffeeReading,
+  claimCoffeeAd,
   getCoffeeStatus,
   listCoffeeReadings,
   type CoffeeStatus,
