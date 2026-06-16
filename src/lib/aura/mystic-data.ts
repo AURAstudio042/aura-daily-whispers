@@ -7,6 +7,7 @@ export const MYSTIC_CATEGORIES = [
   "Mizah",
   "Derin",
   "Felsefi",
+  "Romantik",
 ] as const;
 export type MysticCategory = (typeof MYSTIC_CATEGORIES)[number];
 
@@ -18,24 +19,45 @@ export type MysticCardContent = {
 
 const F = (category: MysticCategory, quote: string, whisper: string): MysticCardContent => ({ category, quote, whisper });
 
-// High-quality, hand-written fallback pool (used only if AI fails).
+// High-quality, hand-written content pool. Used as fallback when AI is unavailable,
+// and as inspiration / tone reference for AI-generated personalized cards.
 export const MYSTIC_FALLBACK: MysticCardContent[] = [
-  F("Huzur", "Bazı şeyleri çözmek zorunda değilsin.", "Bugün kontrol değil, denge günü."),
-  F("Huzur", "Sessizlik bir cevaptır.", "Açıklamaya borcun yok."),
-  F("Güç", "Işığını kısmayı reddeden insanlar, bazı gözleri rahatsız eder.", "Sen rahatsız etmek için değil, parlamak için buradasın."),
-  F("Güç", "Geri adım atmak, geri çekilmek değildir.", "Bazen güç, yavaşlamayı seçtiğinde belli olur."),
-  F("Şefkat", "Kendine, en sevdiğin insana davrandığın gibi davran.", "Bugün önce sana iyi gel."),
-  F("Şefkat", "Yorulmak zayıflık değil, taşımanın kanıtıdır.", "Bırakmak da bir özen biçimidir."),
-  F("İddialı", "Sahne senin. Rolünü küçültme.", "Yer açmak için kendini küçültme."),
-  F("İddialı", "Hak etmek için izin beklemiyorsun.", "İstediğini, kibarca ama net iste."),
-  F("Ana karakter", "Hayatının başrolü olmak kibir değil, sorumluluktur.", "Bugün figüran gibi davranma."),
-  F("Ana karakter", "Sen sahneye çıkınca ışık değişir.", "Olduğun gibi içeri gir."),
-  F("Mizah", "Bugün hiçbir şey yapmadın ama en azından kötü karar da vermedin.", "Bu da bir başarı sayılır ☕"),
-  F("Mizah", "Drama sende değil, çevrende fazla.", "Sen sadece izleyici koltuğuna geç."),
-  F("Derin", "Bazı kapılar kapanmadı, sadece sana ait değiller.", "Yanlış kapıyı zorlamak da bir tür kayıptır."),
-  F("Derin", "Kaybettiğini sandığın şey, aslında yön değiştiriyordu.", "Gidenin arkasından bakma; o seni bırakmadı, akış değişti."),
-  F("Felsefi", "Olduğun yer, olman gereken yerdir; ama burada kalman gerekmez.", "Şimdi var olmak, sonra hareket etmeye engel değil."),
-  F("Felsefi", "Zaman kaybı diye bir şey yok; sadece dönüşüm var.", "Bekleme dediğin şey, içten içe büyüme."),
+  // HUZUR
+  F("Huzur", "Bazen en cesur şey, her şeyi bırakmak değil — olduğun yerde durmaktır.", "Bugün kontrol değil, teslim günü."),
+  F("Huzur", "Bir şeylerin hemen çözülmesi gerekmiyor. Bazı cevaplar zamanla gelir, zorlamayla değil.", "Sabır da bir güçtür."),
+
+  // GÜÇ
+  F("Güç", "Seni yıkmaya çalışan her şey, aslında ne kadar güçlü olduğunu test ediyor.", "Ve sen hâlâ buradasın."),
+  F("Güç", "Kendi sesini bastırmayı bıraktığın gün, hayatın gerçekten başlar.", "O ses senin rehberin."),
+
+  // ŞEFKAT
+  F("Şefkat", "Kendine karşı en sert eleştirmen olma. O içindeki ses sana ait, ama her söylediği doğru değil.", "Kendine biraz daha nazik ol."),
+  F("Şefkat", "Gösterdiğin çaba, aldığın sonuçtan çok daha değerlidir. Bunu unutma.", "Emek asla boşa gitmez."),
+
+  // İDDİALI
+  F("İddialı", "Herkesin seni anlamasına gerek yok. Kendini kaybetmediğin sürece sorun yok.", "Bazı insanlar seni ancak kaybettikten sonra anlar."),
+  F("İddialı", "Kendi ayakları üzerinde durmayı öğrenen bir kadın, hiçbir ayrılığı felaket olarak görmez.", "Özgürlük bazen yalnız kalmakla başlar."),
+
+  // ANA KARAKTER
+  F("Ana karakter", "Hayatının yan karakteri olmaya niyetin var mı? Yoksa sahne senin.", "Başrol her zaman seçimdir."),
+  F("Ana karakter", "Işığını kısmayı reddeden insanlar, bazı gözleri rahatsız eder. Bu senin sorunun değil.", "Parlamaya devam et."),
+
+  // DERİN
+  F("Derin", "Bazı kapılar kapanmadı. Sadece artık senin kapın değiller.", "Ait olduğun yer seni bekliyor."),
+  F("Derin", "İnsan en çok kaçtığı şeyin içinde olgunlaşır.", "Zorluğun içinde bir hediye var."),
+
+  // FELSEFİ
+  F("Felsefi", "Dünle beraber gitti cancağızım, ne kadar söz varsa düne ait.", "— Mevlana"),
+  F("Felsefi", "Mutluluk hayatının kalitesine değil, düşüncelerinin kalitesine bağlıdır.", "— Marcus Aurelius"),
+  F("Felsefi", "İnsanın elinden alınamayacak son özgürlüğü — tavrını seçebilmesidir.", "— Viktor Frankl"),
+
+  // MİZAH
+  F("Mizah", "Bugün büyük kararlar almak zorunda değilsin. Sadece iyi bir kahve iç.", "Bazen bu yeterli. ☕"),
+  F("Mizah", "Hakkımda konuşanlar kadar kendimle meşgul olsaydım, çoktan dünyayı değiştirmiştim.", "Ama işte buradayım. 😏"),
+
+  // ROMANTİK
+  F("Romantik", "Bazı insanlar hayatına girer, bazıları hayatının ta kendisi olur.", "Farkı hissediyorsun zaten."),
+  F("Romantik", "Sevelim, sevilelim; dünya kimseye kalmaz.", "— Yunus Emre"),
 ];
 
 export type TimeOfDay = "sabah" | "öğle" | "akşam" | "gece";
