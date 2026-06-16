@@ -50,6 +50,7 @@ export type Database = {
           notification_time: string
           skin_tone: string | null
           style_type: string | null
+          tier: string
           updated_at: string
           zodiac_sign: string | null
         }
@@ -64,6 +65,7 @@ export type Database = {
           notification_time?: string
           skin_tone?: string | null
           style_type?: string | null
+          tier?: string
           updated_at?: string
           zodiac_sign?: string | null
         }
@@ -78,6 +80,7 @@ export type Database = {
           notification_time?: string
           skin_tone?: string | null
           style_type?: string | null
+          tier?: string
           updated_at?: string
           zodiac_sign?: string | null
         }
@@ -103,6 +106,36 @@ export type Database = {
           quote_author?: string | null
           quote_text?: string
           saved_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      tarot_readings: {
+        Row: {
+          card_meaning: string
+          card_name: string
+          category: string
+          created_at: string
+          id: string
+          interpretation: string
+          user_id: string
+        }
+        Insert: {
+          card_meaning: string
+          card_name: string
+          category: string
+          created_at?: string
+          id?: string
+          interpretation: string
+          user_id: string
+        }
+        Update: {
+          card_meaning?: string
+          card_name?: string
+          category?: string
+          created_at?: string
+          id?: string
+          interpretation?: string
           user_id?: string
         }
         Relationships: []
