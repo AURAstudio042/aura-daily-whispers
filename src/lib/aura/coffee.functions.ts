@@ -201,14 +201,29 @@ export const analyzeCoffeeReading = createServerFn({ method: "POST" })
       };
     }
 
-    if (status.tier === "free" && !data.adWatched) {
-      return {
-        ok: false,
-        reason: "ad_required",
-        message: "Falını okumak için önce kısa bir reklam izlemelisin.",
-        status,
-      };
+    // Free-tier: consume a server-issued ad grant (replaces client-controlled adWatched flag)
+    let grantIdToConsume: string | null = null;
+    if (status.tier === "free") {
+      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+      const { data: grant } = await supabaseAdmin
+        .from("coffee_ad_grants")
+        .select("id")
+        .eq("user_id", context.userId)
+        .is("consumed_at", null)
+        .order("created_at", { ascending: true })
+        .limit(1)
+        .maybeSingle();
+      if (!grant) {
+        return {
+          ok: false,
+          reason: "ad_required",
+          message: "Falını okumak için önce kısa bir reklam izlemelisin.",
+          status,
+        };
+      }
+      grantIdToConsume = grant.id as string;
     }
+
 
     const key = process.env.LOVABLE_API_KEY;
     if (!key) {
