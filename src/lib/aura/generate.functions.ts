@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { generateText } from "ai";
 import { z } from "zod";
 import { createLovableAiGatewayProvider } from "@/lib/ai-gateway.server";
+import { buildPersonalizationGuidance } from "./data";
 
 const InputSchema = z.object({
   name: z.string(),
@@ -13,6 +14,11 @@ const InputSchema = z.object({
     temp: z.number(),
     cond: z.string(),
   }),
+  relationshipStatus: z.string().optional(),
+  gender: z.string().optional(),
+  lifeFocus: z.array(z.string()).optional(),
+  hasChildren: z.boolean().optional(),
+  hasPets: z.boolean().optional(),
 });
 
 const DailyPackSchema = z.object({
