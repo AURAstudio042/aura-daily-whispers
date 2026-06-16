@@ -105,6 +105,18 @@ export const drawTarot = createServerFn({ method: "POST" })
     try {
       const key = process.env.LOVABLE_API_KEY;
       if (key) {
+        const { data: prof } = await context.supabase
+          .from("profiles")
+          .select("relationship_status, gender, life_focus, has_children, has_pets")
+          .eq("id", context.userId)
+          .maybeSingle();
+        const personalization = buildPersonalizationGuidance({
+          relationshipStatus: prof?.relationship_status ?? undefined,
+          gender: prof?.gender ?? undefined,
+          lifeFocus: (prof?.life_focus as string[] | null) ?? undefined,
+          hasChildren: prof?.has_children ?? undefined,
+          hasPets: prof?.has_pets ?? undefined,
+        });
         const gateway = createLovableAiGatewayProvider(key);
         const result = await generateText({
           model: gateway("google/gemini-3-flash-preview"),
@@ -113,8 +125,8 @@ export const drawTarot = createServerFn({ method: "POST" })
 Kartın genel anlamı: ${card.meaning}
 Kullanıcının sorusu kategorisi: ${catObj.label}
 Kullanıcı adı: ${data.name ?? "Kullanıcı"}
-
-Bu karta ve bu kategoriye özel, 3-4 cümlelik kişisel, sıcak ve şiirsel bir Türkçe yorum yaz. Genelleme yapma. Klişelerden kaçın. "— AURA" gibi imza ekleme.`,
+${personalization ? "\n" + personalization + "\n" : ""}
+Bu karta ve bu kategoriye özel, 3-4 cümlelik kişisel, sıcak ve şiirsel bir Türkçe yorum yaz. Genelleme yapma. Klişelerden kaçın. Kullanıcının yaşam bağlamını doğal, ima yoluyla işle — asla doğrudan etiketleme. "— AURA" gibi imza ekleme.`,
         });
         const text = result.text?.trim();
         if (text && text.length > 20) interpretation = text;
@@ -122,6 +134,7 @@ Bu karta ve bu kategoriye özel, 3-4 cümlelik kişisel, sıcak ve şiirsel bir 
     } catch {
       // fallback already set
     }
+
 
     await context.supabase.from("tarot_readings").insert({
       user_id: context.userId,
