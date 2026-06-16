@@ -56,6 +56,7 @@ function KahvePage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const pendingPhotoRef = useRef<string | null>(null);
   const readingRef = useRef<HTMLDivElement>(null);
+  const adIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const refresh = useCallback(async () => {
     try {
@@ -72,6 +73,13 @@ function KahvePage() {
   useEffect(() => {
     if (authed && u) refresh();
   }, [authed, u, refresh]);
+
+  // Cleanup ad interval on unmount so navigating away doesn't leak the timer
+  useEffect(() => {
+    return () => {
+      if (adIntervalRef.current) clearInterval(adIntervalRef.current);
+    };
+  }, []);
 
   if (!ready) return <div className="min-h-screen" />;
   if (!authed) return <AuthScreen />;
@@ -116,10 +124,14 @@ function KahvePage() {
   const startAdAndAnalyze = (dataUrl: string) => {
     setAdWatching(true);
     setAdCountdown(5);
-    const tick = setInterval(() => {
+    if (adIntervalRef.current) clearInterval(adIntervalRef.current);
+    adIntervalRef.current = setInterval(() => {
       setAdCountdown((s) => {
         if (s <= 1) {
-          clearInterval(tick);
+          if (adIntervalRef.current) {
+            clearInterval(adIntervalRef.current);
+            adIntervalRef.current = null;
+          }
           setAdWatching(false);
           runAnalysis(dataUrl, true);
           return 0;
@@ -191,7 +203,12 @@ function KahvePage() {
         accept="image/*"
         capture="environment"
         className="hidden"
-        onChange={(e) => onFilePicked(e.target.files?.[0] ?? null)}
+        onChange={(e) => {
+          const f = e.target.files?.[0] ?? null;
+          // Reset value so picking the same file again still fires onChange
+          e.target.value = "";
+          onFilePicked(f);
+        }}
       />
 
       <header className="relative mb-6 animate-aura-fade-in">

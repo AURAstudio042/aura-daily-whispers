@@ -6,6 +6,7 @@ import { AuthScreen } from "@/components/aura/AuthScreen";
 import { Onboarding } from "@/components/aura/Onboarding";
 import { useUser, userName, zodiacOf, toggleFav, useFavs } from "@/lib/aura/store";
 import { generateMysticCard } from "@/lib/aura/mystic.functions";
+import { getUserTier } from "@/lib/aura/tier.functions";
 import { pickFallback, timeOfDay, type MysticCardContent } from "@/lib/aura/mystic-data";
 import { ShareSheet } from "@/components/aura/ShareSheet";
 import { downloadBlob, nativeShareImage, renderNodeAsStoryBlob, shareToWhatsApp } from "@/lib/aura/share";
@@ -30,14 +31,36 @@ function MistikPage() {
   const [adWatching, setAdWatching] = useState(false);
   const [shareOpen, setShareOpen] = useState(false);
   const [shareBusy, setShareBusy] = useState(false);
+  const [tier, setTier] = useState<"free" | "plus" | "premium">("free");
   const cardRef = useRef<HTMLDivElement>(null);
+  const adTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const genCard = useServerFn(generateMysticCard);
+  const fetchTier = useServerFn(getUserTier);
   const favs = useFavs();
 
-  // TODO: pull real tier from profile; for now treat as free.
-  const tier = "free" as "free" | "plus" | "premium";
+  useEffect(() => {
+    if (!authed) return;
+    let cancelled = false;
+    fetchTier()
+      .then((r) => {
+        if (!cancelled && r?.tier) setTier(r.tier);
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, [authed, fetchTier]);
+
+  // Ensure ad timer never outlives the page
+  useEffect(() => {
+    return () => {
+      if (adTimerRef.current) clearTimeout(adTimerRef.current);
+    };
+  }, []);
+
   const unlimited: boolean = tier === "plus" || tier === "premium";
+
 
   const drawCard = useCallback(async () => {
     if (loading) return;
@@ -80,7 +103,9 @@ function MistikPage() {
     if (unlimited) { drawCard(); return; }
     setAdWatching(true);
     // Mock ad: 3s wait, then draw
-    setTimeout(async () => {
+    if (adTimerRef.current) clearTimeout(adTimerRef.current);
+    adTimerRef.current = setTimeout(async () => {
+      adTimerRef.current = null;
       setAdWatching(false);
       await drawCard();
     }, 3000);

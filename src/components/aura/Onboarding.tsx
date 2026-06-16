@@ -84,7 +84,14 @@ export function Onboarding() {
           </Field>
 
           <Field label="Doğum Tarihi">
-            <input type="date" value={birthDate} onChange={(e) => setBirthDate(e.target.value)} className={inputCls} />
+            <input
+              type="date"
+              value={birthDate}
+              onChange={(e) => setBirthDate(e.target.value)}
+              min="1920-01-01"
+              max={new Date().toISOString().slice(0, 10)}
+              className={inputCls}
+            />
           </Field>
 
           <Field label="Doğum Saati (opsiyonel, yükseliş için)">
