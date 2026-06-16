@@ -203,7 +203,12 @@ function KahvePage() {
         accept="image/*"
         capture="environment"
         className="hidden"
-        onChange={(e) => onFilePicked(e.target.files?.[0] ?? null)}
+        onChange={(e) => {
+          const f = e.target.files?.[0] ?? null;
+          // Reset value so picking the same file again still fires onChange
+          e.target.value = "";
+          onFilePicked(f);
+        }}
       />
 
       <header className="relative mb-6 animate-aura-fade-in">
