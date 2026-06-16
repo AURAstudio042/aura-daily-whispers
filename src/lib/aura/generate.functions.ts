@@ -65,6 +65,7 @@ function extractJson(text: string): string {
 }
 
 export const generateDailyPack = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
   .inputValidator((data: unknown) => InputSchema.parse(data))
   .handler(async ({ data }): Promise<{ pack: DailyPack | null }> => {
     try {
