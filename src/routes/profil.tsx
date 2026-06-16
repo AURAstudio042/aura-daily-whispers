@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { AuraShell, SectionLabel } from "@/components/aura/Shell";
 import { Onboarding } from "@/components/aura/Onboarding";
+import { AuthScreen } from "@/components/aura/AuthScreen";
 import { useUser, userName, userCity, zodiacOf, clearUser } from "@/lib/aura/store";
 
 export const Route = createFileRoute("/profil")({
@@ -10,9 +11,10 @@ export const Route = createFileRoute("/profil")({
 });
 
 function ProfilPage() {
-  const [u, , ready] = useUser();
+  const [u, , ready, authed] = useUser();
   const [mystic, setMystic] = useState(false);
   if (!ready) return <div className="min-h-screen" />;
+  if (!authed) return <AuthScreen />;
   if (!u) return <Onboarding />;
 
   const name = userName(u);
@@ -68,7 +70,7 @@ function ProfilPage() {
         onClick={() => { clearUser(); }}
         className="mb-6 w-full rounded-full border border-[color:var(--border)] py-3 text-[11px] tracking-[0.3em] uppercase text-[color:var(--aura-muted)]"
       >
-        Profili Sıfırla
+        Çıkış Yap
       </button>
 
       {mystic && <MysticCard onClose={() => setMystic(false)} />}

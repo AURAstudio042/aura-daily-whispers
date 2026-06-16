@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { AuraShell, SectionLabel, ShareSignature, Tag } from "@/components/aura/Shell";
 import { Onboarding } from "@/components/aura/Onboarding";
+import { AuthScreen } from "@/components/aura/AuthScreen";
 import { useUser, userName, userCity, zodiacOf, toggleFav, useFavs } from "@/lib/aura/store";
 import {
   ZODIAC_SYMBOL,
@@ -28,7 +29,7 @@ export const Route = createFileRoute("/")({
 });
 
 function BugunPage() {
-  const [u, , ready] = useUser();
+  const [u, , ready, authed] = useUser();
   const city = userCity(u);
   const mock = dailyWeather(city);
   const live = useDailyWeather(u?.city);
@@ -38,6 +39,7 @@ function BugunPage() {
   const { pack, loading } = useDailyPack(u, { temp: weather.temp, cond: weather.cond });
 
   if (!ready) return <div className="min-h-screen" />;
+  if (!authed) return <AuthScreen />;
   if (!u) return <Onboarding />;
 
   const name = userName(u);

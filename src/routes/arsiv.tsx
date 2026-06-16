@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { AuraShell, SectionLabel } from "@/components/aura/Shell";
 import { Onboarding } from "@/components/aura/Onboarding";
+import { AuthScreen } from "@/components/aura/AuthScreen";
 import { useUser, useFavs, zodiacOf } from "@/lib/aura/store";
 import { dailyColors, dailyStone, dailyScent, QUOTES, pick } from "@/lib/aura/data";
 
@@ -15,7 +16,7 @@ const DAYS_TR = ["Paz","Pzt","Sal","Çar","Per","Cum","Cmt"];
 const MOODS_PAST = ["Sakin", "Odaklı", "Enerjik", "Romantik", "Yorgun", "Mutlu"];
 
 function ArsivPage() {
-  const [u, , ready] = useUser();
+  const [u, , ready, authed] = useUser();
   const favs = useFavs();
   const now = new Date();
   const [month, setMonth] = useState(now.getMonth());
@@ -43,6 +44,7 @@ function ArsivPage() {
   }, [month, u]);
 
   if (!ready) return <div className="min-h-screen" />;
+  if (!authed) return <AuthScreen />;
   if (!u) return <Onboarding />;
 
   const stats = [
