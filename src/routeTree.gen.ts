@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as TarotRouteImport } from './routes/tarot'
 import { Route as ProfilRouteImport } from './routes/profil'
+import { Route as MistikRouteImport } from './routes/mistik'
 import { Route as HaftalikRouteImport } from './routes/haftalik'
 import { Route as ArsivRouteImport } from './routes/arsiv'
 import { Route as IndexRouteImport } from './routes/index'
@@ -23,6 +24,11 @@ const TarotRoute = TarotRouteImport.update({
 const ProfilRoute = ProfilRouteImport.update({
   id: '/profil',
   path: '/profil',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MistikRoute = MistikRouteImport.update({
+  id: '/mistik',
+  path: '/mistik',
   getParentRoute: () => rootRouteImport,
 } as any)
 const HaftalikRoute = HaftalikRouteImport.update({
@@ -45,6 +51,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/arsiv': typeof ArsivRoute
   '/haftalik': typeof HaftalikRoute
+  '/mistik': typeof MistikRoute
   '/profil': typeof ProfilRoute
   '/tarot': typeof TarotRoute
 }
@@ -52,6 +59,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/arsiv': typeof ArsivRoute
   '/haftalik': typeof HaftalikRoute
+  '/mistik': typeof MistikRoute
   '/profil': typeof ProfilRoute
   '/tarot': typeof TarotRoute
 }
@@ -60,21 +68,30 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/arsiv': typeof ArsivRoute
   '/haftalik': typeof HaftalikRoute
+  '/mistik': typeof MistikRoute
   '/profil': typeof ProfilRoute
   '/tarot': typeof TarotRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/arsiv' | '/haftalik' | '/profil' | '/tarot'
+  fullPaths: '/' | '/arsiv' | '/haftalik' | '/mistik' | '/profil' | '/tarot'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/arsiv' | '/haftalik' | '/profil' | '/tarot'
-  id: '__root__' | '/' | '/arsiv' | '/haftalik' | '/profil' | '/tarot'
+  to: '/' | '/arsiv' | '/haftalik' | '/mistik' | '/profil' | '/tarot'
+  id:
+    | '__root__'
+    | '/'
+    | '/arsiv'
+    | '/haftalik'
+    | '/mistik'
+    | '/profil'
+    | '/tarot'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ArsivRoute: typeof ArsivRoute
   HaftalikRoute: typeof HaftalikRoute
+  MistikRoute: typeof MistikRoute
   ProfilRoute: typeof ProfilRoute
   TarotRoute: typeof TarotRoute
 }
@@ -93,6 +110,13 @@ declare module '@tanstack/react-router' {
       path: '/profil'
       fullPath: '/profil'
       preLoaderRoute: typeof ProfilRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/mistik': {
+      id: '/mistik'
+      path: '/mistik'
+      fullPath: '/mistik'
+      preLoaderRoute: typeof MistikRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/haftalik': {
@@ -123,6 +147,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ArsivRoute: ArsivRoute,
   HaftalikRoute: HaftalikRoute,
+  MistikRoute: MistikRoute,
   ProfilRoute: ProfilRoute,
   TarotRoute: TarotRoute,
 }

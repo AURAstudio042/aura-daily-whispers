@@ -36,8 +36,8 @@ function MistikPage() {
   const favs = useFavs();
 
   // TODO: pull real tier from profile; for now treat as free.
-  const tier: "free" | "plus" | "premium" = "free";
-  const unlimited = tier === "plus" || tier === "premium";
+  const tier = "free" as "free" | "plus" | "premium";
+  const unlimited: boolean = tier === "plus" || tier === "premium";
 
   const drawCard = useCallback(async () => {
     if (loading) return;
