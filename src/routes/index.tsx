@@ -278,12 +278,26 @@ function Row({ k, v }: { k: string; v: string }) {
 }
 
 function QuoteCard({ q }: { q: { text: string; author?: string; category: string } }) {
-  const [shared, setShared] = useState(false);
   const favs = useFavs();
   const id = "q:" + q.text;
   const saved = favs.some((f) => f.id === id);
+  const ref = useRef<HTMLElement>(null);
+  const [busy, setBusy] = useState(false);
+  const onShare = async () => {
+    if (busy) return;
+    setBusy(true);
+    try {
+      await shareNodeAsStory(ref.current, {
+        title: "Günün Sözü",
+        text: `"${q.text}"${q.author ? ` — ${q.author}` : ""}\n\n— AURA ✨`,
+        filename: "aura-soz.png",
+      });
+    } finally {
+      setBusy(false);
+    }
+  };
   return (
-    <section className="aura-card-dark relative mb-5 overflow-hidden p-6 animate-aura-fade-in">
+    <section ref={ref} className="aura-card-dark relative mb-5 overflow-hidden p-6 animate-aura-fade-in">
       <div className="pointer-events-none absolute -top-20 left-1/2 h-40 w-40 -translate-x-1/2 rounded-full bg-[color:var(--aura-purple)]/20 blur-3xl" />
       <p className="text-[10px] tracking-[0.3em] uppercase text-[color:var(--aura-muted)]">Günün Sözü · {q.category}</p>
       <p className="serif mt-4 text-[24px] leading-snug italic text-white">"{q.text}"</p>
@@ -301,13 +315,18 @@ function QuoteCard({ q }: { q: { text: string; author?: string; category: string
             {saved ? "♥" : "♡"}
           </button>
           <button
-            onClick={() => {
-              if ((navigator as any).share) (navigator as any).share({ text: `"${q.text}"${q.author ? ` — ${q.author}` : ""}\n\n— AURA ✨` }).catch(() => {});
-              else setShared(true);
-            }}
-            className="rounded-full border border-[color:var(--border)] px-3 py-1.5 text-[10px] tracking-[0.2em] uppercase text-[color:var(--aura-lavender)]"
+            onClick={onShare}
+            disabled={busy}
+            className="rounded-full border border-[color:var(--border)] px-3 py-1.5 text-[10px] tracking-[0.2em] uppercase text-[color:var(--aura-lavender)] disabled:opacity-60"
           >
-            {shared ? "Kopyalandı" : "Paylaş"}
+            {busy ? "..." : "Paylaş"}
+          </button>
+        </div>
+      </div>
+      <p className="mt-4 text-right text-[10px] tracking-[0.35em] text-[color:var(--aura-muted)]">— AURA ✨</p>
+    </section>
+  );
+}
           </button>
         </div>
       </div>
