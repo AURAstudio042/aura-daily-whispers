@@ -80,8 +80,6 @@ function BugunPage() {
 
 
 
-  const shareRef = useRef<HTMLDivElement>(null);
-  const [sharing, setSharing] = useState(false);
 
   const onShareAll = async () => {
     if (sharing) return;
