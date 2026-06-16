@@ -14,6 +14,78 @@ export type Database = {
   }
   public: {
     Tables: {
+      ad_tarot_grants: {
+        Row: {
+          created_at: string
+          id: string
+          user_id: string
+          week_start: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          user_id: string
+          week_start: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          user_id?: string
+          week_start?: string
+        }
+        Relationships: []
+      }
+      aura_plus_trials: {
+        Row: {
+          created_at: string
+          ends_at: string
+          id: string
+          source: string
+          starts_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          ends_at: string
+          id?: string
+          source: string
+          starts_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          ends_at?: string
+          id?: string
+          source?: string
+          starts_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      bonus_tarot_credits: {
+        Row: {
+          consumed_at: string | null
+          created_at: string
+          id: string
+          source: string
+          user_id: string
+        }
+        Insert: {
+          consumed_at?: string | null
+          created_at?: string
+          id?: string
+          source: string
+          user_id: string
+        }
+        Update: {
+          consumed_at?: string | null
+          created_at?: string
+          id?: string
+          source?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       daily_content: {
         Row: {
           content: Json
@@ -140,6 +212,51 @@ export type Database = {
           tier?: string
           updated_at?: string
           zodiac_sign?: string | null
+        }
+        Relationships: []
+      }
+      referral_codes: {
+        Row: {
+          code: string
+          created_at: string
+          user_id: string
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          user_id: string
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      referrals: {
+        Row: {
+          code: string
+          created_at: string
+          id: string
+          referred_user_id: string
+          referrer_id: string
+          rewarded_at: string | null
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          id?: string
+          referred_user_id: string
+          referrer_id: string
+          rewarded_at?: string | null
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          id?: string
+          referred_user_id?: string
+          referrer_id?: string
+          rewarded_at?: string | null
         }
         Relationships: []
       }

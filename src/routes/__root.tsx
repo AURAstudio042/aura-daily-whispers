@@ -116,8 +116,68 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
+      <ReferralCapture />
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
       <Outlet />
     </QueryClientProvider>
   );
+}
+
+const REF_STORAGE_KEY = "aura:pending-ref";
+
+function ReferralCapture() {
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    // 1) Persist ?ref= from URL into localStorage (survives auth redirect)
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const ref = params.get("ref");
+      if (ref) {
+        window.localStorage.setItem(REF_STORAGE_KEY, ref.trim().toUpperCase());
+      }
+    } catch {
+      // ignore
+    }
+
+    // 2) Whenever the user becomes authenticated, try to redeem
+    let cancelled = false;
+    const tryRedeem = async () => {
+      try {
+        const pending = window.localStorage.getItem(REF_STORAGE_KEY);
+        if (!pending) return;
+        const { supabase } = await import("@/integrations/supabase/client");
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) return;
+        const { redeemReferral } = await import("@/lib/aura/rewards.functions");
+        const res = await redeemReferral({ data: { code: pending } });
+        if (cancelled) return;
+        // Clear pending whether success, invalid, self, or already
+        if (res.ok || (!res.ok && res.reason !== "error")) {
+          window.localStorage.removeItem(REF_STORAGE_KEY);
+        }
+      } catch {
+        // network/auth not ready — leave for next attempt
+      }
+    };
+
+    tryRedeem();
+
+    // also retry on auth state changes
+    let unsub: (() => void) | null = null;
+    (async () => {
+      const { supabase } = await import("@/integrations/supabase/client");
+      const { data } = supabase.auth.onAuthStateChange((event) => {
+        if (event === "SIGNED_IN" || event === "USER_UPDATED") tryRedeem();
+      });
+      unsub = () => data.subscription.unsubscribe();
+    })();
+
+    return () => {
+      cancelled = true;
+      if (unsub) unsub();
+    };
+  }, []);
+
+  return null;
 }

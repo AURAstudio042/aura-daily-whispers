@@ -4,9 +4,11 @@ import { useServerFn } from "@tanstack/react-start";
 import { AuraShell, SectionLabel, ShareSignature } from "@/components/aura/Shell";
 import { AuthScreen } from "@/components/aura/AuthScreen";
 import { Onboarding } from "@/components/aura/Onboarding";
+import { AdTarotModal } from "@/components/aura/AdTarotModal";
 import { useUser, userName } from "@/lib/aura/store";
 import { TAROT_CATEGORIES } from "@/lib/aura/tarot-data";
 import { drawTarot, getTarotStatus, type TarotReadingResult } from "@/lib/aura/tarot.functions";
+import { claimAdTarot, getRewardsSummary } from "@/lib/aura/rewards.functions";
 import { shareNodeAsStory } from "@/lib/aura/share";
 
 export const Route = createFileRoute("/tarot")({
@@ -19,7 +21,11 @@ export const Route = createFileRoute("/tarot")({
   component: TarotPage,
 });
 
-type Status = { tier: string; limit: { allowed: boolean; remaining: number; cap: number; periodLabel: string } };
+type Status = {
+  tier: string;
+  limit: { allowed: boolean; remaining: number; cap: number; periodLabel: string };
+  bonusCredits: number;
+};
 
 function TarotPage() {
   const [u, , ready, authed] = useUser();
@@ -29,15 +35,26 @@ function TarotPage() {
   const [result, setResult] = useState<TarotReadingResult | null>(null);
   const [status, setStatus] = useState<Status | null>(null);
   const [sharing, setSharing] = useState(false);
+  const [adOpen, setAdOpen] = useState(false);
+  const [adAvailableThisWeek, setAdAvailableThisWeek] = useState<boolean>(false);
+  const [adClaiming, setAdClaiming] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
 
   const fetchStatus = useServerFn(getTarotStatus);
   const draw = useServerFn(drawTarot);
+  const fetchSummary = useServerFn(getRewardsSummary);
+  const claimAd = useServerFn(claimAdTarot);
+
+  const refreshAll = () => {
+    fetchStatus().then((s) => setStatus(s as Status)).catch(() => {});
+    fetchSummary().then((r) => setAdAvailableThisWeek(!!r?.adTarotAvailableThisWeek)).catch(() => {});
+  };
 
   useEffect(() => {
     if (!authed) return;
-    fetchStatus().then((s) => setStatus(s as Status)).catch(() => {});
-  }, [authed, fetchStatus]);
+    refreshAll();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [authed]);
 
   if (!ready) return <div className="min-h-screen" />;
   if (!authed) return <AuthScreen />;
@@ -45,19 +62,20 @@ function TarotPage() {
 
   const tier = status?.tier ?? "free";
   const isFree = tier === "free";
+  const bonus = status?.bonusCredits ?? 0;
+  const canDraw = !isFree ? (status?.limit.allowed || bonus > 0) : bonus > 0;
   const name = userName(u);
 
   const onDraw = async () => {
-    if (!category || loading) return;
+    if (!category || loading || !canDraw) return;
     setLoading(true);
     setReveal(false);
     try {
       const r = (await draw({ data: { category, name } })) as TarotReadingResult;
-      // small delay for flip animation feel
       setTimeout(() => {
         setResult(r);
         setReveal(true);
-        if (r.limit) setStatus((s) => (s ? { ...s, limit: r.limit! } : s));
+        if (r.ok) refreshAll();
         setLoading(false);
       }, 900);
     } catch {
@@ -85,6 +103,18 @@ function TarotPage() {
     }
   };
 
+  const onAdComplete = async () => {
+    if (adClaiming) return;
+    setAdClaiming(true);
+    try {
+      await claimAd();
+      setAdOpen(false);
+      refreshAll();
+    } finally {
+      setAdClaiming(false);
+    }
+  };
+
   return (
     <AuraShell>
       {/* HEADER */}
@@ -99,30 +129,51 @@ function TarotPage() {
         {status && !isFree && (
           <p className="mt-3 text-[11px] tracking-[0.25em] uppercase text-[color:var(--aura-muted)]">
             {status.limit.remaining}/{status.limit.cap} {status.limit.periodLabel}
+            {bonus > 0 && <> · 🎴 {bonus} bonus</>}
+          </p>
+        )}
+        {status && isFree && bonus > 0 && (
+          <p className="mt-3 text-[11px] tracking-[0.25em] uppercase text-[color:var(--aura-lavender)]">
+            🎴 {bonus} bonus tarot hakkın hazır
           </p>
         )}
       </header>
 
-      {/* FREE LOCK */}
-      {isFree && !result && (
+      {/* FREE — locked but unlockable via ad */}
+      {isFree && bonus === 0 && !result && (
         <section className="aura-card-dark relative mb-5 overflow-hidden p-6 text-center animate-aura-fade-in">
           <div className="pointer-events-none absolute -top-20 left-1/2 h-40 w-40 -translate-x-1/2 rounded-full bg-[color:var(--aura-purple)]/30 blur-3xl" />
           <div className="serif text-6xl text-white/40">✦</div>
           <p className="serif mt-4 text-[22px] italic text-white">Kartlar kapalı.</p>
           <p className="mt-2 text-[13px] text-[color:var(--aura-soft)]">
-            Tarot AURA+ üyelerine açıktır. Haftada 2, Premium'da günde 2 kart.
+            Bu hafta için 1 ücretsiz tarot kazanabilirsin — kısa bir reklam yeter.
           </p>
-          <Link
-            to="/profil"
-            className="aura-btn aura-btn-hover mt-5 inline-block px-6 text-[12px]"
-          >
+
+          {adAvailableThisWeek ? (
+            <button
+              onClick={() => setAdOpen(true)}
+              className="mt-5 inline-flex items-center justify-center gap-2 rounded-full bg-white px-6 py-3 text-[12px] font-medium tracking-[0.15em] text-[#08060f]"
+            >
+              Reklam İzle ve 1 Tarot Hakkı Kazan 🎴
+            </button>
+          ) : (
+            <p className="mt-5 text-[12px] tracking-[0.2em] uppercase text-[color:var(--aura-muted)]">
+              Bu hafta hakkını kullandın · Pazartesi yenilenecek
+            </p>
+          )}
+
+          <div className="my-5 h-px bg-[color:var(--border)]" />
+          <p className="text-[12px] text-[color:var(--aura-soft)]">
+            Sınırsız tarot için AURA+'ya geç.
+          </p>
+          <Link to="/profil" className="aura-btn aura-btn-hover mt-3 inline-block px-6 text-[12px]">
             ✦ AURA+ ile aç ✦
           </Link>
         </section>
       )}
 
       {/* CATEGORY PICKER */}
-      {!isFree && !result && (
+      {canDraw && !result && (
         <section className="aura-card mb-5 p-5 animate-aura-fade-in">
           <SectionLabel n="01" title="Sorunu Seç" />
           <div className="grid grid-cols-2 gap-2.5">
@@ -149,12 +200,11 @@ function TarotPage() {
       )}
 
       {/* CARD AREA */}
-      {!isFree && (
+      {canDraw && (
         <section ref={cardRef} className="aura-card-dark relative mb-5 overflow-hidden p-6 animate-aura-fade-in">
           <div className="pointer-events-none absolute -top-24 left-1/2 h-48 w-48 -translate-x-1/2 rounded-full bg-[color:var(--aura-purple)]/25 blur-3xl" />
           <div className="pointer-events-none absolute -bottom-20 right-0 h-40 w-40 rounded-full bg-[#b794d4]/15 blur-3xl" />
 
-          {/* Card visual */}
           <div className="relative mx-auto my-3 grid h-64 w-44 place-items-center">
             <div
               className="absolute inset-0 rounded-2xl border border-[color:var(--aura-lavender)]/30 transition-all duration-700"
@@ -197,7 +247,6 @@ function TarotPage() {
             )}
           </div>
 
-          {/* Reveal text */}
           {reveal && result?.card && (
             <div className="mt-2 animate-aura-fade-in">
               <p className="text-[11px] tracking-[0.3em] uppercase text-[color:var(--aura-muted)]">Kartın Anlamı</p>
@@ -209,16 +258,12 @@ function TarotPage() {
             </div>
           )}
 
-          {/* Empty state */}
           {!reveal && !loading && (
             <p className="mt-3 text-center text-[12px] italic text-[color:var(--aura-soft)]">
-              {category
-                ? "Hazır olduğunda kartını aç."
-                : "Önce bir kategori seç."}
+              {category ? "Hazır olduğunda kartını aç." : "Önce bir kategori seç."}
             </p>
           )}
 
-          {/* Limit reached */}
           {result && !result.ok && result.reason === "limit" && (
             <p className="mt-3 text-center text-[12px] text-[color:var(--aura-soft)]">
               Bu {result.limit?.periodLabel} için kartlarını çektin. Bir sonraki açılışı bekle. ✦
@@ -228,12 +273,12 @@ function TarotPage() {
       )}
 
       {/* ACTIONS */}
-      {!isFree && (
+      {canDraw && (
         <div className="flex gap-2">
           {!reveal ? (
             <button
               onClick={onDraw}
-              disabled={!category || loading || (status ? !status.limit.allowed : false)}
+              disabled={!category || loading || !canDraw}
               className="aura-btn aura-btn-hover flex-1 text-[13px] disabled:opacity-50"
             >
               {loading ? "✦ Açılıyor… ✦" : "✦ Kartı Aç ✦"}
@@ -259,6 +304,10 @@ function TarotPage() {
       )}
 
       <ShareSignature />
+
+      {adOpen && (
+        <AdTarotModal onComplete={onAdComplete} onClose={() => setAdOpen(false)} />
+      )}
     </AuraShell>
   );
 }
