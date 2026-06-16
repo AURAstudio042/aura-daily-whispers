@@ -112,10 +112,11 @@ export type ClaimAdTarotResult =
 export const claimAdTarot = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }): Promise<ClaimAdTarotResult> => {
-    const { supabase, userId } = context;
+    const { userId } = context;
     const week = mondayOfWeekUTC();
+    const admin = await getAdmin();
 
-    const { error: grantErr } = await supabase
+    const { error: grantErr } = await admin
       .from("ad_tarot_grants")
       .insert({ user_id: userId, week_start: week });
     if (grantErr) {
@@ -123,8 +124,8 @@ export const claimAdTarot = createServerFn({ method: "POST" })
       return { ok: false, reason: "already_claimed" };
     }
 
-    await supabase.from("bonus_tarot_credits").insert({ user_id: userId, source: "ad" });
-    const { count } = await supabase
+    await admin.from("bonus_tarot_credits").insert({ user_id: userId, source: "ad" });
+    const { count } = await admin
       .from("bonus_tarot_credits")
       .select("id", { count: "exact", head: true })
       .eq("user_id", userId)
