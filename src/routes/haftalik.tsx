@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { AuraShell, SectionLabel, ShareSignature } from "@/components/aura/Shell";
 import { Onboarding } from "@/components/aura/Onboarding";
+import { AuthScreen } from "@/components/aura/AuthScreen";
 import { useUser, zodiacOf } from "@/lib/aura/store";
 import { weeklyAura } from "@/lib/aura/data";
 
@@ -11,8 +12,9 @@ export const Route = createFileRoute("/haftalik")({
 });
 
 function HaftalikPage() {
-  const [u, , ready] = useUser();
+  const [u, , ready, authed] = useUser();
   if (!ready) return <div className="min-h-screen" />;
+  if (!authed) return <AuthScreen />;
   if (!u) return <Onboarding />;
 
   const z = zodiacOf(u);
