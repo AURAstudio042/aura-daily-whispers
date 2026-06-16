@@ -175,7 +175,7 @@ function KahvePage() {
       if (status.requiresAd) {
         startAdAndAnalyze(dataUrl);
       } else {
-        runAnalysis(dataUrl, false);
+        runAnalysis(dataUrl);
       }
     } catch {
       setError("Fotoğrafı analiz edemedim. Lütfen daha net bir fotoğraf dene.");
