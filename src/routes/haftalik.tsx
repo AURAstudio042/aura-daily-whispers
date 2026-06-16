@@ -13,13 +13,13 @@ export const Route = createFileRoute("/haftalik")({
 
 function HaftalikPage() {
   const [u, , ready, authed] = useUser();
+  const [checked, setChecked] = useState<Record<number, boolean>>({});
   if (!ready) return <div className="min-h-screen" />;
   if (!authed) return <AuthScreen />;
   if (!u) return <Onboarding />;
 
   const z = zodiacOf(u);
   const w = weeklyAura(z, u.mood);
-  const [checked, setChecked] = useState<Record<number, boolean>>({});
 
   const now = new Date();
   const monday = new Date(now);
