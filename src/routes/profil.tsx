@@ -39,15 +39,47 @@ function ProfilPage() {
         </div>
       </header>
 
-      {/* Premium banner */}
+      {/* AURA+ */}
+      <section
+        className="relative mb-4 overflow-hidden rounded-3xl p-6 text-white animate-aura-fade-in"
+        style={{ background: "linear-gradient(135deg, #2a1f3d 0%, #3d2e54 50%, #5a3e7a 100%)" }}
+      >
+        <div className="pointer-events-none absolute -right-8 -top-8 h-32 w-32 rounded-full bg-white/8 blur-3xl" />
+        <p className="text-[10px] tracking-[0.3em] uppercase opacity-70">AURA+ ✦</p>
+        <h2 className="serif mt-1 text-2xl">AURA+</h2>
+        <ul className="mt-3 space-y-1 text-[12px] opacity-90">
+          <li>Reklamsız deneyim</li>
+          <li>Daha derin günlük içerik</li>
+          <li>Özel gün modu</li>
+          <li>Taş & koku arşivi</li>
+          <li>Sınırsız Mystic Card</li>
+          <li>Haftada 2 kez tarot</li>
+          <li>Editöryal / Clean tema</li>
+        </ul>
+        <button className="mt-4 rounded-full bg-white px-5 py-2.5 text-[12px] font-medium tracking-[0.15em] text-[#08060f]">
+          49.90 TL / AY
+        </button>
+      </section>
+
+      {/* AURA Premium */}
       <section
         className="relative mb-6 overflow-hidden rounded-3xl p-6 text-white animate-aura-fade-in"
         style={{ background: "linear-gradient(135deg, #4a2470 0%, #8b5cf6 60%, #b794d4 100%)" }}
       >
         <div className="pointer-events-none absolute -right-10 -top-10 h-40 w-40 rounded-full bg-white/10 blur-3xl" />
-        <p className="text-[10px] tracking-[0.3em] uppercase opacity-80">AURA ✦</p>
-        <h2 className="serif mt-2 text-3xl">Premium</h2>
-        <p className="mt-2 text-[13px] opacity-90">Doğum haritası, aylık derin analiz, AI stilist ve günde 2 tarot.</p>
+        <p className="text-[10px] tracking-[0.3em] uppercase opacity-80">AURA Premium ✦</p>
+        <h2 className="serif mt-1 text-2xl">AURA Premium</h2>
+        <ul className="mt-3 space-y-1 text-[12px] opacity-90">
+          <li>AURA+'nın her şeyi</li>
+          <li>Doğum haritası & yıldız haritası</li>
+          <li>Aylık derin analiz</li>
+          <li>Gezegen takibi</li>
+          <li>AI Stylist</li>
+          <li>Gelecekteki kendinden mektup</li>
+          <li>Günde 2 kez tarot</li>
+          <li>Özel temalar (Altın, Gece Mavisi)</li>
+          <li>Premium watermark</li>
+        </ul>
         <button className="mt-4 rounded-full bg-white px-5 py-2.5 text-[12px] font-medium tracking-[0.15em] text-[#08060f]">
           99.90 TL / AY
         </button>
