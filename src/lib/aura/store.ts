@@ -70,6 +70,11 @@ export async function saveUser(u: AuraUser) {
       style_type: u.style,
       skin_tone: u.undertone ?? null,
       hair_color: u.hair ?? null,
+      relationship_status: u.relationshipStatus ?? null,
+      gender: u.gender ?? null,
+      life_focus: u.lifeFocus ?? [],
+      has_children: u.hasChildren ?? null,
+      has_pets: u.hasPets ?? null,
     });
     if (error) console.error("[aura] saveUser:", error);
   } catch (e) { console.error("[aura] saveUser:", e); }
