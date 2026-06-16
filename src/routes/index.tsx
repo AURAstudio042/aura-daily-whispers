@@ -133,6 +133,22 @@ function BugunPage() {
 
       <NotifPermissionBanner name={name} hint={morning} />
 
+      {/* TAROT ENTRY */}
+      <Link
+        to="/tarot"
+        className="aura-card relative mb-5 flex items-center gap-4 overflow-hidden p-4 animate-aura-fade-in"
+      >
+        <div className="pointer-events-none absolute -right-6 -top-6 h-24 w-24 rounded-full bg-[color:var(--aura-purple)]/30 blur-2xl" />
+        <div className="grid h-12 w-12 shrink-0 place-items-center rounded-full border border-[color:var(--aura-lavender)]/40 bg-[#1a0f2e] text-2xl text-[color:var(--aura-lavender)]">
+          ✦
+        </div>
+        <div className="min-w-0 flex-1">
+          <p className="text-[11px] tracking-[0.3em] uppercase text-[color:var(--aura-lavender)]">Tarot</p>
+          <p className="mt-0.5 text-[14px] text-white">Kartlar sana ne söylüyor?</p>
+        </div>
+        <span className="text-[color:var(--aura-soft)]">›</span>
+      </Link>
+
 
 
       {/* 01 HOROSCOPE */}
