@@ -124,10 +124,14 @@ function KahvePage() {
   const startAdAndAnalyze = (dataUrl: string) => {
     setAdWatching(true);
     setAdCountdown(5);
-    const tick = setInterval(() => {
+    if (adIntervalRef.current) clearInterval(adIntervalRef.current);
+    adIntervalRef.current = setInterval(() => {
       setAdCountdown((s) => {
         if (s <= 1) {
-          clearInterval(tick);
+          if (adIntervalRef.current) {
+            clearInterval(adIntervalRef.current);
+            adIntervalRef.current = null;
+          }
           setAdWatching(false);
           runAnalysis(dataUrl, true);
           return 0;
