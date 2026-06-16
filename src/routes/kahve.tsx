@@ -87,7 +87,7 @@ function KahvePage() {
   if (!authed) return <AuthScreen />;
   if (!u) return <Onboarding />;
 
-  const runAnalysis = async (dataUrl: string, adWatched: boolean) => {
+  const runAnalysis = async (dataUrl: string) => {
     setAnalyzing(true);
     setError(null);
     setReading(null);
@@ -95,7 +95,6 @@ function KahvePage() {
       const res = (await analyzeFn({
         data: {
           imageDataUrl: dataUrl,
-          adWatched,
           context: {
             name: userName(u),
             zodiac: zodiacOf(u),
@@ -122,6 +121,7 @@ function KahvePage() {
       pendingPhotoRef.current = null;
     }
   };
+
 
   const startAdAndAnalyze = (dataUrl: string) => {
     setAdWatching(true);
