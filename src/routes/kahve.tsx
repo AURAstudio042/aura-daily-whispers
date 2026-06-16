@@ -123,7 +123,18 @@ function KahvePage() {
   };
 
 
-  const startAdAndAnalyze = (dataUrl: string) => {
+  const startAdAndAnalyze = async (dataUrl: string) => {
+    // Claim a server-side ad grant first; server validates and rate-limits.
+    try {
+      const claim = (await claimAdFn()) as { ok: boolean };
+      if (!claim?.ok) {
+        setError("Reklam doğrulanamadı, lütfen tekrar dene.");
+        return;
+      }
+    } catch {
+      setError("Reklam doğrulanamadı, lütfen tekrar dene.");
+      return;
+    }
     setAdWatching(true);
     setAdCountdown(5);
     if (adIntervalRef.current) clearInterval(adIntervalRef.current);
@@ -135,13 +146,14 @@ function KahvePage() {
             adIntervalRef.current = null;
           }
           setAdWatching(false);
-          runAnalysis(dataUrl, true);
+          runAnalysis(dataUrl);
           return 0;
         }
         return s - 1;
       });
     }, 1000);
   };
+
 
   const onFilePicked = async (file: File | null) => {
     if (!file) return;
