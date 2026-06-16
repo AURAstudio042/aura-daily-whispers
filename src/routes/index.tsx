@@ -77,8 +77,26 @@ function BugunPage() {
 
 
 
+  const shareRef = useRef<HTMLDivElement>(null);
+  const [sharing, setSharing] = useState(false);
+
+  const onShareAll = async () => {
+    if (sharing) return;
+    setSharing(true);
+    try {
+      await shareNodeAsStory(shareRef.current, {
+        title: "Aura",
+        text: `Bugünkü AURA'm ✨\n\n${horo}\n\n— AURA ✨`,
+        filename: "aura-gunluk.png",
+      });
+    } finally {
+      setSharing(false);
+    }
+  };
+
   return (
     <AuraShell>
+      <div ref={shareRef}>
       {/* HEADER */}
       <header className="relative mb-7 animate-aura-fade-in">
         <div className="aura-glow -left-10 -top-16 h-56 w-56 bg-[#8b5cf6]/40" />
@@ -113,13 +131,13 @@ function BugunPage() {
       </div>
 
       {/* 01 HOROSCOPE */}
-      <Card>
+      <Card shareTitle="Günlük Yorumun" shareText={horo}>
         <SectionLabel n="01" title="Günlük Yorumun" />
         <p className="text-[16px] leading-relaxed text-white">{horo}</p>
       </Card>
 
       {/* 02 COLORS */}
-      <Card>
+      <Card shareTitle="Renklerin" shareText={colors.map((c) => c.name).join(" · ")}>
         <SectionLabel n="02" title="Renklerin" />
         <div className="flex justify-around gap-3">
           {colors.map((c) => (
@@ -135,7 +153,7 @@ function BugunPage() {
       </Card>
 
       {/* 03 STYLE */}
-      <Card>
+      <Card shareTitle="Stilin" shareText={`${outfit.top} · ${outfit.bottom} · ${outfit.shoe}`}>
         <SectionLabel n="03" title="Stilin" />
         <ul className="space-y-2 text-[14px] text-[color:var(--aura-soft)]">
           <Row k="Üst" v={outfit.top} />
@@ -157,7 +175,7 @@ function BugunPage() {
       </Card>
 
       {/* 04 STONE */}
-      <Card>
+      <Card shareTitle="Taşın" shareText={`${stone.name} — ${stone.meaning}`}>
         <SectionLabel n="04" title="Taşın" />
         <div className="flex items-center gap-5">
           <div className={`gem gem-${stone.kind} animate-aura-pulse shrink-0`} />
@@ -176,7 +194,7 @@ function BugunPage() {
       </Card>
 
       {/* 05 SCENT */}
-      <Card>
+      <Card shareTitle="Kokun" shareText={`${scent.scents.join(" · ")} — ${scent.feel}`}>
         <SectionLabel n="05" title="Kokun" />
         <p className="text-[16px] text-white">
           {scent.scents.join(" · ")}
@@ -186,17 +204,15 @@ function BugunPage() {
 
       {/* 06 QUOTE */}
       <QuoteCard q={quote} />
+      </div>
 
       {/* SHARE */}
       <button
-        onClick={() => {
-          if (typeof navigator !== "undefined" && (navigator as any).share) {
-            (navigator as any).share({ title: "AURA", text: `${horo}\n\n— AURA ✨` }).catch(() => {});
-          }
-        }}
-        className="aura-btn aura-btn-hover mt-6 w-full text-[13px]"
+        onClick={onShareAll}
+        disabled={sharing}
+        className="aura-btn aura-btn-hover mt-6 w-full text-[13px] disabled:opacity-60"
       >
-        ✦ AURA'mı Paylaş ✦
+        {sharing ? "✦ Hazırlanıyor… ✦" : "✦ AURA'mı Paylaş ✦"}
       </button>
 
       <ShareSignature />
@@ -204,8 +220,50 @@ function BugunPage() {
   );
 }
 
-function Card({ children }: { children: React.ReactNode }) {
-  return <section className="aura-card mb-5 p-5 animate-aura-fade-in">{children}</section>;
+function Card({
+  children,
+  shareTitle,
+  shareText,
+}: {
+  children: React.ReactNode;
+  shareTitle?: string;
+  shareText?: string;
+}) {
+  const ref = useRef<HTMLElement>(null);
+  const [busy, setBusy] = useState(false);
+  const canShare = !!shareTitle;
+  const onShare = async () => {
+    if (busy) return;
+    setBusy(true);
+    try {
+      await shareNodeAsStory(ref.current, {
+        title: shareTitle,
+        text: shareText ? `${shareText}\n\n— AURA ✨` : "— AURA ✨",
+        filename: `aura-${(shareTitle ?? "kart").toLowerCase()}.png`,
+      });
+    } finally {
+      setBusy(false);
+    }
+  };
+  return (
+    <section ref={ref} className="aura-card relative mb-5 p-5 animate-aura-fade-in">
+      {canShare && (
+        <button
+          onClick={onShare}
+          disabled={busy}
+          aria-label={`${shareTitle} paylaş`}
+          className="absolute right-3 top-3 z-10 rounded-full border border-[color:var(--border)] bg-white/[0.03] p-2 text-[color:var(--aura-soft)] backdrop-blur-md transition hover:text-white disabled:opacity-50"
+        >
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+            <path d="M4 12v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7" />
+            <polyline points="16 6 12 2 8 6" />
+            <line x1="12" y1="2" x2="12" y2="15" />
+          </svg>
+        </button>
+      )}
+      {children}
+    </section>
+  );
 }
 function Sep() {
   return <div className="my-4 h-px bg-[color:var(--border)]" />;
