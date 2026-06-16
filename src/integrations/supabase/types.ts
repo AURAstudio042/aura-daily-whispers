@@ -281,10 +281,15 @@ export type Database = {
           birth_time: string | null
           city: string | null
           created_at: string
+          gender: string | null
           hair_color: string | null
+          has_children: boolean | null
+          has_pets: boolean | null
           id: string
+          life_focus: string[]
           name: string | null
           notification_time: string
+          relationship_status: string | null
           skin_tone: string | null
           style_type: string | null
           tier: string
@@ -296,10 +301,15 @@ export type Database = {
           birth_time?: string | null
           city?: string | null
           created_at?: string
+          gender?: string | null
           hair_color?: string | null
+          has_children?: boolean | null
+          has_pets?: boolean | null
           id: string
+          life_focus?: string[]
           name?: string | null
           notification_time?: string
+          relationship_status?: string | null
           skin_tone?: string | null
           style_type?: string | null
           tier?: string
@@ -311,10 +321,15 @@ export type Database = {
           birth_time?: string | null
           city?: string | null
           created_at?: string
+          gender?: string | null
           hair_color?: string | null
+          has_children?: boolean | null
+          has_pets?: boolean | null
           id?: string
+          life_focus?: string[]
           name?: string | null
           notification_time?: string
+          relationship_status?: string | null
           skin_tone?: string | null
           style_type?: string | null
           tier?: string

@@ -2,6 +2,7 @@ import { createServerFn } from "@tanstack/react-start";
 import { generateText } from "ai";
 import { z } from "zod";
 import { createLovableAiGatewayProvider } from "@/lib/ai-gateway.server";
+import { buildPersonalizationGuidance } from "./data";
 
 const InputSchema = z.object({
   name: z.string(),
@@ -13,6 +14,11 @@ const InputSchema = z.object({
     temp: z.number(),
     cond: z.string(),
   }),
+  relationshipStatus: z.string().optional(),
+  gender: z.string().optional(),
+  lifeFocus: z.array(z.string()).optional(),
+  hasChildren: z.boolean().optional(),
+  hasPets: z.boolean().optional(),
 });
 
 const DailyPackSchema = z.object({
@@ -67,12 +73,21 @@ export const generateDailyPack = createServerFn({ method: "POST" })
       const gateway = createLovableAiGatewayProvider(key);
       const system = `Sen AURA'sın — kullanıcılara her gün kişiselleştirilmiş, sıcak, şiirsel ve özgün günlük ritüel içeriği üreten Türkçe bir asistan. Tüm çıktın Türkçe olmalı. Asla genel ifadeler kullanma — kullanıcının burcuna, ruh haline, stiline, şehrine ve havasına özgü, kişisel ve spesifik içerik üret. Yanıtın YALNIZCA geçerli bir JSON nesnesi olmalı, markdown veya açıklama olmadan.`;
 
+      const personalization = buildPersonalizationGuidance({
+        relationshipStatus: data.relationshipStatus,
+        gender: data.gender,
+        lifeFocus: data.lifeFocus,
+        hasChildren: data.hasChildren,
+        hasPets: data.hasPets,
+      });
+
       const user = `Kullanıcı: ${data.name}
 Burç: ${data.zodiac}
 Ruh hali: ${data.mood ?? "belirtilmemiş"}
 Stil: ${data.style ?? "belirtilmemiş"}
 Şehir: ${data.city}
 Hava: ${data.weather.temp}°C, ${data.weather.cond}
+${personalization ? "\n" + personalization + "\n" : ""}
 
 Aşağıdaki yapıya tam olarak uyan bir JSON üret:
 
