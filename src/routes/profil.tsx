@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+
 import { AuraShell, SectionLabel } from "@/components/aura/Shell";
 import { Onboarding } from "@/components/aura/Onboarding";
 import { AuthScreen } from "@/components/aura/AuthScreen";
@@ -12,7 +12,6 @@ export const Route = createFileRoute("/profil")({
 
 function ProfilPage() {
   const [u, , ready, authed] = useUser();
-  const [mystic, setMystic] = useState(false);
   if (!ready) return <div className="min-h-screen" />;
   if (!authed) return <AuthScreen />;
   if (!u) return <Onboarding />;
@@ -91,11 +90,6 @@ function ProfilPage() {
         <SettingRow label="Stil Tercihlerim" value={u.style} />
         <SettingRow label="Tema" value="Dark Luxury ✦" />
         <SettingRow label="Taş & Koku Arşivi" value="AURA+" locked />
-        <SettingRow
-          label="Mystic Card"
-          value={mystic ? "Açık" : "Reklam izle"}
-          onClick={() => setMystic(true)}
-        />
       </ul>
 
       <button
@@ -104,8 +98,6 @@ function ProfilPage() {
       >
         Çıkış Yap
       </button>
-
-      {mystic && <MysticCard onClose={() => setMystic(false)} />}
     </AuraShell>
   );
 }
@@ -125,30 +117,5 @@ function SettingRow({ label, value, locked, onClick }: { label: string; value: s
         </span>
       </button>
     </li>
-  );
-}
-
-function MysticCard({ onClose }: { onClose: () => void }) {
-  return (
-    <div className="fixed inset-0 z-[60] flex items-center justify-center bg-[#03020a]/95 px-6 backdrop-blur-xl animate-aura-fade-in">
-      <div className="pointer-events-none absolute left-1/2 top-1/2 h-80 w-80 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[color:var(--aura-purple)]/30 blur-3xl animate-aura-pulse" />
-      <div className="relative max-w-sm text-center">
-        <p className="section-label">Mistik Kart</p>
-        <p className="serif mt-6 text-[28px] leading-snug italic text-white">
-          "Bazı şeyleri çözmek zorunda değilsin."
-        </p>
-        <p className="mt-4 text-[14px] text-[color:var(--aura-soft)]">Bugün kontrol değil, denge günü.</p>
-        <p className="mt-8 text-[11px] tracking-[0.35em] text-[color:var(--aura-muted)]">— AURA 🤍</p>
-        <div className="mt-10 flex gap-3">
-          <button className="flex-1 rounded-full border border-[color:var(--border)] py-3 text-[11px] tracking-[0.2em] uppercase text-[color:var(--aura-soft)]" onClick={onClose}>
-            Kaydet
-          </button>
-          <button className="aura-btn flex-1 text-[11px]" onClick={onClose}>
-            Paylaş
-          </button>
-        </div>
-        <button onClick={onClose} className="mt-6 text-[10px] tracking-[0.3em] uppercase text-[color:var(--aura-muted)]">Kapat</button>
-      </div>
-    </div>
   );
 }
