@@ -56,6 +56,7 @@ function KahvePage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const pendingPhotoRef = useRef<string | null>(null);
   const readingRef = useRef<HTMLDivElement>(null);
+  const adIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const refresh = useCallback(async () => {
     try {
@@ -72,6 +73,13 @@ function KahvePage() {
   useEffect(() => {
     if (authed && u) refresh();
   }, [authed, u, refresh]);
+
+  // Cleanup ad interval on unmount so navigating away doesn't leak the timer
+  useEffect(() => {
+    return () => {
+      if (adIntervalRef.current) clearInterval(adIntervalRef.current);
+    };
+  }, []);
 
   if (!ready) return <div className="min-h-screen" />;
   if (!authed) return <AuthScreen />;
