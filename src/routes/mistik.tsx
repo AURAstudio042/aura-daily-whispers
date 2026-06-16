@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { AuraShell, ShareSignature } from "@/components/aura/Shell";
@@ -136,6 +136,22 @@ function MistikPage() {
         </h1>
         <p className="mt-2 text-[14px] italic text-[color:var(--aura-soft)]">Kalbinden geçen bir mesaj.</p>
       </header>
+
+      {/* COFFEE FORTUNE ENTRY */}
+      <Link
+        to="/kahve"
+        className="aura-card relative mb-5 flex items-center gap-4 overflow-hidden p-4 animate-aura-fade-in"
+      >
+        <div className="pointer-events-none absolute -right-6 -top-6 h-24 w-24 rounded-full bg-[#d4a373]/30 blur-2xl" />
+        <div className="grid h-12 w-12 shrink-0 place-items-center rounded-full border border-[#d4a373]/50 bg-[#1a120a] text-2xl">
+          ☕
+        </div>
+        <div className="min-w-0 flex-1">
+          <p className="text-[11px] tracking-[0.3em] uppercase text-[#d4a373]">Kahve Falım</p>
+          <p className="mt-0.5 text-[14px] text-white">Fincanını çevir, AURA'ya bırak</p>
+        </div>
+        <span className="text-[color:var(--aura-soft)]">›</span>
+      </Link>
 
       {/* CARD */}
       <section

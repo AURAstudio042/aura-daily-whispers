@@ -14,6 +14,7 @@ import { Route as StilistRouteImport } from './routes/stilist'
 import { Route as ProfilRouteImport } from './routes/profil'
 import { Route as MistikRouteImport } from './routes/mistik'
 import { Route as MektupRouteImport } from './routes/mektup'
+import { Route as KahveRouteImport } from './routes/kahve'
 import { Route as HaftalikRouteImport } from './routes/haftalik'
 import { Route as ArsivRouteImport } from './routes/arsiv'
 import { Route as IndexRouteImport } from './routes/index'
@@ -43,6 +44,11 @@ const MektupRoute = MektupRouteImport.update({
   path: '/mektup',
   getParentRoute: () => rootRouteImport,
 } as any)
+const KahveRoute = KahveRouteImport.update({
+  id: '/kahve',
+  path: '/kahve',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const HaftalikRoute = HaftalikRouteImport.update({
   id: '/haftalik',
   path: '/haftalik',
@@ -63,6 +69,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/arsiv': typeof ArsivRoute
   '/haftalik': typeof HaftalikRoute
+  '/kahve': typeof KahveRoute
   '/mektup': typeof MektupRoute
   '/mistik': typeof MistikRoute
   '/profil': typeof ProfilRoute
@@ -73,6 +80,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/arsiv': typeof ArsivRoute
   '/haftalik': typeof HaftalikRoute
+  '/kahve': typeof KahveRoute
   '/mektup': typeof MektupRoute
   '/mistik': typeof MistikRoute
   '/profil': typeof ProfilRoute
@@ -84,6 +92,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/arsiv': typeof ArsivRoute
   '/haftalik': typeof HaftalikRoute
+  '/kahve': typeof KahveRoute
   '/mektup': typeof MektupRoute
   '/mistik': typeof MistikRoute
   '/profil': typeof ProfilRoute
@@ -96,6 +105,7 @@ export interface FileRouteTypes {
     | '/'
     | '/arsiv'
     | '/haftalik'
+    | '/kahve'
     | '/mektup'
     | '/mistik'
     | '/profil'
@@ -106,6 +116,7 @@ export interface FileRouteTypes {
     | '/'
     | '/arsiv'
     | '/haftalik'
+    | '/kahve'
     | '/mektup'
     | '/mistik'
     | '/profil'
@@ -116,6 +127,7 @@ export interface FileRouteTypes {
     | '/'
     | '/arsiv'
     | '/haftalik'
+    | '/kahve'
     | '/mektup'
     | '/mistik'
     | '/profil'
@@ -127,6 +139,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ArsivRoute: typeof ArsivRoute
   HaftalikRoute: typeof HaftalikRoute
+  KahveRoute: typeof KahveRoute
   MektupRoute: typeof MektupRoute
   MistikRoute: typeof MistikRoute
   ProfilRoute: typeof ProfilRoute
@@ -171,6 +184,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MektupRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/kahve': {
+      id: '/kahve'
+      path: '/kahve'
+      fullPath: '/kahve'
+      preLoaderRoute: typeof KahveRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/haftalik': {
       id: '/haftalik'
       path: '/haftalik'
@@ -199,6 +219,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ArsivRoute: ArsivRoute,
   HaftalikRoute: HaftalikRoute,
+  KahveRoute: KahveRoute,
   MektupRoute: MektupRoute,
   MistikRoute: MistikRoute,
   ProfilRoute: ProfilRoute,
