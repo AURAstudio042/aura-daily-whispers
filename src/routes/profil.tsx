@@ -132,7 +132,11 @@ function ProfilPage() {
           <li>Haftada 2 kez tarot</li>
           <li>Editöryal / Clean tema</li>
         </ul>
-        <button className="mt-4 rounded-full bg-white px-5 py-2.5 text-[12px] font-medium tracking-[0.15em] text-[#08060f]">
+        <button
+          type="button"
+          onClick={() => handleSubscribe("AURA+")}
+          className="mt-4 rounded-full bg-white px-5 py-2.5 text-[12px] font-medium tracking-[0.15em] text-[#08060f] transition-transform active:scale-95"
+        >
           49.90 TL / AY
         </button>
       </section>
@@ -157,7 +161,11 @@ function ProfilPage() {
           <li>Premium watermark</li>
         </ul>
         <div className="mt-4 flex flex-wrap items-center gap-2">
-          <button className="rounded-full bg-white px-5 py-2.5 text-[12px] font-medium tracking-[0.15em] text-[#08060f]">
+          <button
+            type="button"
+            onClick={() => handleSubscribe("AURA Premium")}
+            className="rounded-full bg-white px-5 py-2.5 text-[12px] font-medium tracking-[0.15em] text-[#08060f] transition-transform active:scale-95"
+          >
             99.90 TL / AY
           </button>
           <Link
@@ -177,10 +185,11 @@ function ProfilPage() {
 
       <SectionLabel n="✦" title="Ayarlar" />
       <ul className="mb-6 overflow-hidden rounded-2xl border border-[color:var(--border)] bg-[color:var(--card)]">
-        <SettingRow label="Bildirim Saati" value="07:00" />
-        <SettingRow label="Stil Tercihlerim" value={u.style} />
-        <SettingRow label="Tema" value="Dark Luxury ✦" />
-        <SettingRow label="Taş & Koku Arşivi" value="AURA+" locked />
+        <SettingRow label="Bildirim Saati" value={notifTime} onClick={handleNotifTime} />
+        <SettingRow label="Stil Tercihlerim" value={u.style} onClick={handleStyle} />
+        <SettingRow label="Tema" value="Dark Luxury ✦" onClick={handleTheme} />
+        <SettingRow label="Taş Arşivi" value="AURA+" locked onClick={() => handleLocked("Taş Arşivi")} />
+        <SettingRow label="Koku Arşivi" value="AURA+" locked onClick={() => handleLocked("Koku Arşivi")} />
       </ul>
 
       <button
@@ -197,8 +206,9 @@ function SettingRow({ label, value, locked, onClick }: { label: string; value: s
   return (
     <li>
       <button
+        type="button"
         onClick={onClick}
-        className="flex w-full items-center justify-between gap-3 border-b border-[color:var(--border)] px-4 py-4 text-left last:border-b-0"
+        className="flex w-full items-center justify-between gap-3 border-b border-[color:var(--border)] px-4 py-4 text-left last:border-b-0 transition-colors hover:bg-white/[0.02] active:bg-white/[0.04]"
       >
         <span className="text-[14px] text-white">{label}</span>
         <span className="flex items-center gap-2 text-[12px] text-[color:var(--aura-soft)]">
