@@ -12,7 +12,6 @@ export const Route = createFileRoute("/profil")({
 
 function ProfilPage() {
   const [u, , ready, authed] = useUser();
-  const [mystic, setMystic] = useState(false);
   if (!ready) return <div className="min-h-screen" />;
   if (!authed) return <AuthScreen />;
   if (!u) return <Onboarding />;
