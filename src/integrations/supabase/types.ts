@@ -38,6 +38,36 @@ export type Database = {
         }
         Relationships: []
       }
+      future_letters: {
+        Row: {
+          answers: Json
+          created_at: string
+          deliver_at: string
+          id: string
+          letter: string
+          opened_at: string | null
+          user_id: string
+        }
+        Insert: {
+          answers: Json
+          created_at?: string
+          deliver_at: string
+          id?: string
+          letter: string
+          opened_at?: string | null
+          user_id: string
+        }
+        Update: {
+          answers?: Json
+          created_at?: string
+          deliver_at?: string
+          id?: string
+          letter?: string
+          opened_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           birth_date: string | null
