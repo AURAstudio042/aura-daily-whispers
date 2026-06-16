@@ -18,6 +18,63 @@ export type StyleType = typeof STYLES[number];
 
 export const UNDERTONES = ["Sıcak", "Soğuk", "Nötr"] as const;
 
+// ── Kişiselleştirme: ilişki, odak, yaşam bağlamı
+export const RELATIONSHIP_STATUSES = [
+  { id: "Evli", emoji: "💍" },
+  { id: "İlişkim Var", emoji: "❤️" },
+  { id: "Bekar", emoji: "🌿" },
+  { id: "İlişki Aramıyorum", emoji: "🤍" },
+  { id: "Karmaşık / Belirsiz", emoji: "🌙" },
+] as const;
+export type RelationshipStatus = typeof RELATIONSHIP_STATUSES[number]["id"];
+
+export const GENDERS = ["Kadın", "Erkek", "Non-binary", "Belirtmek istemiyorum"] as const;
+export type Gender = typeof GENDERS[number];
+
+export const LIFE_FOCUS_OPTIONS = [
+  { id: "Aşk", emoji: "❤️" },
+  { id: "Kariyer", emoji: "💼" },
+  { id: "Para", emoji: "💰" },
+  { id: "Ruhsal Gelişim", emoji: "✨" },
+  { id: "Sağlık", emoji: "🌿" },
+  { id: "Aile", emoji: "👨‍👩‍👧‍👦" },
+] as const;
+export type LifeFocus = typeof LIFE_FOCUS_OPTIONS[number]["id"];
+
+export type PersonalizationContext = {
+  relationshipStatus?: string;
+  gender?: string;
+  lifeFocus?: string[];
+  hasChildren?: boolean;
+  hasPets?: boolean;
+};
+
+/**
+ * Builds a short Turkish guidance string fed into AI prompts. Designed to be
+ * subtle — never let AI label or restrict the user, just nudge tone.
+ */
+export function buildPersonalizationGuidance(p: PersonalizationContext | null | undefined): string {
+  if (!p) return "";
+  const lines: string[] = [];
+  const rel = p.relationshipStatus;
+  if (rel) {
+    if (rel === "Evli") lines.push("İlişki bağlamı: Evli — bağlılık, aile, ortak enerji ve uzun vadeli uyum temaları doğal biçimde yer alabilir.");
+    else if (rel === "İlişkim Var") lines.push("İlişki bağlamı: Bir ilişkide — iletişim, duygusal uyum ve bağlantı temalarına nazikçe değin.");
+    else if (rel === "Bekar") lines.push("İlişki bağlamı: Bekar — kendine dönüş, yeni deneyimlere açıklık ve duygusal bağımsızlık temalarına odaklan.");
+    else if (rel === "İlişki Aramıyorum") lines.push("İlişki bağlamı: Şu an ilişki aramıyor — bireysel özgürlük, iç huzur ve kendi enerjisi temalarına saygıyla yaklaş; partner ima etme.");
+    else lines.push("İlişki bağlamı: Belirsiz/Karmaşık — duygusal netlik, kendini dinleme ve şefkatli bir ton kullan; yargılayıcı olma.");
+  }
+  if (p.lifeFocus && p.lifeFocus.length) {
+    lines.push(`Yaşam odağı: ${p.lifeFocus.join(", ")} — günün renkleri, kıyafet, taş, koku ve burç yorumu bu alana hafifçe eğilebilir.`);
+  }
+  if (p.hasChildren) lines.push("Çocuk: var — aile ve koruyucu enerji temaları doğal olabilir.");
+  if (p.hasPets) lines.push("Evcil hayvan: var — sıcaklık ve sadakat metaforlarına yer açabilirsin.");
+  if (p.gender) lines.push(`Cinsiyet: ${p.gender} — dili ona göre doğal tut, ama kalıplara sokma.`);
+  if (!lines.length) return "";
+  return "Kişisel bağlam (asla doğrudan etiketleme, sadece tonu yumuşatmak için kullan):\n- " + lines.join("\n- ");
+}
+
+
 export type ZodiacKey =
   | "Koç" | "Boğa" | "İkizler" | "Yengeç" | "Aslan" | "Başak"
   | "Terazi" | "Akrep" | "Yay" | "Oğlak" | "Kova" | "Balık" | "Bilinmiyor";
