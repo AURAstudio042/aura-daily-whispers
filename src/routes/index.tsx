@@ -15,6 +15,7 @@ import {
   dailyWeather,
 } from "@/lib/aura/data";
 import { useDailyPack } from "@/lib/aura/useDailyPack";
+import { useDailyWeather, weatherNote } from "@/lib/aura/useDailyWeather";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -29,7 +30,11 @@ export const Route = createFileRoute("/")({
 function BugunPage() {
   const [u, , ready] = useUser();
   const city = userCity(u);
-  const weather = dailyWeather(city);
+  const mock = dailyWeather(city);
+  const live = useDailyWeather(u?.city);
+  const weather = live
+    ? { icon: live.icon, cond: live.cond, temp: live.temp, city: live.city, note: weatherNote(live) }
+    : mock;
   const { pack, loading } = useDailyPack(u, { temp: weather.temp, cond: weather.cond });
 
   if (!ready) return <div className="min-h-screen" />;
