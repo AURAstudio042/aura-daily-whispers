@@ -59,6 +59,14 @@ async function ensureCode(supabase: any, userId: string): Promise<string> {
   return code;
 }
 
+// Privileged writes: users cannot self-grant rewards via RLS, so any
+// reward issuance must go through the service-role client after the
+// server has validated the request.
+async function getAdmin() {
+  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  return supabaseAdmin;
+}
+
 export const getRewardsSummary = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }): Promise<RewardsSummary> => {
@@ -104,10 +112,11 @@ export type ClaimAdTarotResult =
 export const claimAdTarot = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }): Promise<ClaimAdTarotResult> => {
-    const { supabase, userId } = context;
+    const { userId } = context;
     const week = mondayOfWeekUTC();
+    const admin = await getAdmin();
 
-    const { error: grantErr } = await supabase
+    const { error: grantErr } = await admin
       .from("ad_tarot_grants")
       .insert({ user_id: userId, week_start: week });
     if (grantErr) {
@@ -115,8 +124,8 @@ export const claimAdTarot = createServerFn({ method: "POST" })
       return { ok: false, reason: "already_claimed" };
     }
 
-    await supabase.from("bonus_tarot_credits").insert({ user_id: userId, source: "ad" });
-    const { count } = await supabase
+    await admin.from("bonus_tarot_credits").insert({ user_id: userId, source: "ad" });
+    const { count } = await admin
       .from("bonus_tarot_credits")
       .select("id", { count: "exact", head: true })
       .eq("user_id", userId)
@@ -135,6 +144,7 @@ export const redeemReferral = createServerFn({ method: "POST" })
   .handler(async ({ data, context }): Promise<RedeemReferralResult> => {
     const { supabase, userId } = context;
     const code = data.code.toUpperCase().trim();
+    const admin = await getAdmin();
 
     // Already referred?
     const { data: existing } = await supabase
@@ -144,7 +154,8 @@ export const redeemReferral = createServerFn({ method: "POST" })
       .maybeSingle();
     if (existing) return { ok: true, alreadyRedeemed: true };
 
-    const { data: codeRow } = await supabase
+    // Look up referrer via admin client — referral_codes is owner-read only
+    const { data: codeRow } = await admin
       .from("referral_codes")
       .select("user_id")
       .eq("code", code)
@@ -161,8 +172,8 @@ export const redeemReferral = createServerFn({ method: "POST" })
     });
     if (insErr) return { ok: false, reason: "error" };
 
-    // Grant credits: 1 for referrer, 1 welcome for new user
-    await supabase.from("bonus_tarot_credits").insert([
+    // Grant credits: 1 for referrer, 1 welcome for new user (privileged)
+    await admin.from("bonus_tarot_credits").insert([
       { user_id: referrerId, source: "referral_referrer" },
       { user_id: userId, source: "referral_welcome" },
     ]);
@@ -177,7 +188,7 @@ export const redeemReferral = createServerFn({ method: "POST" })
       // Idempotency: tag each milestone with a deterministic source so a
       // re-run (race / retry) cannot grant the same milestone twice.
       const milestoneSource = `referral_milestone_${total / MILESTONE_EVERY}`;
-      const { data: existingTrial } = await supabase
+      const { data: existingTrial } = await admin
         .from("aura_plus_trials")
         .select("id")
         .eq("user_id", referrerId)
@@ -185,7 +196,7 @@ export const redeemReferral = createServerFn({ method: "POST" })
         .maybeSingle();
       if (!existingTrial) {
         const ends = new Date(Date.now() + TRIAL_DAYS_PER_MILESTONE * 86400000);
-        await supabase.from("aura_plus_trials").insert({
+        await admin.from("aura_plus_trials").insert({
           user_id: referrerId,
           ends_at: ends.toISOString(),
           source: milestoneSource,
