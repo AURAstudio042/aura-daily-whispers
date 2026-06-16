@@ -147,10 +147,12 @@ Bu karta ve bu kategoriye özel, 3-4 cümlelik kişisel, sıcak ve şiirsel bir 
     let bonusUsed = false;
     let bonusRemaining = 0;
     if (bonusCreditIdToConsume) {
-      await context.supabase
+      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+      await supabaseAdmin
         .from("bonus_tarot_credits")
         .update({ consumed_at: new Date().toISOString() })
-        .eq("id", bonusCreditIdToConsume);
+        .eq("id", bonusCreditIdToConsume)
+        .eq("user_id", context.userId);
       bonusUsed = true;
       const remaining = await fetchBonusCredits(context.supabase, context.userId);
       bonusRemaining = remaining.length;
