@@ -334,6 +334,15 @@ Bu kullanıcının kahve fincanı fotoğrafını incele ve falını oku. Burç e
         };
       }
 
+      if (grantIdToConsume) {
+        const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+        await supabaseAdmin
+          .from("coffee_ad_grants")
+          .update({ consumed_at: new Date().toISOString() })
+          .eq("id", grantIdToConsume)
+          .eq("user_id", context.userId);
+      }
+
       const newStatus = await buildStatus(context.supabase, context.userId);
       return {
         ok: true,
@@ -342,6 +351,7 @@ Bu kullanıcının kahve fincanı fotoğrafını incele ve falını oku. Burç e
         photoUrl,
         status: newStatus,
       };
+
     } catch {
       return {
         ok: false,
