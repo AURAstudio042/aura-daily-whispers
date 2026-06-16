@@ -194,6 +194,87 @@ export type Database = {
         }
         Relationships: []
       }
+      mystic_pool: {
+        Row: {
+          active: boolean
+          body: string
+          category: string | null
+          created_at: string
+          id: string
+          title: string
+        }
+        Insert: {
+          active?: boolean
+          body: string
+          category?: string | null
+          created_at?: string
+          id?: string
+          title: string
+        }
+        Update: {
+          active?: boolean
+          body?: string
+          category?: string | null
+          created_at?: string
+          id?: string
+          title?: string
+        }
+        Relationships: []
+      }
+      page_views: {
+        Row: {
+          id: number
+          route: string
+          user_id: string | null
+          viewed_at: string
+        }
+        Insert: {
+          id?: number
+          route: string
+          user_id?: string | null
+          viewed_at?: string
+        }
+        Update: {
+          id?: number
+          route?: string
+          user_id?: string | null
+          viewed_at?: string
+        }
+        Relationships: []
+      }
+      premium_grants: {
+        Row: {
+          created_at: string
+          ends_at: string
+          granted_by: string | null
+          id: string
+          note: string | null
+          starts_at: string
+          tier: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          ends_at: string
+          granted_by?: string | null
+          id?: string
+          note?: string | null
+          starts_at?: string
+          tier: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          ends_at?: string
+          granted_by?: string | null
+          id?: string
+          note?: string | null
+          starts_at?: string
+          tier?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           birth_date: string | null
@@ -239,6 +320,33 @@ export type Database = {
           tier?: string
           updated_at?: string
           zodiac_sign?: string | null
+        }
+        Relationships: []
+      }
+      quotes_pool: {
+        Row: {
+          active: boolean
+          author: string | null
+          created_at: string
+          id: string
+          tags: string[] | null
+          text: string
+        }
+        Insert: {
+          active?: boolean
+          author?: string | null
+          created_at?: string
+          id?: string
+          tags?: string[] | null
+          text: string
+        }
+        Update: {
+          active?: boolean
+          author?: string | null
+          created_at?: string
+          id?: string
+          tags?: string[] | null
+          text?: string
         }
         Relationships: []
       }
@@ -311,6 +419,57 @@ export type Database = {
         }
         Relationships: []
       }
+      share_events: {
+        Row: {
+          created_at: string
+          id: number
+          kind: string
+          ref_id: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: number
+          kind: string
+          ref_id?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: number
+          kind?: string
+          ref_id?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      special_day_messages: {
+        Row: {
+          created_at: string
+          day: number
+          id: string
+          label: string
+          message: string
+          month: number
+        }
+        Insert: {
+          created_at?: string
+          day: number
+          id?: string
+          label: string
+          message: string
+          month: number
+        }
+        Update: {
+          created_at?: string
+          day?: number
+          id?: string
+          label?: string
+          message?: string
+          month?: number
+        }
+        Relationships: []
+      }
       tarot_readings: {
         Row: {
           card_meaning: string
@@ -341,15 +500,63 @@ export type Database = {
         }
         Relationships: []
       }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
+      whispers_pool: {
+        Row: {
+          active: boolean
+          created_at: string
+          id: string
+          text: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          id?: string
+          text: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          id?: string
+          text?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "moderator" | "user"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -476,6 +683,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "moderator", "user"],
+    },
   },
 } as const
