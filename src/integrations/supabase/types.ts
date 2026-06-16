@@ -86,6 +86,33 @@ export type Database = {
         }
         Relationships: []
       }
+      coffee_readings: {
+        Row: {
+          created_at: string
+          id: string
+          photo_url: string | null
+          reading: string
+          saved: boolean
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          photo_url?: string | null
+          reading: string
+          saved?: boolean
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          photo_url?: string | null
+          reading?: string
+          saved?: boolean
+          user_id?: string
+        }
+        Relationships: []
+      }
       daily_content: {
         Row: {
           content: Json
