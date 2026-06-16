@@ -5,6 +5,7 @@ import { Onboarding } from "@/components/aura/Onboarding";
 import { AuthScreen } from "@/components/aura/AuthScreen";
 import { useUser, zodiacOf } from "@/lib/aura/store";
 import { weeklyAura } from "@/lib/aura/data";
+import { MonthlyAnalysisSection } from "@/components/aura/MonthlyAnalysis";
 
 export const Route = createFileRoute("/haftalik")({
   head: () => ({ meta: [{ title: "Haftalık ✦ AURA" }, { name: "description", content: "Bu haftanın enerjisi, odak noktası ve mini hedefleri." }] }),
@@ -83,6 +84,8 @@ function HaftalikPage() {
       </section>
 
       <ShareSignature />
+
+      <MonthlyAnalysisSection user={u} />
     </AuraShell>
   );
 }
