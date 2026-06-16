@@ -19,15 +19,18 @@ export const Route = createFileRoute("/profil")({
   component: ProfilPage,
 });
 
-export const Route = createFileRoute("/profil")({
-  head: () => ({ meta: [{ title: "Profil ✦ AURA" }, { name: "description", content: "Profilin, ayarların ve AURA+ üyelik." }] }),
-  component: ProfilPage,
-});
-
 function ProfilPage() {
   const [u, , ready, authed] = useUser();
   const [rewards, setRewards] = useState<RewardsSummary | null>(null);
+  const [notifTime, setNotifTime] = useState<string>("07:00");
   const fetchSummary = useServerFn(getRewardsSummary);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const saved = window.localStorage.getItem(NOTIF_TIME_KEY);
+      if (saved) setNotifTime(saved);
+    }
+  }, []);
 
   useEffect(() => {
     if (!authed) return;
@@ -42,6 +45,39 @@ function ProfilPage() {
   const initial = name[0]?.toUpperCase() || "?";
   const z = zodiacOf(u);
   const dateLabel = u.birthDate ? new Date(u.birthDate).toLocaleDateString("tr-TR") : "—";
+
+  const handleNotifTime = () => {
+    const next = window.prompt("Bildirim saati (HH:MM)", notifTime);
+    if (!next) return;
+    if (!/^([01]?\d|2[0-3]):[0-5]\d$/.test(next.trim())) {
+      toast.error("Geçersiz saat formatı. Örn: 07:30");
+      return;
+    }
+    const value = next.trim();
+    window.localStorage.setItem(NOTIF_TIME_KEY, value);
+    setNotifTime(value);
+    toast.success(`Bildirim saati ${value} olarak ayarlandı.`);
+  };
+
+  const handleStyle = () => {
+    const idx = STYLES.indexOf(u.style as StyleType);
+    const next = STYLES[(idx + 1) % STYLES.length];
+    saveUser({ ...u, style: next });
+    toast.success(`Stil tercihi: ${next}`);
+  };
+
+  const handleTheme = () => {
+    toast("Tema seçenekleri yakında ✦", { description: "Şu an Dark Luxury aktif." });
+  };
+
+  const handleLocked = (label: string) => {
+    toast(`${label} — AURA+ üyelerine özel ✦`, { description: "Yakında abonelik ile aç." });
+  };
+
+  const handleSubscribe = (plan: string) => {
+    toast(`${plan} aboneliği yakında ✦`, { description: "Lansman sonrası aktif olacak." });
+  };
+
 
   return (
     <AuraShell>
