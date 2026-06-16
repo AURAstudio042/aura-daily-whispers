@@ -112,9 +112,19 @@ export type ClaimAdTarotResult =
 export const claimAdTarot = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }): Promise<ClaimAdTarotResult> => {
-    const { userId } = context;
+    const { supabase, userId } = context;
     const week = mondayOfWeekUTC();
     const admin = await getAdmin();
+
+    // Only free-tier users (no active plus/premium trial or grant) may claim
+    const nowIso = new Date().toISOString();
+    const [{ data: profile }, { data: trial }, { data: grant }] = await Promise.all([
+      supabase.from("profiles").select("tier").eq("id", userId).maybeSingle(),
+      supabase.from("aura_plus_trials").select("ends_at").eq("user_id", userId).gt("ends_at", nowIso).limit(1).maybeSingle(),
+      supabase.from("premium_grants").select("ends_at").eq("user_id", userId).gt("ends_at", nowIso).limit(1).maybeSingle(),
+    ]);
+    const tier = ((profile?.tier as string | null) ?? "free").toLowerCase();
+    if (tier !== "free" || trial || grant) return { ok: false, reason: "premium" };
 
     const { error: grantErr } = await admin
       .from("ad_tarot_grants")
@@ -123,6 +133,7 @@ export const claimAdTarot = createServerFn({ method: "POST" })
       // unique violation
       return { ok: false, reason: "already_claimed" };
     }
+
 
     await admin.from("bonus_tarot_credits").insert({ user_id: userId, source: "ad" });
     const { count } = await admin
