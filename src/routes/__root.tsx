@@ -133,6 +133,7 @@ function RootComponent() {
 function PageViewTracker() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   const last = useRef<string>("");
+  const userIdRef = useRef<string | null>(null);
   useEffect(() => {
     if (typeof window === "undefined") return;
     if (pathname.startsWith("/admin")) return;
@@ -141,14 +142,22 @@ function PageViewTracker() {
     (async () => {
       try {
         const { supabase } = await import("@/integrations/supabase/client");
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user) return;
-        await supabase.from("page_views").insert({ user_id: user.id, route: pathname });
+        // Cache user id for the tab session — avoid /user network call per nav.
+        if (!userIdRef.current) {
+          const { data: { session } } = await supabase.auth.getSession();
+          if (!session?.user) return;
+          userIdRef.current = session.user.id;
+        }
+        await supabase.from("page_views").insert({
+          user_id: userIdRef.current,
+          route: pathname,
+        });
       } catch { /* ignore */ }
     })();
   }, [pathname]);
   return null;
 }
+
 
 const REF_STORAGE_KEY = "aura:pending-ref";
 
