@@ -17,11 +17,32 @@ export type TarotReadingResult = {
   category?: string;
   categoryLabel?: string;
   limit?: TarotLimit;
+  bonusUsed?: boolean;
+  bonusRemaining?: number;
 };
+
+async function fetchTrialActive(supabase: any, userId: string): Promise<boolean> {
+  const { data } = await supabase
+    .from("aura_plus_trials")
+    .select("ends_at")
+    .eq("user_id", userId)
+    .gt("ends_at", new Date().toISOString())
+    .limit(1)
+    .maybeSingle();
+  return !!data;
+}
 
 async function fetchTier(supabase: any, userId: string): Promise<string> {
   const { data } = await supabase.from("profiles").select("tier").eq("id", userId).maybeSingle();
-  return (data?.tier as string) || "free";
+  let tier = (data?.tier as string) || "free";
+  if (tier === "free" || tier === "plus" || tier === "aura+") {
+    // Trial elevates to plus (not above premium)
+    if (tier === "free") {
+      const trial = await fetchTrialActive(supabase, userId);
+      if (trial) tier = "plus";
+    }
+  }
+  return tier;
 }
 
 async function fetchUsage(supabase: any, userId: string, tier: string): Promise<number> {
@@ -37,12 +58,23 @@ async function fetchUsage(supabase: any, userId: string, tier: string): Promise<
   return count ?? 0;
 }
 
+async function fetchBonusCredits(supabase: any, userId: string): Promise<{ id: string }[]> {
+  const { data } = await supabase
+    .from("bonus_tarot_credits")
+    .select("id")
+    .eq("user_id", userId)
+    .is("consumed_at", null)
+    .order("created_at", { ascending: true });
+  return (data ?? []) as { id: string }[];
+}
+
 export const getTarotStatus = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
-  .handler(async ({ context }): Promise<{ tier: string; limit: TarotLimit }> => {
+  .handler(async ({ context }): Promise<{ tier: string; limit: TarotLimit; bonusCredits: number }> => {
     const tier = await fetchTier(context.supabase, context.userId);
     const used = await fetchUsage(context.supabase, context.userId, tier);
-    return { tier, limit: tarotLimitFor(tier, used) };
+    const bonus = await fetchBonusCredits(context.supabase, context.userId);
+    return { tier, limit: tarotLimitFor(tier, used), bonusCredits: bonus.length };
   });
 
 export const drawTarot = createServerFn({ method: "POST" })
@@ -50,13 +82,19 @@ export const drawTarot = createServerFn({ method: "POST" })
   .inputValidator((d: unknown) => z.object({ category: CategoryEnum, name: z.string().optional() }).parse(d))
   .handler(async ({ data, context }): Promise<TarotReadingResult> => {
     const tier = await fetchTier(context.supabase, context.userId);
-    if (tier === "free") {
-      return { ok: false, reason: "free", limit: tarotLimitFor(tier, 0) };
-    }
     const used = await fetchUsage(context.supabase, context.userId, tier);
-    const limit = tarotLimitFor(tier, used);
-    if (!limit.allowed) {
-      return { ok: false, reason: "limit", limit };
+    let limit = tarotLimitFor(tier, used);
+
+    // Determine whether we will consume a bonus credit
+    let bonusCreditIdToConsume: string | null = null;
+    const allowedByTier = tier !== "free" && limit.allowed;
+    if (!allowedByTier) {
+      const credits = await fetchBonusCredits(context.supabase, context.userId);
+      if (credits.length === 0) {
+        if (tier === "free") return { ok: false, reason: "free", limit };
+        return { ok: false, reason: "limit", limit };
+      }
+      bonusCreditIdToConsume = credits[0].id;
     }
 
     const card = pickCard();
@@ -92,14 +130,32 @@ Bu karta ve bu kategoriye özel, 3-4 cümlelik kişisel, sıcak ve şiirsel bir 
       interpretation,
     });
 
-    const nextLimit = tarotLimitFor(tier, used + 1);
+    let bonusUsed = false;
+    let bonusRemaining = 0;
+    if (bonusCreditIdToConsume) {
+      await context.supabase
+        .from("bonus_tarot_credits")
+        .update({ consumed_at: new Date().toISOString() })
+        .eq("id", bonusCreditIdToConsume);
+      bonusUsed = true;
+      const remaining = await fetchBonusCredits(context.supabase, context.userId);
+      bonusRemaining = remaining.length;
+      // Tier limit stays unchanged when bonus is used
+    } else {
+      limit = tarotLimitFor(tier, used + 1);
+      const remaining = await fetchBonusCredits(context.supabase, context.userId);
+      bonusRemaining = remaining.length;
+    }
+
     return {
       ok: true,
       card: { name: card.name, meaning: card.meaning, symbol: card.symbol },
       interpretation,
       category: data.category,
       categoryLabel: catObj.label,
-      limit: nextLimit,
+      limit,
+      bonusUsed,
+      bonusRemaining,
     };
   });
 
