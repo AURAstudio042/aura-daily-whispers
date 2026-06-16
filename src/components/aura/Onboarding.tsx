@@ -1,5 +1,14 @@
 import { useState } from "react";
-import { MOODS, STYLES, UNDERTONES, type Mood, type StyleType } from "@/lib/aura/data";
+import {
+  MOODS,
+  STYLES,
+  UNDERTONES,
+  RELATIONSHIP_STATUSES,
+  GENDERS,
+  LIFE_FOCUS_OPTIONS,
+  type Mood,
+  type StyleType,
+} from "@/lib/aura/data";
 import { saveUser } from "@/lib/aura/store";
 
 export function Onboarding() {
@@ -9,11 +18,29 @@ export function Onboarding() {
   const [birthTime, setBirthTime] = useState("");
   const [city, setCity] = useState("");
   const [style, setStyle] = useState<StyleType>("Klasik");
+
+  // Personalization step
+  const [relationshipStatus, setRelationshipStatus] = useState<string>("");
+  const [gender, setGender] = useState<string>("");
+  const [lifeFocus, setLifeFocus] = useState<string[]>([]);
+  const [hasChildren, setHasChildren] = useState<boolean | undefined>(undefined);
+  const [hasPets, setHasPets] = useState<boolean | undefined>(undefined);
+
+  // Optional step
   const [mood, setMood] = useState<Mood | "">("");
   const [undertone, setUndertone] = useState<string>("");
   const [hair, setHair] = useState("");
 
   const canNext1 = name.trim() && birthDate && city.trim();
+  const canNext2 = !!relationshipStatus; // require relationship status — drives core personalization
+
+  function toggleFocus(id: string) {
+    setLifeFocus((curr) => {
+      if (curr.includes(id)) return curr.filter((x) => x !== id);
+      if (curr.length >= 2) return [curr[1], id]; // max 2
+      return [...curr, id];
+    });
+  }
 
   function finish(skipOptional = false) {
     saveUser({
@@ -22,9 +49,14 @@ export function Onboarding() {
       birthTime: birthTime || undefined,
       city: city.trim() || "Bilinmiyor",
       style,
-      mood: skipOptional ? undefined : (mood || undefined),
-      undertone: skipOptional ? undefined : (undertone || undefined),
-      hair: skipOptional ? undefined : (hair.trim() || undefined),
+      relationshipStatus: relationshipStatus || undefined,
+      gender: gender || undefined,
+      lifeFocus: lifeFocus.length ? lifeFocus : undefined,
+      hasChildren,
+      hasPets,
+      mood: skipOptional ? undefined : mood || undefined,
+      undertone: skipOptional ? undefined : undertone || undefined,
+      hair: skipOptional ? undefined : hair.trim() || undefined,
       createdAt: new Date().toISOString(),
     });
   }
@@ -38,8 +70,8 @@ export function Onboarding() {
       </div>
 
       <div className="mb-6 flex justify-center gap-2">
-        {[0, 1].map((i) => (
-          <span key={i} className={`h-1 w-12 rounded-full ${i <= step ? "bg-[color:var(--aura-lavender)]" : "bg-white/10"}`} />
+        {[0, 1, 2].map((i) => (
+          <span key={i} className={`h-1 w-10 rounded-full ${i <= step ? "bg-[color:var(--aura-lavender)]" : "bg-white/10"}`} />
         ))}
       </div>
 
@@ -82,6 +114,73 @@ export function Onboarding() {
       )}
 
       {step === 1 && (
+        <div className="aura-card animate-aura-fade-in space-y-5 p-6">
+          <h2 className="text-2xl font-light text-white">Seni biraz daha tanıyalım ✨</h2>
+          <p className="text-xs text-[color:var(--aura-muted)]">
+            Bu bilgiler AURA'nın sana daha anlamlı ve kişisel bir rehberlik sunmasına yardımcı olur.
+          </p>
+
+          <Field label="İlişki Durumun">
+            <div className="flex flex-wrap gap-2">
+              {RELATIONSHIP_STATUSES.map((r) => (
+                <Chip key={r.id} active={relationshipStatus === r.id} onClick={() => setRelationshipStatus(r.id)}>
+                  <span className="mr-1">{r.emoji}</span>{r.id}
+                </Chip>
+              ))}
+            </div>
+          </Field>
+
+          <Field label="Cinsiyet (opsiyonel)">
+            <div className="flex flex-wrap gap-2">
+              {GENDERS.map((g) => (
+                <Chip key={g} active={gender === g} onClick={() => setGender(gender === g ? "" : g)}>{g}</Chip>
+              ))}
+            </div>
+          </Field>
+
+          <Field label="Hayatındaki Ana Odak (1-2 seç)">
+            <div className="flex flex-wrap gap-2">
+              {LIFE_FOCUS_OPTIONS.map((f) => (
+                <Chip key={f.id} active={lifeFocus.includes(f.id)} onClick={() => toggleFocus(f.id)}>
+                  <span className="mr-1">{f.emoji}</span>{f.id}
+                </Chip>
+              ))}
+            </div>
+          </Field>
+
+          <Field label="Çocuğun var mı? (opsiyonel)">
+            <div className="flex gap-2">
+              <Chip active={hasChildren === true} onClick={() => setHasChildren(hasChildren === true ? undefined : true)}>Evet</Chip>
+              <Chip active={hasChildren === false} onClick={() => setHasChildren(hasChildren === false ? undefined : false)}>Hayır</Chip>
+            </div>
+          </Field>
+
+          <Field label="Evcil hayvanın var mı? (opsiyonel)">
+            <div className="flex gap-2">
+              <Chip active={hasPets === true} onClick={() => setHasPets(hasPets === true ? undefined : true)}>Evet 🐾</Chip>
+              <Chip active={hasPets === false} onClick={() => setHasPets(hasPets === false ? undefined : false)}>Hayır</Chip>
+            </div>
+          </Field>
+
+          <div className="flex gap-3">
+            <button
+              onClick={() => setStep(0)}
+              className="flex-1 rounded-full border border-[color:var(--border)] py-3 text-sm tracking-[0.15em] text-[color:var(--aura-soft)]"
+            >
+              GERİ
+            </button>
+            <button
+              disabled={!canNext2}
+              onClick={() => setStep(2)}
+              className="aura-btn aura-btn-hover flex-1 disabled:opacity-40"
+            >
+              DEVAM ✦
+            </button>
+          </div>
+        </div>
+      )}
+
+      {step === 2 && (
         <div className="aura-card animate-aura-fade-in space-y-5 p-6">
           <h2 className="text-2xl font-light text-white">Biraz daha senden</h2>
           <p className="text-xs text-[color:var(--aura-muted)]">Bu bilgiler sadece renk ve kıyafet uyumu için kullanılır.</p>
