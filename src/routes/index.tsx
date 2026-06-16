@@ -131,7 +131,11 @@ function BugunPage() {
         </div>
       </div>
 
-      <NotifPermissionBanner name={name} hint={morning} />
+      <NotifPermissionBanner
+        name={name}
+        hint={morning}
+        notificationTime={typeof window !== "undefined" ? (window.localStorage.getItem("aura:notif-time") ?? undefined) : undefined}
+      />
 
       {/* TAROT ENTRY */}
       <Link

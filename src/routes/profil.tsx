@@ -1,14 +1,18 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
+import { toast } from "sonner";
 
 import { AuraShell, SectionLabel } from "@/components/aura/Shell";
 import { Onboarding } from "@/components/aura/Onboarding";
 import { AuthScreen } from "@/components/aura/AuthScreen";
 import { RewardsCard } from "@/components/aura/RewardsCard";
 import { ReferralCard } from "@/components/aura/ReferralCard";
-import { useUser, userName, userCity, zodiacOf, clearUser } from "@/lib/aura/store";
+import { useUser, userName, userCity, zodiacOf, clearUser, saveUser } from "@/lib/aura/store";
 import { getRewardsSummary, type RewardsSummary } from "@/lib/aura/rewards.functions";
+import { STYLES, type StyleType } from "@/lib/aura/data";
+
+const NOTIF_TIME_KEY = "aura:notif-time";
 
 export const Route = createFileRoute("/profil")({
   head: () => ({ meta: [{ title: "Profil ✦ AURA" }, { name: "description", content: "Profilin, ayarların ve AURA+ üyelik." }] }),
@@ -18,7 +22,15 @@ export const Route = createFileRoute("/profil")({
 function ProfilPage() {
   const [u, , ready, authed] = useUser();
   const [rewards, setRewards] = useState<RewardsSummary | null>(null);
+  const [notifTime, setNotifTime] = useState<string>("07:00");
   const fetchSummary = useServerFn(getRewardsSummary);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const saved = window.localStorage.getItem(NOTIF_TIME_KEY);
+      if (saved) setNotifTime(saved);
+    }
+  }, []);
 
   useEffect(() => {
     if (!authed) return;
@@ -33,6 +45,39 @@ function ProfilPage() {
   const initial = name[0]?.toUpperCase() || "?";
   const z = zodiacOf(u);
   const dateLabel = u.birthDate ? new Date(u.birthDate).toLocaleDateString("tr-TR") : "—";
+
+  const handleNotifTime = () => {
+    const next = window.prompt("Bildirim saati (HH:MM)", notifTime);
+    if (!next) return;
+    if (!/^([01]?\d|2[0-3]):[0-5]\d$/.test(next.trim())) {
+      toast.error("Geçersiz saat formatı. Örn: 07:30");
+      return;
+    }
+    const value = next.trim();
+    window.localStorage.setItem(NOTIF_TIME_KEY, value);
+    setNotifTime(value);
+    toast.success(`Bildirim saati ${value} olarak ayarlandı.`);
+  };
+
+  const handleStyle = () => {
+    const idx = STYLES.indexOf(u.style as StyleType);
+    const next = STYLES[(idx + 1) % STYLES.length];
+    saveUser({ ...u, style: next });
+    toast.success(`Stil tercihi: ${next}`);
+  };
+
+  const handleTheme = () => {
+    toast("Tema seçenekleri yakında ✦", { description: "Şu an Dark Luxury aktif." });
+  };
+
+  const handleLocked = (label: string) => {
+    toast(`${label} — AURA+ üyelerine özel ✦`, { description: "Yakında abonelik ile aç." });
+  };
+
+  const handleSubscribe = (plan: string) => {
+    toast(`${plan} aboneliği yakında ✦`, { description: "Lansman sonrası aktif olacak." });
+  };
+
 
   return (
     <AuraShell>
@@ -87,7 +132,11 @@ function ProfilPage() {
           <li>Haftada 2 kez tarot</li>
           <li>Editöryal / Clean tema</li>
         </ul>
-        <button className="mt-4 rounded-full bg-white px-5 py-2.5 text-[12px] font-medium tracking-[0.15em] text-[#08060f]">
+        <button
+          type="button"
+          onClick={() => handleSubscribe("AURA+")}
+          className="mt-4 rounded-full bg-white px-5 py-2.5 text-[12px] font-medium tracking-[0.15em] text-[#08060f] transition-transform active:scale-95"
+        >
           49.90 TL / AY
         </button>
       </section>
@@ -112,7 +161,11 @@ function ProfilPage() {
           <li>Premium watermark</li>
         </ul>
         <div className="mt-4 flex flex-wrap items-center gap-2">
-          <button className="rounded-full bg-white px-5 py-2.5 text-[12px] font-medium tracking-[0.15em] text-[#08060f]">
+          <button
+            type="button"
+            onClick={() => handleSubscribe("AURA Premium")}
+            className="rounded-full bg-white px-5 py-2.5 text-[12px] font-medium tracking-[0.15em] text-[#08060f] transition-transform active:scale-95"
+          >
             99.90 TL / AY
           </button>
           <Link
@@ -132,10 +185,11 @@ function ProfilPage() {
 
       <SectionLabel n="✦" title="Ayarlar" />
       <ul className="mb-6 overflow-hidden rounded-2xl border border-[color:var(--border)] bg-[color:var(--card)]">
-        <SettingRow label="Bildirim Saati" value="07:00" />
-        <SettingRow label="Stil Tercihlerim" value={u.style} />
-        <SettingRow label="Tema" value="Dark Luxury ✦" />
-        <SettingRow label="Taş & Koku Arşivi" value="AURA+" locked />
+        <SettingRow label="Bildirim Saati" value={notifTime} onClick={handleNotifTime} />
+        <SettingRow label="Stil Tercihlerim" value={u.style} onClick={handleStyle} />
+        <SettingRow label="Tema" value="Dark Luxury ✦" onClick={handleTheme} />
+        <SettingRow label="Taş Arşivi" value="AURA+" locked onClick={() => handleLocked("Taş Arşivi")} />
+        <SettingRow label="Koku Arşivi" value="AURA+" locked onClick={() => handleLocked("Koku Arşivi")} />
       </ul>
 
       <button
@@ -152,8 +206,9 @@ function SettingRow({ label, value, locked, onClick }: { label: string; value: s
   return (
     <li>
       <button
+        type="button"
         onClick={onClick}
-        className="flex w-full items-center justify-between gap-3 border-b border-[color:var(--border)] px-4 py-4 text-left last:border-b-0"
+        className="flex w-full items-center justify-between gap-3 border-b border-[color:var(--border)] px-4 py-4 text-left last:border-b-0 transition-colors hover:bg-white/[0.02] active:bg-white/[0.04]"
       >
         <span className="text-[14px] text-white">{label}</span>
         <span className="flex items-center gap-2 text-[12px] text-[color:var(--aura-soft)]">
