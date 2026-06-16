@@ -56,7 +56,7 @@ export function ReferralCard({ code, url, count }: Props) {
       <p className="text-[10px] tracking-[0.3em] uppercase opacity-70">Arkadaşını Davet Et 🎁</p>
       <h2 className="serif mt-1 text-2xl">Birlikte daha güzel</h2>
       <p className="mt-2 text-[12px] text-[color:var(--aura-soft)]">
-        Her davet ettiğin arkadaş için 1 tarot hakkı kazan. 4 arkadaşa ulaştığında
+        Her davet ettiğin kayıt olan arkadaş için 1 tarot hakkı kazan. 4 arkadaşa ulaştığında
         1 hafta AURA+ deneme hediyemiz olsun.
       </p>
 
