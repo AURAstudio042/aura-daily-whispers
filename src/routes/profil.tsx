@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 
 import { AuraShell, SectionLabel } from "@/components/aura/Shell";
 import { Onboarding } from "@/components/aura/Onboarding";
@@ -79,9 +79,17 @@ function ProfilPage() {
           <li>Özel temalar (Altın, Gece Mavisi)</li>
           <li>Premium watermark</li>
         </ul>
-        <button className="mt-4 rounded-full bg-white px-5 py-2.5 text-[12px] font-medium tracking-[0.15em] text-[#08060f]">
-          99.90 TL / AY
-        </button>
+        <div className="mt-4 flex flex-wrap items-center gap-2">
+          <button className="rounded-full bg-white px-5 py-2.5 text-[12px] font-medium tracking-[0.15em] text-[#08060f]">
+            99.90 TL / AY
+          </button>
+          <Link
+            to="/stilist"
+            className="rounded-full border border-white/40 px-4 py-2.5 text-[11px] tracking-[0.15em] text-white/90 hover:bg-white/10"
+          >
+            ✦ AI Stilist'i Aç
+          </Link>
+        </div>
       </section>
 
       <SectionLabel n="✦" title="Ayarlar" />
