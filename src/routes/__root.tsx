@@ -82,7 +82,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "viewport", content: "width=device-width, initial-scale=1, viewport-fit=cover" },
       { title: "AURA ✦ Günlük Ritüelin" },
       { name: "description", content: "AURA — kişisel günlük yaşam yoldaşın. Burç, stil, taş ve koku önerileriyle her gün taze." },
-      { name: "theme-color", content: "#08060f" },
+      { name: "theme-color", content: "#0a0a1a" },
       { name: "apple-mobile-web-app-title", content: "AURA" },
       { name: "apple-mobile-web-app-capable", content: "yes" },
       { name: "apple-mobile-web-app-status-bar-style", content: "black-translucent" },
