@@ -6,7 +6,7 @@ import { createLovableAiGatewayProvider } from "@/lib/ai-gateway.server";
 
 const MsgSchema = z.object({
   role: z.enum(["user", "assistant"]),
-  content: z.string(),
+  content: z.string().max(2000),
 });
 
 const InputSchema = z.object({
@@ -19,12 +19,12 @@ const InputSchema = z.object({
   history: z.array(MsgSchema).max(20).optional(),
   context: z
     .object({
-      name: z.string().optional(),
-      style: z.string().optional(),
-      zodiac: z.string().optional(),
-      city: z.string().optional(),
-      weather: z.string().optional(),
-      timeOfDay: z.string().optional(),
+      name: z.string().max(100).optional(),
+      style: z.string().max(100).optional(),
+      zodiac: z.string().max(50).optional(),
+      city: z.string().max(100).optional(),
+      weather: z.string().max(100).optional(),
+      timeOfDay: z.string().max(50).optional(),
     })
     .optional(),
 });
