@@ -344,12 +344,13 @@ function TarotPage() {
           ) : (
             <>
               <button
-                onClick={onShare}
+                onClick={openShare}
                 disabled={sharing}
                 className="aura-btn aura-btn-hover flex-1 text-[12px] disabled:opacity-60"
               >
                 {sharing ? "..." : "Paylaş"}
               </button>
+
               <button
                 onClick={onReset}
                 className="rounded-full border border-[color:var(--border)] bg-white/[0.03] px-5 py-3 text-[12px] tracking-[0.2em] uppercase text-[color:var(--aura-soft)]"
