@@ -92,19 +92,70 @@ function TarotPage() {
     setCategory(null);
   };
 
-  const onShare = async () => {
+  const viralText = () =>
+    result?.card
+      ? `Today my AURA reading said this. What about yours?\n\n🔮 ${result.card.name}\n"${result.interpretation}"\n\n✨ ${typeof window !== "undefined" ? window.location.origin : "https://aura-daily-whispers.lovable.app"}/tarot`
+      : "";
+
+  const filename = () =>
+    result?.card ? `aura-tarot-${result.card.name.toLowerCase().replace(/\s+/g, "-")}.png` : "aura-tarot.png";
+
+  const openShare = () => {
+    if (!result?.card) return;
+    setShareOpen(true);
+  };
+
+  const onShareInstagram = async () => {
     if (!result?.card || sharing) return;
     setSharing(true);
     try {
-      await shareNodeAsStory(cardRef.current, {
-        title: `Tarot · ${result.card.name}`,
-        text: `${result.card.name} — ${result.interpretation}\n\n— AURA ✨`,
-        filename: `aura-tarot-${result.card.name.toLowerCase()}.png`,
-      });
-    } finally {
-      setSharing(false);
+      const blob = await renderNodeAsStoryBlob(cardRef.current, `Tarot · ${result.card.name}`);
+      if (!blob) { toast.error("Görsel oluşturulamadı"); return; }
+      const shared = await nativeShareImage(blob, viralText(), filename());
+      if (!shared) {
+        downloadBlob(blob, filename());
+        toast.success("Görsel indirildi — Instagram Story'e ekle ✨");
+        if (/Android|iPhone|iPad/i.test(navigator.userAgent)) {
+          setTimeout(() => { window.location.href = "instagram://story-camera"; }, 400);
+        }
+      }
+      setShareOpen(false);
+    } finally { setSharing(false); }
+  };
+
+  const onShareWhatsApp = async () => {
+    if (!result?.card || sharing) return;
+    setSharing(true);
+    try {
+      const blob = await renderNodeAsStoryBlob(cardRef.current, `Tarot · ${result.card.name}`);
+      shareToWhatsApp(viralText(), blob, filename());
+      setShareOpen(false);
+    } finally { setSharing(false); }
+  };
+
+  const onShareMore = async () => {
+    if (!result?.card || sharing) return;
+    setSharing(true);
+    try {
+      const blob = await renderNodeAsStoryBlob(cardRef.current, `Tarot · ${result.card.name}`);
+      if (!blob) { toast.error("Görsel oluşturulamadı"); return; }
+      const shared = await nativeShareImage(blob, viralText(), filename());
+      if (!shared) downloadBlob(blob, filename());
+      setShareOpen(false);
+    } finally { setSharing(false); }
+  };
+
+  const onCopyLink = async () => {
+    try {
+      await navigator.clipboard.writeText(viralText());
+      toast.success("Bağlantı kopyalandı ✨");
+      setShareOpen(false);
+    } catch {
+      toast.error("Kopyalanamadı");
     }
   };
+
+
 
   const onAdComplete = async () => {
     if (adClaiming) return;
