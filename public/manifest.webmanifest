@@ -1,0 +1,10 @@
+{
+  "name": "AURA",
+  "short_name": "AURA",
+  "id": "com.aurastudio.app",
+  "description": "Senin için günlük bir ritüel. Burç, tarot, stil, doğal taş, koku ve daha fazlası",
+  "theme_color": "#0a0a1a",
+  "background_color": "#0a0a1a",
+  "display": "standalone",
+  "start_url": "/"
+}
