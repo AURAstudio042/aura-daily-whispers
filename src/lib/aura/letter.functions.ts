@@ -73,10 +73,10 @@ export const createFutureLetter = createServerFn({ method: "POST" })
         answers: AnswersSchema,
         context: z
           .object({
-            name: z.string().optional(),
-            zodiac: z.string().optional(),
-            style: z.string().optional(),
-            mood: z.string().optional(),
+            name: z.string().max(100).optional(),
+            zodiac: z.string().max(50).optional(),
+            style: z.string().max(100).optional(),
+            mood: z.string().max(200).optional(),
           })
           .optional(),
       })
