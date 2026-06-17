@@ -1,16 +1,18 @@
 import type { ReactNode } from "react";
 
 export function ShareSheet({
-  open, onClose, onInstagram, onWhatsApp, onMore, busy,
+  open, onClose, onInstagram, onWhatsApp, onMore, onCopyLink, busy,
 }: {
   open: boolean;
   onClose: () => void;
   onInstagram: () => void;
   onWhatsApp: () => void;
   onMore: () => void;
+  onCopyLink?: () => void;
   busy?: boolean;
 }) {
   if (!open) return null;
+
   return (
     <div className="fixed inset-0 z-[80] flex items-end justify-center bg-black/60 backdrop-blur-sm animate-aura-fade-in" onClick={onClose}>
       <div
@@ -21,7 +23,7 @@ export function ShareSheet({
       >
         <div className="mx-auto mb-4 h-1 w-12 rounded-full bg-white/15" />
         <p className="mb-4 text-center text-[11px] tracking-[0.3em] uppercase text-[color:var(--aura-muted)]">Paylaş</p>
-        <div className="grid grid-cols-3 gap-3">
+        <div className={`grid gap-3 ${onCopyLink ? "grid-cols-4" : "grid-cols-3"}`}>
           <ShareBtn label="Instagram" onClick={onInstagram} disabled={busy} icon={
             <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
               <rect x="3" y="3" width="18" height="18" rx="5" />
@@ -35,6 +37,14 @@ export function ShareSheet({
               <path d="M8.5 9.5c0 4 3 7 7 7l1.5-1.5-2.2-1.1-1 1c-1.4-.5-2.7-1.7-3.2-3.1l1-1L10.5 8 9 9.5z" />
             </svg>
           } />
+          {onCopyLink && (
+            <ShareBtn label="Link" onClick={onCopyLink} disabled={busy} icon={
+              <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M10 14a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1" />
+                <path d="M14 10a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1" />
+              </svg>
+            } />
+          )}
           <ShareBtn label="Diğer" onClick={onMore} disabled={busy} icon={
             <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
               <path d="M4 12v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7" />
@@ -43,6 +53,7 @@ export function ShareSheet({
             </svg>
           } />
         </div>
+
         <button onClick={onClose} className="mt-5 w-full rounded-full border border-[color:var(--border)] py-3 text-[11px] tracking-[0.3em] uppercase text-[color:var(--aura-muted)]">
           Vazgeç
         </button>

@@ -9,7 +9,9 @@ import { useUser, userName } from "@/lib/aura/store";
 import { TAROT_CATEGORIES } from "@/lib/aura/tarot-data";
 import { drawTarot, getTarotStatus, type TarotReadingResult } from "@/lib/aura/tarot.functions";
 import { claimAdTarot, getRewardsSummary } from "@/lib/aura/rewards.functions";
-import { shareNodeAsStory } from "@/lib/aura/share";
+import { renderNodeAsStoryBlob, nativeShareImage, downloadBlob, shareToWhatsApp } from "@/lib/aura/share";
+import { ShareSheet } from "@/components/aura/ShareSheet";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/tarot")({
   head: () => ({
@@ -38,6 +40,7 @@ function TarotPage() {
   const [adOpen, setAdOpen] = useState(false);
   const [adAvailableThisWeek, setAdAvailableThisWeek] = useState<boolean>(false);
   const [adClaiming, setAdClaiming] = useState(false);
+  const [shareOpen, setShareOpen] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
 
   const fetchStatus = useServerFn(getTarotStatus);
@@ -89,19 +92,70 @@ function TarotPage() {
     setCategory(null);
   };
 
-  const onShare = async () => {
+  const viralText = () =>
+    result?.card
+      ? `Today my AURA reading said this. What about yours?\n\n🔮 ${result.card.name}\n"${result.interpretation}"\n\n✨ ${typeof window !== "undefined" ? window.location.origin : "https://aura-daily-whispers.lovable.app"}/tarot`
+      : "";
+
+  const filename = () =>
+    result?.card ? `aura-tarot-${result.card.name.toLowerCase().replace(/\s+/g, "-")}.png` : "aura-tarot.png";
+
+  const openShare = () => {
+    if (!result?.card) return;
+    setShareOpen(true);
+  };
+
+  const onShareInstagram = async () => {
     if (!result?.card || sharing) return;
     setSharing(true);
     try {
-      await shareNodeAsStory(cardRef.current, {
-        title: `Tarot · ${result.card.name}`,
-        text: `${result.card.name} — ${result.interpretation}\n\n— AURA ✨`,
-        filename: `aura-tarot-${result.card.name.toLowerCase()}.png`,
-      });
-    } finally {
-      setSharing(false);
+      const blob = await renderNodeAsStoryBlob(cardRef.current, `Tarot · ${result.card.name}`);
+      if (!blob) { toast.error("Görsel oluşturulamadı"); return; }
+      const shared = await nativeShareImage(blob, viralText(), filename());
+      if (!shared) {
+        downloadBlob(blob, filename());
+        toast.success("Görsel indirildi — Instagram Story'e ekle ✨");
+        if (/Android|iPhone|iPad/i.test(navigator.userAgent)) {
+          setTimeout(() => { window.location.href = "instagram://story-camera"; }, 400);
+        }
+      }
+      setShareOpen(false);
+    } finally { setSharing(false); }
+  };
+
+  const onShareWhatsApp = async () => {
+    if (!result?.card || sharing) return;
+    setSharing(true);
+    try {
+      const blob = await renderNodeAsStoryBlob(cardRef.current, `Tarot · ${result.card.name}`);
+      shareToWhatsApp(viralText(), blob, filename());
+      setShareOpen(false);
+    } finally { setSharing(false); }
+  };
+
+  const onShareMore = async () => {
+    if (!result?.card || sharing) return;
+    setSharing(true);
+    try {
+      const blob = await renderNodeAsStoryBlob(cardRef.current, `Tarot · ${result.card.name}`);
+      if (!blob) { toast.error("Görsel oluşturulamadı"); return; }
+      const shared = await nativeShareImage(blob, viralText(), filename());
+      if (!shared) downloadBlob(blob, filename());
+      setShareOpen(false);
+    } finally { setSharing(false); }
+  };
+
+  const onCopyLink = async () => {
+    try {
+      await navigator.clipboard.writeText(viralText());
+      toast.success("Bağlantı kopyalandı ✨");
+      setShareOpen(false);
+    } catch {
+      toast.error("Kopyalanamadı");
     }
   };
+
+
 
   const onAdComplete = async () => {
     if (adClaiming) return;
@@ -254,9 +308,13 @@ function TarotPage() {
               <div className="my-4 h-px bg-[color:var(--border)]" />
               <p className="text-[11px] tracking-[0.3em] uppercase text-[color:var(--aura-muted)]">Sana Özel</p>
               <p className="serif mt-2 text-[18px] italic leading-snug text-white">"{result.interpretation}"</p>
-              <p className="mt-5 text-right text-[10px] tracking-[0.35em] text-[color:var(--aura-muted)]">— AURA ✨</p>
+              <div className="mt-5 flex items-center justify-between text-[10px] tracking-[0.35em] text-[color:var(--aura-muted)]">
+                <span>{new Date().toLocaleDateString("tr-TR", { day: "2-digit", month: "long", year: "numeric" })}</span>
+                <span>— AURA ✨</span>
+              </div>
             </div>
           )}
+
 
           {!reveal && !loading && (
             <p className="mt-3 text-center text-[12px] italic text-[color:var(--aura-soft)]">
@@ -286,12 +344,13 @@ function TarotPage() {
           ) : (
             <>
               <button
-                onClick={onShare}
+                onClick={openShare}
                 disabled={sharing}
                 className="aura-btn aura-btn-hover flex-1 text-[12px] disabled:opacity-60"
               >
                 {sharing ? "..." : "Paylaş"}
               </button>
+
               <button
                 onClick={onReset}
                 className="rounded-full border border-[color:var(--border)] bg-white/[0.03] px-5 py-3 text-[12px] tracking-[0.2em] uppercase text-[color:var(--aura-soft)]"
@@ -308,6 +367,17 @@ function TarotPage() {
       {adOpen && (
         <AdTarotModal onComplete={onAdComplete} onClose={() => setAdOpen(false)} />
       )}
+
+      <ShareSheet
+        open={shareOpen}
+        onClose={() => setShareOpen(false)}
+        onInstagram={onShareInstagram}
+        onWhatsApp={onShareWhatsApp}
+        onCopyLink={onCopyLink}
+        onMore={onShareMore}
+        busy={sharing}
+      />
     </AuraShell>
   );
 }
+
