@@ -40,6 +40,7 @@ function TarotPage() {
   const [adOpen, setAdOpen] = useState(false);
   const [adAvailableThisWeek, setAdAvailableThisWeek] = useState<boolean>(false);
   const [adClaiming, setAdClaiming] = useState(false);
+  const [shareOpen, setShareOpen] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
 
   const fetchStatus = useServerFn(getTarotStatus);
