@@ -254,7 +254,7 @@ function TarotPage() {
       )}
 
       {/* CARD AREA */}
-      {canDraw && (
+      {(canDraw || (reveal && result?.card)) && (
         <section ref={cardRef} className="aura-card-dark relative mb-5 overflow-hidden p-6 animate-aura-fade-in">
           <div className="pointer-events-none absolute -top-24 left-1/2 h-48 w-48 -translate-x-1/2 rounded-full bg-[color:var(--aura-purple)]/25 blur-3xl" />
           <div className="pointer-events-none absolute -bottom-20 right-0 h-40 w-40 rounded-full bg-[#b794d4]/15 blur-3xl" />
