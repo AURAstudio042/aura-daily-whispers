@@ -367,6 +367,17 @@ function TarotPage() {
       {adOpen && (
         <AdTarotModal onComplete={onAdComplete} onClose={() => setAdOpen(false)} />
       )}
+
+      <ShareSheet
+        open={shareOpen}
+        onClose={() => setShareOpen(false)}
+        onInstagram={onShareInstagram}
+        onWhatsApp={onShareWhatsApp}
+        onCopyLink={onCopyLink}
+        onMore={onShareMore}
+        busy={sharing}
+      />
     </AuraShell>
   );
 }
+
