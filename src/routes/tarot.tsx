@@ -331,7 +331,7 @@ function TarotPage() {
       )}
 
       {/* ACTIONS */}
-      {canDraw && (
+      {(canDraw || (reveal && result?.card)) && (
         <div className="flex gap-2">
           {!reveal ? (
             <button
