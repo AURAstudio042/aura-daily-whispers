@@ -1,16 +1,18 @@
 import type { ReactNode } from "react";
 
 export function ShareSheet({
-  open, onClose, onInstagram, onWhatsApp, onMore, busy,
+  open, onClose, onInstagram, onWhatsApp, onMore, onCopyLink, busy,
 }: {
   open: boolean;
   onClose: () => void;
   onInstagram: () => void;
   onWhatsApp: () => void;
   onMore: () => void;
+  onCopyLink?: () => void;
   busy?: boolean;
 }) {
   if (!open) return null;
+
   return (
     <div className="fixed inset-0 z-[80] flex items-end justify-center bg-black/60 backdrop-blur-sm animate-aura-fade-in" onClick={onClose}>
       <div
