@@ -308,9 +308,13 @@ function TarotPage() {
               <div className="my-4 h-px bg-[color:var(--border)]" />
               <p className="text-[11px] tracking-[0.3em] uppercase text-[color:var(--aura-muted)]">Sana Özel</p>
               <p className="serif mt-2 text-[18px] italic leading-snug text-white">"{result.interpretation}"</p>
-              <p className="mt-5 text-right text-[10px] tracking-[0.35em] text-[color:var(--aura-muted)]">— AURA ✨</p>
+              <div className="mt-5 flex items-center justify-between text-[10px] tracking-[0.35em] text-[color:var(--aura-muted)]">
+                <span>{new Date().toLocaleDateString("tr-TR", { day: "2-digit", month: "long", year: "numeric" })}</span>
+                <span>— AURA ✨</span>
+              </div>
             </div>
           )}
+
 
           {!reveal && !loading && (
             <p className="mt-3 text-center text-[12px] italic text-[color:var(--aura-soft)]">
