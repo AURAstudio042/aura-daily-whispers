@@ -9,7 +9,9 @@ import { useUser, userName } from "@/lib/aura/store";
 import { TAROT_CATEGORIES } from "@/lib/aura/tarot-data";
 import { drawTarot, getTarotStatus, type TarotReadingResult } from "@/lib/aura/tarot.functions";
 import { claimAdTarot, getRewardsSummary } from "@/lib/aura/rewards.functions";
-import { shareNodeAsStory } from "@/lib/aura/share";
+import { renderNodeAsStoryBlob, nativeShareImage, downloadBlob, shareToWhatsApp } from "@/lib/aura/share";
+import { ShareSheet } from "@/components/aura/ShareSheet";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/tarot")({
   head: () => ({
