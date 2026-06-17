@@ -6,18 +6,18 @@ import { createLovableAiGatewayProvider } from "@/lib/ai-gateway.server";
 import { buildPersonalizationGuidance } from "./data";
 
 const InputSchema = z.object({
-  name: z.string(),
-  zodiac: z.string(),
-  mood: z.string().optional(),
-  style: z.string().optional(),
-  city: z.string(),
+  name: z.string().max(100),
+  zodiac: z.string().max(50),
+  mood: z.string().max(200).optional(),
+  style: z.string().max(100).optional(),
+  city: z.string().max(100),
   weather: z.object({
     temp: z.number(),
-    cond: z.string(),
+    cond: z.string().max(100),
   }),
-  relationshipStatus: z.string().optional(),
-  gender: z.string().optional(),
-  lifeFocus: z.array(z.string()).optional(),
+  relationshipStatus: z.string().max(50).optional(),
+  gender: z.string().max(50).optional(),
+  lifeFocus: z.array(z.string().max(50)).max(20).optional(),
   hasChildren: z.boolean().optional(),
   hasPets: z.boolean().optional(),
 });

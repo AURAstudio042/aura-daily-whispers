@@ -10,11 +10,11 @@ import {
 } from "./mystic-data";
 
 const InputSchema = z.object({
-  zodiac: z.string().optional(),
-  mood: z.string().optional(),
-  name: z.string().optional(),
+  zodiac: z.string().max(50).optional(),
+  mood: z.string().max(200).optional(),
+  name: z.string().max(100).optional(),
   timeOfDay: z.enum(["sabah", "öğle", "akşam", "gece"]),
-  avoidQuote: z.string().optional(),
+  avoidQuote: z.string().max(500).optional(),
 });
 
 function extractJson(text: string): string {

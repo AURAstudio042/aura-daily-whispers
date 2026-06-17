@@ -80,7 +80,7 @@ export const getTarotStatus = createServerFn({ method: "GET" })
 
 export const drawTarot = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) => z.object({ category: CategoryEnum, name: z.string().optional() }).parse(d))
+  .inputValidator((d: unknown) => z.object({ category: CategoryEnum, name: z.string().max(100).optional() }).parse(d))
   .handler(async ({ data, context }): Promise<TarotReadingResult> => {
     const tier = await fetchTier(context.supabase, context.userId);
     const used = await fetchUsage(context.supabase, context.userId, tier);
