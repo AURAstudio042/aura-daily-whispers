@@ -6,7 +6,7 @@ import { createLovableAiGatewayProvider } from "@/lib/ai-gateway.server";
 
 export type FutureLetter = {
   id: string;
-  letter: string;
+  letter: string | null;
   created_at: string;
   deliver_at: string;
   opened_at: string | null;
@@ -39,15 +39,18 @@ export const getLetterStatus = createServerFn({ method: "GET" })
       .order("created_at", { ascending: false });
 
     const now = Date.now();
-    const letters: FutureLetter[] = (rows ?? []).map((r: any) => ({
-      id: r.id,
-      letter: r.letter,
-      created_at: r.created_at,
-      deliver_at: r.deliver_at,
-      opened_at: r.opened_at,
-      unlocked: new Date(r.deliver_at).getTime() <= now,
-      answers: (r.answers ?? {}) as Record<string, string>,
-    }));
+    const letters: FutureLetter[] = (rows ?? []).map((r: any) => {
+      const unlocked = new Date(r.deliver_at).getTime() <= now;
+      return {
+        id: r.id,
+        letter: unlocked ? r.letter : null,
+        created_at: r.created_at,
+        deliver_at: r.deliver_at,
+        opened_at: r.opened_at,
+        unlocked,
+        answers: (r.answers ?? {}) as Record<string, string>,
+      };
+    });
 
     return { tier, letters };
   });
