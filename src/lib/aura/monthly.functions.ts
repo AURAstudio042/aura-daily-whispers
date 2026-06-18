@@ -148,6 +148,48 @@ export const getMonthlyAnalysis = createServerFn({ method: "POST" })
       const c = data.context ?? {};
       const monthName = now.toLocaleDateString("tr-TR", { month: "long" });
       const lastDay = new Date(year, month, 0).getDate();
+      const monthStartIso = new Date(year, month - 1, 1).toISOString();
+
+      // Pull this month's personal data for deeper analysis
+      const [tarotRes, contentRes, coffeeRes] = await Promise.all([
+        context.supabase
+          .from("tarot_readings")
+          .select("category, card_name, created_at")
+          .eq("user_id", context.userId)
+          .gte("created_at", monthStartIso)
+          .order("created_at", { ascending: false })
+          .limit(20),
+        context.supabase
+          .from("daily_content")
+          .select("date, content")
+          .eq("user_id", context.userId)
+          .gte("date", monthStartIso.slice(0, 10))
+          .order("date", { ascending: false })
+          .limit(30),
+        context.supabase
+          .from("coffee_readings")
+          .select("created_at")
+          .eq("user_id", context.userId)
+          .gte("created_at", monthStartIso)
+          .limit(10),
+      ]);
+
+      const tarotSummary = (tarotRes.data ?? []).map((t: any) => `${t.card_name} (${t.category})`).join(", ") || "yok";
+      const moods = new Set<string>();
+      const stones = new Set<string>();
+      const scents = new Set<string>();
+      for (const r of contentRes.data ?? []) {
+        const cc = (r.content ?? {}) as any;
+        if (cc.mood) moods.add(cc.mood);
+        if (cc.stone?.name) stones.add(cc.stone.name);
+        if (cc.scent?.names) scents.add(cc.scent.names);
+      }
+      const personalData = `
+Bu ay tarot çekimleri: ${tarotSummary}
+Bu ay ruh halleri: ${[...moods].join(", ") || "—"}
+Önerilen taşlar: ${[...stones].slice(0, 8).join(", ") || "—"}
+Önerilen kokular: ${[...scents].slice(0, 6).join(", ") || "—"}
+Kahve falı sayısı: ${coffeeRes.data?.length ?? 0}`;
 
       const system = `Sen AURA'nın derin astroloji analistisin. Bir kullanıcı için bu ayın derin analizini hazırla. Türkçe yaz. Şiirsel, sıcak, kişisel ve spesifik ol; aynı burçtan iki kullanıcının aynı raporu almaması için kullanıcının özgün verilerini (isim, doğum, şehir, ruh hali, stil) dokuya işle.
 
