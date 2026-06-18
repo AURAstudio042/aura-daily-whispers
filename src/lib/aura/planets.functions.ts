@@ -92,7 +92,7 @@ Tarih: ${dateLabel}`,
       }, { onConflict: "user_id,date" });
 
       return { ok: true, locked: false, date: today, data: day };
-    } catch {
+    } catch (e) { console.error("[aura/planets] ai error", e);
       return { ok: false, reason: "error", message: "Şu an hazırlanamadı, tekrar dene." };
     }
   });

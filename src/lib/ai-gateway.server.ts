@@ -8,5 +8,10 @@ export function createLovableAiGatewayProvider(lovableApiKey: string) {
       "Lovable-API-Key": lovableApiKey,
       "X-Lovable-AIG-SDK": "vercel-ai-sdk",
     },
+    // Lovable AI Gateway / Gemini supports JSON Schema response_format.
+    // Without this, AI SDK falls back to json_object and the model returns
+    // free-form keys that fail Zod validation.
+    supportsStructuredOutputs: true,
   });
 }
+

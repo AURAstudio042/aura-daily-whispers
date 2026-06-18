@@ -240,7 +240,7 @@ Bu aya ait kişisel veri:${personalData}`;
       );
 
       return { ok: true, locked: false, year, month, analysis };
-    } catch {
+    } catch (e) { console.error("[aura/monthly] ai error", e);
       return {
         ok: false,
         reason: "error",
