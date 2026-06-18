@@ -179,7 +179,8 @@ Bugünün tarihi: ${today.toLocaleDateString("tr-TR")}.`;
         ok: true,
         letter: {
           id: row.id,
-          letter: unlocked ? row.letter : null,
+          letter: unlocked ? finalText : null,
+
           created_at: row.created_at,
           deliver_at: row.deliver_at,
           opened_at: row.opened_at,
