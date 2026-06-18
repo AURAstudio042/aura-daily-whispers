@@ -98,14 +98,6 @@ Kullanıcının notu: ${data.note ?? "—"}`;
       });
 
       const plan = experimental_output as SpecialDayPlan;
-
-      await context.supabase.from("special_day_messages").insert({
-        user_id: context.userId,
-        occasion: data.occasion,
-        message_date: dateStr,
-        content: plan,
-      } as never);
-
       return { ok: true, plan };
     } catch {
       return { ok: false, reason: "error", message: "Şu an hazırlanamadı, tekrar dener misin?" };
