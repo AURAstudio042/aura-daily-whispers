@@ -211,9 +211,12 @@ Kurallar:
 - Güçlü günler 3-5, dikkatli günler 2-3 tane.
 - Her bölüm 1-3 cümle, akıcı Türkçe.
 - power_sentence tek cümlelik, paylaşılmaya değer, güçlü.
-- Yükselen ve ay burcunu bilmiyorsan kullanıcının burcundan ve doğum bilgisinden ince bir çıkarım yap; emin değilsen şiirsel bir ihtimal dili kullan.`;
+- Yükselen ve ay burcunu bilmiyorsan kullanıcının burcundan ve doğum bilgisinden ince bir çıkarım yap; emin değilsen şiirsel bir ihtimal dili kullan.
+- Bu ayki kişisel verilerini (tarot, ruh halleri, taş/koku tercihleri) doğal biçimde yorumuna ört; doğrudan listelemeden tema olarak işle.
 
-      const userPrompt = `${c.name ?? "Bu kişi"} için ${monthName} ${year} ayının derin analizini ver. Bu ay tam olarak ona, bu ana, bu burç-ruh hali kombinasyonuna özel hissettir.`;
+Bu aya ait kişisel veri:${personalData}`;
+
+      const userPrompt = `${c.name ?? "Bu kişi"} için ${monthName} ${year} ayının derin analizini ver. Bu ay tam olarak ona, bu ana, bu burç-ruh hali kombinasyonuna ve yukarıdaki kişisel verilere özel hissettir.`;
 
       const gateway = createLovableAiGatewayProvider(key);
       const { experimental_output } = await generateText({
