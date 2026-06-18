@@ -87,7 +87,8 @@ export const getBirthChart = createServerFn({ method: "POST" })
     try {
       const gateway = createLovableAiGatewayProvider(key);
       const { experimental_output } = await generateText({
-        model: gateway("google/gemini-3-flash-preview", { structuredOutputs: true }),
+        model: gateway("google/gemini-3-flash-preview"),
+        providerOptions: { lovable: { structuredOutputs: true } },
         system: `Sen AURA'nın astrolojik harita yorumcususun. Verilen doğum bilgilerine göre kişiye özel doğum haritası yorumu üretirsin. Türkçe yaz, şiirsel ama net ol. Gezegen konumlarını klasik astroloji bilgisiyle yaklaşık olarak tahmin et (efemerid hesabı yok). Her gezegen için burç (sign) ve ev (house) tahmini ver, sonra anlamını kişiselleştir.
 
 Kullanıcı: ${c.name ?? "—"}
