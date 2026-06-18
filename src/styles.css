@@ -68,6 +68,16 @@
   --aura-lavender: #b794d4;
   --aura-purple: #8b5cf6;
   --aura-gold: #d4b078;
+
+  /* Themeable accent glows (rgb tuples for rgba()) */
+  --aura-glow-1: 139, 92, 246;   /* primary */
+  --aura-glow-2: 183, 148, 212;  /* secondary */
+  --aura-glow-3: 212, 176, 120;  /* tertiary */
+  --aura-card-1: 28, 22, 44;
+  --aura-card-2: 15, 11, 24;
+  --aura-card-dark-1: 13, 9, 23;
+  --aura-card-dark-2: 5, 3, 9;
+  --aura-btn-grad: linear-gradient(135deg, #8b5cf6 0%, #b794d4 50%, #d4b078 130%);
 }
 
 .dark {
