@@ -220,7 +220,7 @@ Bu aya ait kişisel veri:${personalData}`;
 
       const gateway = createLovableAiGatewayProvider(key);
       const { experimental_output } = await generateText({
-        model: gateway("google/gemini-3-flash-preview", { structuredOutputs: true }),
+        model: gateway("google/gemini-3-flash-preview"),
         system,
         experimental_output: Output.object({ schema: AnalysisSchema }),
         messages: [{ role: "user", content: userPrompt }],
