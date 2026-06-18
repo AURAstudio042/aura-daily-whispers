@@ -649,17 +649,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      get_my_future_letters: {
-        Args: never
-        Returns: {
-          answers: Json
-          created_at: string
-          deliver_at: string
-          id: string
-          letter: string
-          opened_at: string
-        }[]
-      }
+      [_ in never]: never
     }
     Enums: {
       app_role: "admin" | "moderator" | "user"
