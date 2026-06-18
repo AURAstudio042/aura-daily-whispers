@@ -1,57 +1,86 @@
-# Plan — Ad-Tarot & Referral System
+# Premium Özellikler — Gerçek Implementasyon Planı
 
-## 1. Database (single migration)
+Bu plan 7 büyük özelliği "yakında" toast'larından kurtarıp gerçek, AI destekli, kişiselleştirilmiş hale getirir. Hepsi Lovable AI Gateway (`google/gemini-3-flash-preview`) üzerinden çalışır, kullanıcı profili + günlük veriler bağlamına eklenir.
 
-New tables:
+## Kapsam ve Mimari
 
-- **bonus_tarot_credits** — `id`, `user_id`, `source` ('ad' | 'referral_referrer' | 'referral_welcome' | 'milestone'), `created_at`, `consumed_at` (nullable). Each row = one free tarot reading the user can spend.
-- **ad_tarot_grants** — `id`, `user_id`, `week_start` (date, Monday), `created_at`. Unique on `(user_id, week_start)` — enforces "one ad-tarot per week" for free users.
-- **referral_codes** — `user_id` PK, `code` (text unique, 6-char), `created_at`. Lazily created on first profile open.
-- **referrals** — `id`, `referrer_id`, `referred_user_id` (unique — one credit per new user), `code`, `created_at`, `rewarded_at`. Records every completed referral.
-- **aura_plus_trials** — `id`, `user_id`, `starts_at`, `ends_at`, `source` ('referral_milestone'). Profile reads tier as effective `plus` if any active trial.
+Her özellik bir server function (`createServerFn` + `requireSupabaseAuth`) ve gerekirse bir cache tablosu kullanır. Tüm AI çağrıları zaten kurulu olan `createLovableAiGatewayProvider`'dan geçer. Premium gating `getUserTier` ile yapılır.
 
-All tables: `GRANT` to `authenticated` + `service_role`, RLS enabled, `auth.uid() = user_id` (or referrer_id) policies. `referrals` allows referrer SELECT of their own rows.
+### 1) Aylık derin analiz (kişisel veriye dayalı)
+- `monthly.functions.ts` zaten var ama sadece profil verisini kullanıyor. Genişletilecek: o ayki `tarot_readings`, `coffee_readings`, `daily_content` (mood/taş/koku geçmişi) ve `saved_quotes` çekilip prompt'a eklenecek.
+- Yeni route: `src/routes/_authenticated/aylik.tsx` — mevcut `MonthlyAnalysis` componentini gösterir, profil sayfasından link.
+- Cache: var olan `monthly_analyses` tablosu.
 
-## 2. Server functions
+### 2) Özel gün modu (yeni)
+- Yeni route: `src/routes/_authenticated/ozel-gun.tsx` — seçim ekranı (düğün, iş toplantısı, romantik buluşma, mezuniyet, mülakat, ilk randevu, doğum günü, sınav) + tarih + opsiyonel not.
+- Yeni server fn: `src/lib/aura/special-day.functions.ts` → AI'dan yapılandırılmış çıktı: enerji analizi, kombin (üst/alt/ayakkabı/aksesuar/makyaj), taş, koku, hazırlık rehberi (sabah/öğlen/akşam adımları), güçlü cümle.
+- Cache: var olan `special_day_messages` tablosuna kayıt (occasion + date + content jsonb).
+- Gating: AURA+ veya Premium.
 
-`src/lib/aura/rewards.functions.ts` (new):
-- `getRewardsSummary` — returns `{ referralCode, referralUrl, referralCount, tarotCreditsEarned, trialDaysEarned, activeTrialEndsAt, adTarotAvailableThisWeek }`. Lazy-creates referral code.
-- `claimAdTarot` — free users only; inserts `ad_tarot_grants` (errors if already claimed this week) and a `bonus_tarot_credits` row with `source='ad'`. Returns new available count.
-- `redeemReferral({ code })` — called once after sign-up. Validates code ≠ self, not already referred, inserts `referrals` row, grants 1 bonus credit to referrer + 1 welcome credit to new user, checks referrer's count — every 4 referrals adds a 7-day AURA+ trial. Stores a "notification" row (simple: append to a `user_notifications` table — out of scope; instead surface "yeni ödül var" via summary flag `newReward`).
+### 3) Taş ve koku arşivi (yeni)
+- Yeni server fn: `src/lib/aura/stones-archive.functions.ts` → kullanıcının `daily_content` geçmişinden tüm taş + koku önerilerini toplar, tarih + bağlamla döner. Favori için yeni minik tablo `stone_favorites` (user_id, kind: stone|scent, name, meaning, created_at).
+- Yeni route: `src/routes/_authenticated/arsiv-tas.tsx` — sekmeli: Taşlar / Kokular / Favoriler. Her kart açıklama + enerji. Kalp ikonuyla favori.
+- Gating: AURA+ ve üstü.
 
-Modify `src/lib/aura/tarot.functions.ts`:
-- `fetchTier`: also check active trial → return `plus` if trial active.
-- `tarotLimitFor` already exists. In `drawTarot`, before rejecting (`free` or limit reached), check unconsumed `bonus_tarot_credits`. If available, allow the draw and mark one credit `consumed_at = now()` after successful insert. Update `getTarotStatus` to include `bonusCredits` count.
+### 4) Doğum haritası & yıldız haritası (yeni)
+- Profile alanları zaten birth_date/birth_time/birth_place varsayılıyor; yoksa profil formuna ekle.
+- Yeni server fn: `src/lib/aura/birth-chart.functions.ts` → AI'dan yapılandırılmış: güneş, ay, yükselen, merkür, venüs, mars, jüpiter, satürn için burç + ev + kişiye etki yorumu + genel kişilik özeti + güçlü/zayıf yönler + yaşam yolu.
+- Cache: yeni tablo `birth_charts` (user_id pk, content jsonb, generated_at) — bir kez üretilir.
+- Yeni route: `src/routes/_authenticated/dogum-haritasi.tsx` — SVG çember (12 ev + gezegen sembolleri yerleştirme) + her gezegen için açılır kart.
+- Gating: Premium.
 
-## 3. UI
+### 5) Gezegen takibi (yeni)
+- Yeni server fn: `src/lib/aura/planets.functions.ts` → bugünün tarihi + kullanıcı burcu ile AI'dan: 7 gezegen için bugünkü "transit" yorumu + burca özel etki + günün uyarısı + güçlü saatler.
+- Cache: günlük per-user (`daily_content` benzeri yeni `planet_transits` tablosu: user_id + date pk).
+- Yeni route: `src/routes/_authenticated/gezegenler.tsx` — kart listesi.
+- Gating: Premium.
 
-**Tarot screen (`src/routes/tarot.tsx`)** — for free users, show "Reklam İzle ve 1 Tarot Hakkı Kazan 🎴" button if no ad-tarot this week. Click → simulated 5s ad modal (placeholder, since no real ad SDK) → `claimAdTarot` → user can immediately draw. If already claimed, show "Bu hafta hakkını kullandın, Pazartesi yenilenecek."
+### 6) Temalar gerçekten değişsin
+- `src/styles.css` içine 3 tema sınıfı: `.theme-editorial`, `.theme-gold`, `.theme-midnight` — CSS değişkenlerini (background, foreground, primary, accent, card) override eder.
+- Yeni hook: `useTheme()` — localStorage'dan okur, `document.documentElement.classList` üzerinde toggle eder.
+- `profil.tsx`'teki tema seçici gerçek `setTheme()` çağırsın, toast yerine.
+- `__root.tsx` mount'ta tema uygulasın.
 
-**Profile (`src/routes/profil.tsx`)** — two new sections above "Ayarlar":
-- **Ödüllerim ✦** — three cards: tarot credits, invited friends, trial days, plus active trial countdown if any.
-- **Arkadaşını Davet Et 🎁** — shows code, copy-link button, WhatsApp share, Instagram share (web share API fallback). Message exactly as specified.
+### 7) AI Stilist genişletme
+- Mevcut `stylist.functions.ts` korunur. Yeni mod ekle: `mode: "daily" | "special_day"`. `special_day` modunda occasion + tarih alır, ona göre komple rehber döner (gardırop seçimi + alternatifler + saç/makyaj + parfüm + aksesuar + güven cümlesi).
+- `stilist.tsx`'e mod sekmesi ve özel gün formu.
 
-**Referral capture** — `src/routes/index.tsx` reads `?ref=CODE` from URL on mount, stores in `localStorage`. After first successful auth/onboarding (in `AuthScreen` or root effect), calls `redeemReferral`. Use a simple effect in `__root.tsx` post-auth.
+## Yapılacak dosyalar
 
-## 4. Constraints/notes
+**Yeni server functions** (`src/lib/aura/`):
+- `special-day.functions.ts`
+- `stones-archive.functions.ts` (+ favorite toggle)
+- `birth-chart.functions.ts`
+- `planets.functions.ts`
+- `monthly.functions.ts` (genişlet)
+- `stylist.functions.ts` (special_day modu)
 
-- No real ad SDK — the "ad" is a 5s modal with a countdown. Clear in code comment that this is a placeholder for AdMob.
-- Reset every Monday: implicit via `week_start` date computed in JS (Monday of current week) used in unique key.
-- Notifications: in-app only (toast on next profile open when `newReward` flag is true); no push, since native push isn't wired here.
-- All copy in Turkish.
+**Yeni route'lar** (`src/routes/_authenticated/`):
+- `aylik.tsx`
+- `ozel-gun.tsx`
+- `arsiv-tas.tsx`
+- `dogum-haritasi.tsx`
+- `gezegenler.tsx`
 
-## Files
+**Migration**:
+- `stone_favorites` tablosu
+- `birth_charts` tablosu
+- `planet_transits` tablosu
+- `profiles`'a `theme` text kolonu (opsiyonel — şimdilik localStorage yeterli)
 
-Created:
-- `supabase/migrations/<ts>_rewards_and_referrals.sql`
-- `src/lib/aura/rewards.functions.ts`
-- `src/components/aura/AdTarotModal.tsx`
-- `src/components/aura/ReferralCard.tsx`
-- `src/components/aura/RewardsCard.tsx`
+**Tema sistemi**:
+- `src/styles.css` — 3 tema variant
+- `src/hooks/useTheme.ts`
+- `src/routes/profil.tsx` — gerçek tema değişimi
+- `src/routes/__root.tsx` — mount'ta uygula
 
-Edited:
-- `src/lib/aura/tarot.functions.ts` (bonus credit consumption, trial-aware tier)
-- `src/lib/aura/tarot-data.ts` (extend `TarotLimit` with `bonusCredits`)
-- `src/routes/tarot.tsx` (ad button for free users)
-- `src/routes/profil.tsx` (Rewards + Referral sections)
-- `src/routes/__root.tsx` (capture `?ref=` + redeem after sign-in)
+**UI entegrasyonları**:
+- `profil.tsx` — "yakında" toast'larını yeni route linkleriyle değiştir
+- `stilist.tsx` — özel gün modu UI
+
+## Tahmini boyut
+~13 yeni dosya, ~6 mevcut dosya değişikliği, 1 migration. Tek turda hepsini yazacağım, yarım bırakmayacağım.
+
+## Onay sorusu
+Bu kapsam doğru mu? Özellikle:
+- (4) Doğum haritası: tam astronomik hesap (Swiss Ephemeris) yerine **AI tabanlı yorumsal** harita yapıyorum — gezegen pozisyonlarını AI yaklaşık verir, gerçek efemerid değil. Gerçek astronomik hassasiyet istersen ayrı bir library entegrasyonu gerekir (daha uzun). Onay verir misin AI yorumsal versiyonu için?

@@ -128,6 +128,13 @@ function RootShell({ children }: { children: ReactNode }) {
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
 
+  useEffect(() => {
+    // Apply persisted theme on first mount
+    import("@/hooks/useTheme").then(({ getStoredTheme, applyTheme }) => {
+      applyTheme(getStoredTheme());
+    });
+  }, []);
+
   return (
     <QueryClientProvider client={queryClient}>
       <ReferralCapture />

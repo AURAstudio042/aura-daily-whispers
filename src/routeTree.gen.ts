@@ -12,10 +12,15 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as TarotRouteImport } from './routes/tarot'
 import { Route as StilistRouteImport } from './routes/stilist'
 import { Route as ProfilRouteImport } from './routes/profil'
+import { Route as OzelGunRouteImport } from './routes/ozel-gun'
 import { Route as MistikRouteImport } from './routes/mistik'
 import { Route as MektupRouteImport } from './routes/mektup'
 import { Route as KahveRouteImport } from './routes/kahve'
 import { Route as HaftalikRouteImport } from './routes/haftalik'
+import { Route as GezegenlerRouteImport } from './routes/gezegenler'
+import { Route as DogumHaritasiRouteImport } from './routes/dogum-haritasi'
+import { Route as AylikRouteImport } from './routes/aylik'
+import { Route as ArsivTasRouteImport } from './routes/arsiv-tas'
 import { Route as ArsivRouteImport } from './routes/arsiv'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
@@ -33,6 +38,11 @@ const StilistRoute = StilistRouteImport.update({
 const ProfilRoute = ProfilRouteImport.update({
   id: '/profil',
   path: '/profil',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OzelGunRoute = OzelGunRouteImport.update({
+  id: '/ozel-gun',
+  path: '/ozel-gun',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MistikRoute = MistikRouteImport.update({
@@ -55,6 +65,26 @@ const HaftalikRoute = HaftalikRouteImport.update({
   path: '/haftalik',
   getParentRoute: () => rootRouteImport,
 } as any)
+const GezegenlerRoute = GezegenlerRouteImport.update({
+  id: '/gezegenler',
+  path: '/gezegenler',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DogumHaritasiRoute = DogumHaritasiRouteImport.update({
+  id: '/dogum-haritasi',
+  path: '/dogum-haritasi',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AylikRoute = AylikRouteImport.update({
+  id: '/aylik',
+  path: '/aylik',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ArsivTasRoute = ArsivTasRouteImport.update({
+  id: '/arsiv-tas',
+  path: '/arsiv-tas',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ArsivRoute = ArsivRouteImport.update({
   id: '/arsiv',
   path: '/arsiv',
@@ -75,10 +105,15 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/arsiv': typeof ArsivRoute
+  '/arsiv-tas': typeof ArsivTasRoute
+  '/aylik': typeof AylikRoute
+  '/dogum-haritasi': typeof DogumHaritasiRoute
+  '/gezegenler': typeof GezegenlerRoute
   '/haftalik': typeof HaftalikRoute
   '/kahve': typeof KahveRoute
   '/mektup': typeof MektupRoute
   '/mistik': typeof MistikRoute
+  '/ozel-gun': typeof OzelGunRoute
   '/profil': typeof ProfilRoute
   '/stilist': typeof StilistRoute
   '/tarot': typeof TarotRoute
@@ -87,10 +122,15 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/arsiv': typeof ArsivRoute
+  '/arsiv-tas': typeof ArsivTasRoute
+  '/aylik': typeof AylikRoute
+  '/dogum-haritasi': typeof DogumHaritasiRoute
+  '/gezegenler': typeof GezegenlerRoute
   '/haftalik': typeof HaftalikRoute
   '/kahve': typeof KahveRoute
   '/mektup': typeof MektupRoute
   '/mistik': typeof MistikRoute
+  '/ozel-gun': typeof OzelGunRoute
   '/profil': typeof ProfilRoute
   '/stilist': typeof StilistRoute
   '/tarot': typeof TarotRoute
@@ -100,10 +140,15 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
   '/arsiv': typeof ArsivRoute
+  '/arsiv-tas': typeof ArsivTasRoute
+  '/aylik': typeof AylikRoute
+  '/dogum-haritasi': typeof DogumHaritasiRoute
+  '/gezegenler': typeof GezegenlerRoute
   '/haftalik': typeof HaftalikRoute
   '/kahve': typeof KahveRoute
   '/mektup': typeof MektupRoute
   '/mistik': typeof MistikRoute
+  '/ozel-gun': typeof OzelGunRoute
   '/profil': typeof ProfilRoute
   '/stilist': typeof StilistRoute
   '/tarot': typeof TarotRoute
@@ -114,10 +159,15 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/arsiv'
+    | '/arsiv-tas'
+    | '/aylik'
+    | '/dogum-haritasi'
+    | '/gezegenler'
     | '/haftalik'
     | '/kahve'
     | '/mektup'
     | '/mistik'
+    | '/ozel-gun'
     | '/profil'
     | '/stilist'
     | '/tarot'
@@ -126,10 +176,15 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/arsiv'
+    | '/arsiv-tas'
+    | '/aylik'
+    | '/dogum-haritasi'
+    | '/gezegenler'
     | '/haftalik'
     | '/kahve'
     | '/mektup'
     | '/mistik'
+    | '/ozel-gun'
     | '/profil'
     | '/stilist'
     | '/tarot'
@@ -138,10 +193,15 @@ export interface FileRouteTypes {
     | '/'
     | '/admin'
     | '/arsiv'
+    | '/arsiv-tas'
+    | '/aylik'
+    | '/dogum-haritasi'
+    | '/gezegenler'
     | '/haftalik'
     | '/kahve'
     | '/mektup'
     | '/mistik'
+    | '/ozel-gun'
     | '/profil'
     | '/stilist'
     | '/tarot'
@@ -151,10 +211,15 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRoute: typeof AdminRoute
   ArsivRoute: typeof ArsivRoute
+  ArsivTasRoute: typeof ArsivTasRoute
+  AylikRoute: typeof AylikRoute
+  DogumHaritasiRoute: typeof DogumHaritasiRoute
+  GezegenlerRoute: typeof GezegenlerRoute
   HaftalikRoute: typeof HaftalikRoute
   KahveRoute: typeof KahveRoute
   MektupRoute: typeof MektupRoute
   MistikRoute: typeof MistikRoute
+  OzelGunRoute: typeof OzelGunRoute
   ProfilRoute: typeof ProfilRoute
   StilistRoute: typeof StilistRoute
   TarotRoute: typeof TarotRoute
@@ -181,6 +246,13 @@ declare module '@tanstack/react-router' {
       path: '/profil'
       fullPath: '/profil'
       preLoaderRoute: typeof ProfilRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/ozel-gun': {
+      id: '/ozel-gun'
+      path: '/ozel-gun'
+      fullPath: '/ozel-gun'
+      preLoaderRoute: typeof OzelGunRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/mistik': {
@@ -211,6 +283,34 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof HaftalikRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/gezegenler': {
+      id: '/gezegenler'
+      path: '/gezegenler'
+      fullPath: '/gezegenler'
+      preLoaderRoute: typeof GezegenlerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dogum-haritasi': {
+      id: '/dogum-haritasi'
+      path: '/dogum-haritasi'
+      fullPath: '/dogum-haritasi'
+      preLoaderRoute: typeof DogumHaritasiRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/aylik': {
+      id: '/aylik'
+      path: '/aylik'
+      fullPath: '/aylik'
+      preLoaderRoute: typeof AylikRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/arsiv-tas': {
+      id: '/arsiv-tas'
+      path: '/arsiv-tas'
+      fullPath: '/arsiv-tas'
+      preLoaderRoute: typeof ArsivTasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/arsiv': {
       id: '/arsiv'
       path: '/arsiv'
@@ -239,10 +339,15 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRoute,
   ArsivRoute: ArsivRoute,
+  ArsivTasRoute: ArsivTasRoute,
+  AylikRoute: AylikRoute,
+  DogumHaritasiRoute: DogumHaritasiRoute,
+  GezegenlerRoute: GezegenlerRoute,
   HaftalikRoute: HaftalikRoute,
   KahveRoute: KahveRoute,
   MektupRoute: MektupRoute,
   MistikRoute: MistikRoute,
+  OzelGunRoute: OzelGunRoute,
   ProfilRoute: ProfilRoute,
   StilistRoute: StilistRoute,
   TarotRoute: TarotRoute,

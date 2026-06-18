@@ -11,6 +11,7 @@ import { ReferralCard } from "@/components/aura/ReferralCard";
 import { useUser, userName, userCity, zodiacOf, clearUser, saveUser } from "@/lib/aura/store";
 import { getRewardsSummary, type RewardsSummary } from "@/lib/aura/rewards.functions";
 import { STYLES, type StyleType } from "@/lib/aura/data";
+import { useTheme, THEMES, type ThemeId } from "@/hooks/useTheme";
 
 const NOTIF_TIME_KEY = "aura:notif-time";
 
@@ -23,6 +24,7 @@ function ProfilPage() {
   const [u, , ready, authed] = useUser();
   const [rewards, setRewards] = useState<RewardsSummary | null>(null);
   const [notifTime, setNotifTime] = useState<string>("07:00");
+  const [theme, setTheme] = useTheme();
   const fetchSummary = useServerFn(getRewardsSummary);
 
   useEffect(() => {
@@ -67,12 +69,15 @@ function ProfilPage() {
   };
 
   const handleTheme = () => {
-    toast("Tema seçenekleri yakında ✦", { description: "Şu an Dark Luxury aktif." });
+    const ids = THEMES.map((t) => t.id);
+    const idx = ids.indexOf(theme);
+    const next = ids[(idx + 1) % ids.length] as ThemeId;
+    setTheme(next);
+    const label = THEMES.find((t) => t.id === next)?.label ?? next;
+    toast.success(`Tema: ${label} ✦`);
   };
 
-  const handleLocked = (label: string) => {
-    toast(`${label} — AURA+ üyelerine özel ✦`, { description: "Yakında abonelik ile aç." });
-  };
+  const themeLabel = THEMES.find((t) => t.id === theme)?.label ?? "Dark Luxury";
 
   const handleSubscribe = (plan: string) => {
     toast(`${plan} aboneliği yakında ✦`, { description: "Lansman sonrası aktif olacak." });
@@ -180,16 +185,27 @@ function ProfilPage() {
           >
             ✦ Gelecekteki Kendinden Mektup
           </Link>
+          <Link to="/aylik" className="rounded-full border border-white/40 px-4 py-2.5 text-[11px] tracking-[0.15em] text-white/90 hover:bg-white/10">✦ Aylık Analiz</Link>
+          <Link to="/dogum-haritasi" className="rounded-full border border-white/40 px-4 py-2.5 text-[11px] tracking-[0.15em] text-white/90 hover:bg-white/10">✦ Doğum Haritası</Link>
+          <Link to="/gezegenler" className="rounded-full border border-white/40 px-4 py-2.5 text-[11px] tracking-[0.15em] text-white/90 hover:bg-white/10">✦ Gezegen Takibi</Link>
         </div>
       </section>
+
+      <SectionLabel n="✦" title="Premium Özellikler" />
+      <ul className="mb-6 overflow-hidden rounded-2xl border border-[color:var(--border)] bg-[color:var(--card)]">
+        <LinkRow to="/ozel-gun" label="Özel Gün Modu" badge="AURA+" />
+        <LinkRow to="/arsiv-tas" label="Taş & Koku Arşivi" badge="AURA+" />
+        <LinkRow to="/aylik" label="Aylık Derin Analiz" badge="Premium" />
+        <LinkRow to="/dogum-haritasi" label="Doğum Haritası" badge="Premium" />
+        <LinkRow to="/gezegenler" label="Gezegen Takibi" badge="Premium" />
+        <LinkRow to="/stilist" label="AI Stilist" badge="Premium" />
+      </ul>
 
       <SectionLabel n="✦" title="Ayarlar" />
       <ul className="mb-6 overflow-hidden rounded-2xl border border-[color:var(--border)] bg-[color:var(--card)]">
         <SettingRow label="Bildirim Saati" value={notifTime} onClick={handleNotifTime} />
         <SettingRow label="Stil Tercihlerim" value={u.style} onClick={handleStyle} />
-        <SettingRow label="Tema" value="Dark Luxury ✦" onClick={handleTheme} />
-        <SettingRow label="Taş Arşivi" value="AURA+" locked onClick={() => handleLocked("Taş Arşivi")} />
-        <SettingRow label="Koku Arşivi" value="AURA+" locked onClick={() => handleLocked("Koku Arşivi")} />
+        <SettingRow label="Tema" value={themeLabel} onClick={handleTheme} />
       </ul>
 
       <button
@@ -199,6 +215,23 @@ function ProfilPage() {
         Çıkış Yap
       </button>
     </AuraShell>
+  );
+}
+
+function LinkRow({ to, label, badge }: { to: string; label: string; badge?: string }) {
+  return (
+    <li>
+      <Link
+        to={to}
+        className="flex w-full items-center justify-between gap-3 border-b border-[color:var(--border)] px-4 py-4 text-left last:border-b-0 transition-colors hover:bg-white/[0.02]"
+      >
+        <span className="text-[14px] text-white">{label}</span>
+        <span className="flex items-center gap-2 text-[12px] text-[color:var(--aura-soft)]">
+          {badge && <span className="rounded-full bg-gradient-to-r from-[#8b5cf6] to-[#b794d4] px-2 py-0.5 text-[9px] font-medium tracking-wider text-white">{badge}</span>}
+          <span className="text-[color:var(--aura-muted)]">›</span>
+        </span>
+      </Link>
+    </li>
   );
 }
 
