@@ -21,13 +21,15 @@ function translateAuthError(raw: string): string {
 }
 
 export function AuthScreen() {
-  const [mode, setMode] = useState<"login" | "signup">("login");
+  const [mode, setMode] = useState<"login" | "signup" | "forgot">("login");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState<string | null>(null);
   const [info, setInfo] = useState<string | null>(null);
+  const [resetEmail, setResetEmail] = useState("");
   const [resetSending, setResetSending] = useState(false);
+
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
