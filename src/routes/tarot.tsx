@@ -255,6 +255,14 @@ function TarotPage() {
           </Link>
         </section>
       )}
+      {/* PLUS / PREMIUM — limit reached, premium completion state */}
+      {!isFree && !canDraw && !result && (
+        <TarotCompletionCard
+          tier={tier === "premium" ? "premium" : "plus"}
+          nextResetAt={status?.nextResetAt ?? null}
+        />
+      )}
+
 
       {/* CATEGORY PICKER */}
       {canDraw && !result && (
