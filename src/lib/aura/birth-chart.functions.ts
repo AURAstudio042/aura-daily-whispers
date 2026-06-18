@@ -106,7 +106,7 @@ Burç (güneş): ${c.zodiac ?? "—"}`,
       }, { onConflict: "user_id" });
 
       return { ok: true, locked: false, chart };
-    } catch {
+    } catch (e) { console.error("[aura/birth-chart] ai error", e);
       return { ok: false, reason: "error", message: "Şu an hazırlanamadı, tekrar dene." };
     }
   });

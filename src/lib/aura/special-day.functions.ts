@@ -100,7 +100,7 @@ Kullanıcının notu: ${data.note ?? "—"}`;
 
       const plan = experimental_output as SpecialDayPlan;
       return { ok: true, plan };
-    } catch {
+    } catch (e) { console.error("[aura/special-day] ai error", e);
       return { ok: false, reason: "error", message: "Şu an hazırlanamadı, tekrar dener misin?" };
     }
   });
