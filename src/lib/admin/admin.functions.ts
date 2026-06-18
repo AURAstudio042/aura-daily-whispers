@@ -4,23 +4,29 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 const PRICE_PLUS = 49.9;
 const PRICE_PREMIUM = 99.9;
 
+async function isAdmin(ctx: { supabase: any; userId: string }): Promise<boolean> {
+  // RLS on user_roles lets a user read their own rows; querying with the
+  // user-scoped client avoids exposing any role-check RPC publicly.
+  const { data } = await ctx.supabase
+    .from("user_roles")
+    .select("role")
+    .eq("user_id", ctx.userId)
+    .eq("role", "admin")
+    .limit(1)
+    .maybeSingle();
+  return !!data;
+}
+
 async function assertAdmin(ctx: { supabase: any; userId: string }) {
-  const { data, error } = await ctx.supabase.rpc("has_role", {
-    _user_id: ctx.userId,
-    _role: "admin",
-  });
-  if (error || !data) throw new Error("Forbidden");
+  if (!(await isAdmin(ctx))) throw new Error("Forbidden");
 }
 
 export const checkIsAdmin = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
-    const { data } = await context.supabase.rpc("has_role", {
-      _user_id: context.userId,
-      _role: "admin",
-    });
-    return { isAdmin: Boolean(data) };
+    return { isAdmin: await isAdmin(context) };
   });
+
 
 export const getAdminStats = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
