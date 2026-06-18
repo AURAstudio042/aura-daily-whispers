@@ -11,6 +11,7 @@ import { ReferralCard } from "@/components/aura/ReferralCard";
 import { useUser, userName, userCity, zodiacOf, clearUser, saveUser } from "@/lib/aura/store";
 import { getRewardsSummary, type RewardsSummary } from "@/lib/aura/rewards.functions";
 import { STYLES, type StyleType } from "@/lib/aura/data";
+import { useTheme, THEMES, type ThemeId } from "@/hooks/useTheme";
 
 const NOTIF_TIME_KEY = "aura:notif-time";
 
@@ -23,6 +24,7 @@ function ProfilPage() {
   const [u, , ready, authed] = useUser();
   const [rewards, setRewards] = useState<RewardsSummary | null>(null);
   const [notifTime, setNotifTime] = useState<string>("07:00");
+  const [theme, setTheme] = useTheme();
   const fetchSummary = useServerFn(getRewardsSummary);
 
   useEffect(() => {
@@ -67,12 +69,15 @@ function ProfilPage() {
   };
 
   const handleTheme = () => {
-    toast("Tema seçenekleri yakında ✦", { description: "Şu an Dark Luxury aktif." });
+    const ids = THEMES.map((t) => t.id);
+    const idx = ids.indexOf(theme);
+    const next = ids[(idx + 1) % ids.length] as ThemeId;
+    setTheme(next);
+    const label = THEMES.find((t) => t.id === next)?.label ?? next;
+    toast.success(`Tema: ${label} ✦`);
   };
 
-  const handleLocked = (label: string) => {
-    toast(`${label} — AURA+ üyelerine özel ✦`, { description: "Yakında abonelik ile aç." });
-  };
+  const themeLabel = THEMES.find((t) => t.id === theme)?.label ?? "Dark Luxury";
 
   const handleSubscribe = (plan: string) => {
     toast(`${plan} aboneliği yakında ✦`, { description: "Lansman sonrası aktif olacak." });
