@@ -18,6 +18,21 @@ import {
   dailyQuote,
   dailyWeather,
 } from "@/lib/aura/data";
+import amethystImg from "@/assets/stones/amethyst.jpg";
+import aquamarineImg from "@/assets/stones/aquamarine.jpg";
+import roseImg from "@/assets/stones/rose.jpg";
+import carnelianImg from "@/assets/stones/carnelian.jpg";
+import onyxImg from "@/assets/stones/onyx.jpg";
+import citrineImg from "@/assets/stones/citrine.jpg";
+
+const STONE_IMAGES: Record<string, string> = {
+  amethyst: amethystImg,
+  aquamarine: aquamarineImg,
+  rose: roseImg,
+  carnelian: carnelianImg,
+  onyx: onyxImg,
+  citrine: citrineImg,
+};
 import { useDailyPack } from "@/lib/aura/useDailyPack";
 import { useDailyWeather, weatherNote } from "@/lib/aura/useDailyWeather";
 
@@ -220,7 +235,16 @@ function BugunPage() {
       <Card shareTitle="Taşın" shareText={`${stone.name} — ${stone.meaning}`}>
         <SectionLabel n="04" title="Taşın" />
         <div className="flex items-center gap-5">
-          <div className={`gem gem-${stone.kind} animate-aura-pulse shrink-0`} />
+          <div className="relative shrink-0 h-24 w-24 rounded-full overflow-hidden ring-1 ring-white/10 shadow-[0_0_40px_rgba(255,255,255,0.08),inset_0_0_20px_rgba(0,0,0,0.4)] animate-aura-pulse">
+            <img
+              src={STONE_IMAGES[stone.kind]}
+              alt={stone.name}
+              loading="lazy"
+              width={512}
+              height={512}
+              className="h-full w-full object-cover"
+            />
+          </div>
           <div className="min-w-0 flex-1">
             <h3 className="text-2xl font-light text-white">{stone.name}</h3>
             <p className="mt-1 text-[13px] text-[color:var(--aura-soft)]">{stone.meaning}</p>
