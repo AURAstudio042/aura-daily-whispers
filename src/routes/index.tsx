@@ -288,7 +288,7 @@ function Card({
     }
   };
   return (
-    <section ref={ref} className="aura-card relative mb-5 p-5 animate-aura-fade-in">
+    <section ref={ref} className={cn("aura-card relative mb-5 p-5 animate-aura-fade-in", canShare && "pr-12")}>
       {canShare && (
         <button
           onClick={onShare}
