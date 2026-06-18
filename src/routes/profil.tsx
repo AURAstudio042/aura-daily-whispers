@@ -185,16 +185,27 @@ function ProfilPage() {
           >
             ✦ Gelecekteki Kendinden Mektup
           </Link>
+          <Link to="/aylik" className="rounded-full border border-white/40 px-4 py-2.5 text-[11px] tracking-[0.15em] text-white/90 hover:bg-white/10">✦ Aylık Analiz</Link>
+          <Link to="/dogum-haritasi" className="rounded-full border border-white/40 px-4 py-2.5 text-[11px] tracking-[0.15em] text-white/90 hover:bg-white/10">✦ Doğum Haritası</Link>
+          <Link to="/gezegenler" className="rounded-full border border-white/40 px-4 py-2.5 text-[11px] tracking-[0.15em] text-white/90 hover:bg-white/10">✦ Gezegen Takibi</Link>
         </div>
       </section>
+
+      <SectionLabel n="✦" title="Premium Özellikler" />
+      <ul className="mb-6 overflow-hidden rounded-2xl border border-[color:var(--border)] bg-[color:var(--card)]">
+        <LinkRow to="/ozel-gun" label="Özel Gün Modu" badge="AURA+" />
+        <LinkRow to="/arsiv-tas" label="Taş & Koku Arşivi" badge="AURA+" />
+        <LinkRow to="/aylik" label="Aylık Derin Analiz" badge="Premium" />
+        <LinkRow to="/dogum-haritasi" label="Doğum Haritası" badge="Premium" />
+        <LinkRow to="/gezegenler" label="Gezegen Takibi" badge="Premium" />
+        <LinkRow to="/stilist" label="AI Stilist" badge="Premium" />
+      </ul>
 
       <SectionLabel n="✦" title="Ayarlar" />
       <ul className="mb-6 overflow-hidden rounded-2xl border border-[color:var(--border)] bg-[color:var(--card)]">
         <SettingRow label="Bildirim Saati" value={notifTime} onClick={handleNotifTime} />
         <SettingRow label="Stil Tercihlerim" value={u.style} onClick={handleStyle} />
-        <SettingRow label="Tema" value="Dark Luxury ✦" onClick={handleTheme} />
-        <SettingRow label="Taş Arşivi" value="AURA+" locked onClick={() => handleLocked("Taş Arşivi")} />
-        <SettingRow label="Koku Arşivi" value="AURA+" locked onClick={() => handleLocked("Koku Arşivi")} />
+        <SettingRow label="Tema" value={themeLabel} onClick={handleTheme} />
       </ul>
 
       <button
