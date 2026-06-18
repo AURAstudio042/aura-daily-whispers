@@ -165,7 +165,8 @@ Bugünün tarihi: ${today.toLocaleDateString("tr-TR")}.`;
           letter: finalText,
           deliver_at: deliver.toISOString(),
         })
-        .select("id, letter, created_at, deliver_at, opened_at, answers")
+        .select("id, created_at, deliver_at, opened_at, answers")
+
         .single();
 
       if (error || !inserted) {
