@@ -17,6 +17,7 @@ import { Route as MistikRouteImport } from './routes/mistik'
 import { Route as MektupRouteImport } from './routes/mektup'
 import { Route as KahveRouteImport } from './routes/kahve'
 import { Route as HaftalikRouteImport } from './routes/haftalik'
+import { Route as GuvenRouteImport } from './routes/guven'
 import { Route as GizlilikRouteImport } from './routes/gizlilik'
 import { Route as GezegenlerRouteImport } from './routes/gezegenler'
 import { Route as DogumHaritasiRouteImport } from './routes/dogum-haritasi'
@@ -64,6 +65,11 @@ const KahveRoute = KahveRouteImport.update({
 const HaftalikRoute = HaftalikRouteImport.update({
   id: '/haftalik',
   path: '/haftalik',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GuvenRoute = GuvenRouteImport.update({
+  id: '/guven',
+  path: '/guven',
   getParentRoute: () => rootRouteImport,
 } as any)
 const GizlilikRoute = GizlilikRouteImport.update({
@@ -116,6 +122,7 @@ export interface FileRoutesByFullPath {
   '/dogum-haritasi': typeof DogumHaritasiRoute
   '/gezegenler': typeof GezegenlerRoute
   '/gizlilik': typeof GizlilikRoute
+  '/guven': typeof GuvenRoute
   '/haftalik': typeof HaftalikRoute
   '/kahve': typeof KahveRoute
   '/mektup': typeof MektupRoute
@@ -134,6 +141,7 @@ export interface FileRoutesByTo {
   '/dogum-haritasi': typeof DogumHaritasiRoute
   '/gezegenler': typeof GezegenlerRoute
   '/gizlilik': typeof GizlilikRoute
+  '/guven': typeof GuvenRoute
   '/haftalik': typeof HaftalikRoute
   '/kahve': typeof KahveRoute
   '/mektup': typeof MektupRoute
@@ -153,6 +161,7 @@ export interface FileRoutesById {
   '/dogum-haritasi': typeof DogumHaritasiRoute
   '/gezegenler': typeof GezegenlerRoute
   '/gizlilik': typeof GizlilikRoute
+  '/guven': typeof GuvenRoute
   '/haftalik': typeof HaftalikRoute
   '/kahve': typeof KahveRoute
   '/mektup': typeof MektupRoute
@@ -173,6 +182,7 @@ export interface FileRouteTypes {
     | '/dogum-haritasi'
     | '/gezegenler'
     | '/gizlilik'
+    | '/guven'
     | '/haftalik'
     | '/kahve'
     | '/mektup'
@@ -191,6 +201,7 @@ export interface FileRouteTypes {
     | '/dogum-haritasi'
     | '/gezegenler'
     | '/gizlilik'
+    | '/guven'
     | '/haftalik'
     | '/kahve'
     | '/mektup'
@@ -209,6 +220,7 @@ export interface FileRouteTypes {
     | '/dogum-haritasi'
     | '/gezegenler'
     | '/gizlilik'
+    | '/guven'
     | '/haftalik'
     | '/kahve'
     | '/mektup'
@@ -228,6 +240,7 @@ export interface RootRouteChildren {
   DogumHaritasiRoute: typeof DogumHaritasiRoute
   GezegenlerRoute: typeof GezegenlerRoute
   GizlilikRoute: typeof GizlilikRoute
+  GuvenRoute: typeof GuvenRoute
   HaftalikRoute: typeof HaftalikRoute
   KahveRoute: typeof KahveRoute
   MektupRoute: typeof MektupRoute
@@ -294,6 +307,13 @@ declare module '@tanstack/react-router' {
       path: '/haftalik'
       fullPath: '/haftalik'
       preLoaderRoute: typeof HaftalikRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/guven': {
+      id: '/guven'
+      path: '/guven'
+      fullPath: '/guven'
+      preLoaderRoute: typeof GuvenRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/gizlilik': {
@@ -364,6 +384,7 @@ const rootRouteChildren: RootRouteChildren = {
   DogumHaritasiRoute: DogumHaritasiRoute,
   GezegenlerRoute: GezegenlerRoute,
   GizlilikRoute: GizlilikRoute,
+  GuvenRoute: GuvenRoute,
   HaftalikRoute: HaftalikRoute,
   KahveRoute: KahveRoute,
   MektupRoute: MektupRoute,
