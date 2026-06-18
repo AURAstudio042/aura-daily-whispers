@@ -74,6 +74,7 @@ export const getDailyPlanets = createServerFn({ method: "POST" })
 
       const { experimental_output } = await generateText({
         model: gateway("google/gemini-3-flash-preview"),
+        providerOptions: { lovable: { structuredOutputs: true } },
         system: `Sen AURA'nın günlük gök yorumcususun. Bugünün gezegen konumlarını klasik astroloji yaklaşımıyla tahmin et ve kullanıcının burcuna özel etkilerini Türkçe yorumla. Şiirsel ama net.
 
 Kullanıcı: ${c.name ?? "—"}

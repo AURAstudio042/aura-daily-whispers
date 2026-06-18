@@ -89,6 +89,7 @@ Kullanıcının notu: ${data.note ?? "—"}`;
 
       const { experimental_output } = await generateText({
         model: gateway("google/gemini-3-flash-preview"),
+        providerOptions: { lovable: { structuredOutputs: true } },
         system,
         experimental_output: Output.object({ schema: SchemaOut }),
         messages: [{
