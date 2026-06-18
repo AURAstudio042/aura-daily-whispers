@@ -74,6 +74,102 @@
   --background: #08060f;
 }
 
+/* Theme: Editorial — clean ivory & warm slate */
+.theme-editorial {
+  --background: #f5f1ea;
+  --foreground: #1a1a1a;
+  --card: #ffffff;
+  --card-foreground: #1a1a1a;
+  --popover: #ffffff;
+  --popover-foreground: #1a1a1a;
+  --primary: #1a1a1a;
+  --primary-foreground: #f5f1ea;
+  --secondary: #e8e2d6;
+  --secondary-foreground: #1a1a1a;
+  --muted: #e8e2d6;
+  --muted-foreground: #5a5550;
+  --accent: #d4b078;
+  --accent-foreground: #1a1a1a;
+  --border: rgba(26, 26, 26, 0.12);
+  --input: rgba(26, 26, 26, 0.18);
+  --ring: #1a1a1a;
+  --aura-deep: #f5f1ea;
+  --aura-soft: #3a3530;
+  --aura-muted: #7a7570;
+  --aura-lavender: #8a6a3a;
+  --aura-purple: #5a4528;
+  --aura-gold: #b8884a;
+}
+.theme-editorial body {
+  background-image: none;
+}
+
+/* Theme: Gold — deep onyx with rich gold */
+.theme-gold {
+  --background: #0a0805;
+  --foreground: #f5e8c8;
+  --card: #1a1408;
+  --card-foreground: #f5e8c8;
+  --popover: #1a1408;
+  --popover-foreground: #f5e8c8;
+  --primary: #d4b078;
+  --primary-foreground: #0a0805;
+  --secondary: #241a0c;
+  --secondary-foreground: #f5e8c8;
+  --muted: #241a0c;
+  --muted-foreground: #b89860;
+  --accent: #d4b078;
+  --accent-foreground: #0a0805;
+  --border: rgba(212, 176, 120, 0.22);
+  --input: rgba(212, 176, 120, 0.28);
+  --ring: #d4b078;
+  --aura-deep: #0a0805;
+  --aura-soft: #e8d4a4;
+  --aura-muted: #8a7548;
+  --aura-lavender: #d4b078;
+  --aura-purple: #b8884a;
+  --aura-gold: #ffd98a;
+}
+.theme-gold body {
+  background-image:
+    radial-gradient(60% 40% at 20% 0%, rgba(212, 176, 120, 0.22), transparent 60%),
+    radial-gradient(50% 35% at 100% 30%, rgba(255, 217, 138, 0.12), transparent 60%);
+}
+
+/* Theme: Midnight — deep navy & ice blue */
+.theme-midnight {
+  --background: #050814;
+  --foreground: #e8f0ff;
+  --card: #0a1024;
+  --card-foreground: #e8f0ff;
+  --popover: #0a1024;
+  --popover-foreground: #e8f0ff;
+  --primary: #6ba3ff;
+  --primary-foreground: #050814;
+  --secondary: #101a36;
+  --secondary-foreground: #e8f0ff;
+  --muted: #101a36;
+  --muted-foreground: #6a82b0;
+  --accent: #4a78d4;
+  --accent-foreground: #e8f0ff;
+  --border: rgba(107, 163, 255, 0.18);
+  --input: rgba(107, 163, 255, 0.25);
+  --ring: #6ba3ff;
+  --aura-deep: #050814;
+  --aura-soft: #b0c4e8;
+  --aura-muted: #6a82b0;
+  --aura-lavender: #6ba3ff;
+  --aura-purple: #4a78d4;
+  --aura-gold: #b8d4ff;
+}
+.theme-midnight body {
+  background-image:
+    radial-gradient(60% 40% at 20% 0%, rgba(74, 120, 212, 0.28), transparent 60%),
+    radial-gradient(50% 35% at 100% 30%, rgba(107, 163, 255, 0.16), transparent 60%),
+    radial-gradient(70% 50% at 50% 110%, rgba(184, 212, 255, 0.08), transparent 60%);
+}
+
+
 @layer base {
   * { border-color: var(--color-border); }
   html, body { background-color: var(--color-background); color: var(--color-foreground); }
