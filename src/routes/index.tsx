@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useRef, useState } from "react";
+import { cn } from "@/lib/utils";
 import { AuraShell, SectionLabel, ShareSignature, Tag } from "@/components/aura/Shell";
 import { Onboarding } from "@/components/aura/Onboarding";
 import { AuthScreen } from "@/components/aura/AuthScreen";
@@ -287,7 +288,7 @@ function Card({
     }
   };
   return (
-    <section ref={ref} className="aura-card relative mb-5 p-5 animate-aura-fade-in">
+    <section ref={ref} className={cn("aura-card relative mb-5 p-5 animate-aura-fade-in", canShare && "pr-12")}>
       {canShare && (
         <button
           onClick={onShare}
