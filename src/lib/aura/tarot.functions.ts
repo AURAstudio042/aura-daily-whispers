@@ -69,13 +69,36 @@ async function fetchBonusCredits(supabase: any, userId: string): Promise<{ id: s
   return (data ?? []) as { id: string }[];
 }
 
+async function fetchNextResetAt(supabase: any, userId: string, tier: string): Promise<string | null> {
+  if (tier === "premium") {
+    const now = new Date();
+    const next = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + 1, 0, 0, 0));
+    return next.toISOString();
+  }
+  if (tier === "plus" || tier === "aura+") {
+    const since = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
+    const { data } = await supabase
+      .from("tarot_readings")
+      .select("created_at")
+      .eq("user_id", userId)
+      .gte("created_at", since)
+      .order("created_at", { ascending: true })
+      .limit(1)
+      .maybeSingle();
+    if (!data?.created_at) return null;
+    return new Date(new Date(data.created_at as string).getTime() + 7 * 24 * 60 * 60 * 1000).toISOString();
+  }
+  return null;
+}
+
 export const getTarotStatus = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
-  .handler(async ({ context }): Promise<{ tier: string; limit: TarotLimit; bonusCredits: number }> => {
+  .handler(async ({ context }): Promise<{ tier: string; limit: TarotLimit; bonusCredits: number; nextResetAt: string | null }> => {
     const tier = await fetchTier(context.supabase, context.userId);
     const used = await fetchUsage(context.supabase, context.userId, tier);
     const bonus = await fetchBonusCredits(context.supabase, context.userId);
-    return { tier, limit: tarotLimitFor(tier, used), bonusCredits: bonus.length };
+    const nextResetAt = await fetchNextResetAt(context.supabase, context.userId, tier);
+    return { tier, limit: tarotLimitFor(tier, used), bonusCredits: bonus.length, nextResetAt };
   });
 
 export const drawTarot = createServerFn({ method: "POST" })

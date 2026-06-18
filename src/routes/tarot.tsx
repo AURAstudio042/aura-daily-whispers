@@ -5,6 +5,7 @@ import { AuraShell, SectionLabel, ShareSignature } from "@/components/aura/Shell
 import { AuthScreen } from "@/components/aura/AuthScreen";
 import { Onboarding } from "@/components/aura/Onboarding";
 import { AdTarotModal } from "@/components/aura/AdTarotModal";
+import { TarotCompletionCard } from "@/components/aura/TarotCompletionCard";
 import { useUser, userName } from "@/lib/aura/store";
 import { TAROT_CATEGORIES } from "@/lib/aura/tarot-data";
 import { drawTarot, getTarotStatus, type TarotReadingResult } from "@/lib/aura/tarot.functions";
@@ -55,6 +56,7 @@ type Status = {
   tier: string;
   limit: { allowed: boolean; remaining: number; cap: number; periodLabel: string };
   bonusCredits: number;
+  nextResetAt: string | null;
 };
 
 function TarotPage() {
@@ -253,6 +255,14 @@ function TarotPage() {
           </Link>
         </section>
       )}
+      {/* PLUS / PREMIUM — limit reached, premium completion state */}
+      {!isFree && !canDraw && !result && (
+        <TarotCompletionCard
+          tier={tier === "premium" ? "premium" : "plus"}
+          nextResetAt={status?.nextResetAt ?? null}
+        />
+      )}
+
 
       {/* CATEGORY PICKER */}
       {canDraw && !result && (
