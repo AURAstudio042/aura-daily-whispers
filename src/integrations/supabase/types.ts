@@ -62,6 +62,24 @@ export type Database = {
         }
         Relationships: []
       }
+      birth_charts: {
+        Row: {
+          content: Json
+          generated_at: string
+          user_id: string
+        }
+        Insert: {
+          content: Json
+          generated_at?: string
+          user_id: string
+        }
+        Update: {
+          content?: Json
+          generated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       bonus_tarot_credits: {
         Row: {
           consumed_at: string | null
@@ -260,6 +278,27 @@ export type Database = {
           route?: string
           user_id?: string | null
           viewed_at?: string
+        }
+        Relationships: []
+      }
+      planet_transits: {
+        Row: {
+          content: Json
+          created_at: string
+          date: string
+          user_id: string
+        }
+        Insert: {
+          content: Json
+          created_at?: string
+          date: string
+          user_id: string
+        }
+        Update: {
+          content?: Json
+          created_at?: string
+          date?: string
+          user_id?: string
         }
         Relationships: []
       }
@@ -503,6 +542,33 @@ export type Database = {
           label?: string
           message?: string
           month?: number
+        }
+        Relationships: []
+      }
+      stone_favorites: {
+        Row: {
+          created_at: string
+          id: string
+          kind: string
+          meaning: string | null
+          name: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          kind: string
+          meaning?: string | null
+          name: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          kind?: string
+          meaning?: string | null
+          name?: string
+          user_id?: string
         }
         Relationships: []
       }
