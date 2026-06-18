@@ -1,0 +1,1 @@
+REVOKE EXECUTE ON FUNCTION public.prevent_user_tier_escalation() FROM PUBLIC, anon, authenticated;
