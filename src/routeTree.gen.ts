@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as TarotRouteImport } from './routes/tarot'
 import { Route as StilistRouteImport } from './routes/stilist'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as ProfilRouteImport } from './routes/profil'
 import { Route as OzelGunRouteImport } from './routes/ozel-gun'
 import { Route as MistikRouteImport } from './routes/mistik'
@@ -35,6 +36,11 @@ const TarotRoute = TarotRouteImport.update({
 const StilistRoute = StilistRouteImport.update({
   id: '/stilist',
   path: '/stilist',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ProfilRoute = ProfilRouteImport.update({
@@ -129,6 +135,7 @@ export interface FileRoutesByFullPath {
   '/mistik': typeof MistikRoute
   '/ozel-gun': typeof OzelGunRoute
   '/profil': typeof ProfilRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/stilist': typeof StilistRoute
   '/tarot': typeof TarotRoute
 }
@@ -148,6 +155,7 @@ export interface FileRoutesByTo {
   '/mistik': typeof MistikRoute
   '/ozel-gun': typeof OzelGunRoute
   '/profil': typeof ProfilRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/stilist': typeof StilistRoute
   '/tarot': typeof TarotRoute
 }
@@ -168,6 +176,7 @@ export interface FileRoutesById {
   '/mistik': typeof MistikRoute
   '/ozel-gun': typeof OzelGunRoute
   '/profil': typeof ProfilRoute
+  '/reset-password': typeof ResetPasswordRoute
   '/stilist': typeof StilistRoute
   '/tarot': typeof TarotRoute
 }
@@ -189,6 +198,7 @@ export interface FileRouteTypes {
     | '/mistik'
     | '/ozel-gun'
     | '/profil'
+    | '/reset-password'
     | '/stilist'
     | '/tarot'
   fileRoutesByTo: FileRoutesByTo
@@ -208,6 +218,7 @@ export interface FileRouteTypes {
     | '/mistik'
     | '/ozel-gun'
     | '/profil'
+    | '/reset-password'
     | '/stilist'
     | '/tarot'
   id:
@@ -227,6 +238,7 @@ export interface FileRouteTypes {
     | '/mistik'
     | '/ozel-gun'
     | '/profil'
+    | '/reset-password'
     | '/stilist'
     | '/tarot'
   fileRoutesById: FileRoutesById
@@ -247,6 +259,7 @@ export interface RootRouteChildren {
   MistikRoute: typeof MistikRoute
   OzelGunRoute: typeof OzelGunRoute
   ProfilRoute: typeof ProfilRoute
+  ResetPasswordRoute: typeof ResetPasswordRoute
   StilistRoute: typeof StilistRoute
   TarotRoute: typeof TarotRoute
 }
@@ -265,6 +278,13 @@ declare module '@tanstack/react-router' {
       path: '/stilist'
       fullPath: '/stilist'
       preLoaderRoute: typeof StilistRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/profil': {
@@ -391,6 +411,7 @@ const rootRouteChildren: RootRouteChildren = {
   MistikRoute: MistikRoute,
   OzelGunRoute: OzelGunRoute,
   ProfilRoute: ProfilRoute,
+  ResetPasswordRoute: ResetPasswordRoute,
   StilistRoute: StilistRoute,
   TarotRoute: TarotRoute,
 }
