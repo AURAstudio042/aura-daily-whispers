@@ -109,6 +109,14 @@
   --aura-lavender: #8a6a3a;
   --aura-purple: #5a4528;
   --aura-gold: #b8884a;
+  --aura-glow-1: 184, 136, 74;
+  --aura-glow-2: 138, 106, 58;
+  --aura-glow-3: 232, 226, 214;
+  --aura-card-1: 255, 255, 255;
+  --aura-card-2: 245, 241, 234;
+  --aura-card-dark-1: 232, 226, 214;
+  --aura-card-dark-2: 215, 207, 192;
+  --aura-btn-grad: linear-gradient(135deg, #1a1a1a 0%, #5a4528 60%, #b8884a 130%);
 }
 .theme-editorial body {
   background-image: none;
@@ -139,6 +147,14 @@
   --aura-lavender: #d4b078;
   --aura-purple: #b8884a;
   --aura-gold: #ffd98a;
+  --aura-glow-1: 212, 176, 120;
+  --aura-glow-2: 255, 217, 138;
+  --aura-glow-3: 184, 136, 74;
+  --aura-card-1: 36, 26, 12;
+  --aura-card-2: 18, 12, 5;
+  --aura-card-dark-1: 26, 20, 8;
+  --aura-card-dark-2: 10, 8, 5;
+  --aura-btn-grad: linear-gradient(135deg, #b8884a 0%, #d4b078 50%, #ffd98a 130%);
 }
 .theme-gold body {
   background-image:
@@ -171,6 +187,14 @@
   --aura-lavender: #6ba3ff;
   --aura-purple: #4a78d4;
   --aura-gold: #b8d4ff;
+  --aura-glow-1: 74, 120, 212;
+  --aura-glow-2: 107, 163, 255;
+  --aura-glow-3: 184, 212, 255;
+  --aura-card-1: 16, 26, 54;
+  --aura-card-2: 8, 14, 32;
+  --aura-card-dark-1: 10, 16, 36;
+  --aura-card-dark-2: 5, 8, 20;
+  --aura-btn-grad: linear-gradient(135deg, #4a78d4 0%, #6ba3ff 50%, #b8d4ff 130%);
 }
 .theme-midnight body {
   background-image:
