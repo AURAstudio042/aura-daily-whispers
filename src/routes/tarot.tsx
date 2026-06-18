@@ -56,6 +56,7 @@ type Status = {
   tier: string;
   limit: { allowed: boolean; remaining: number; cap: number; periodLabel: string };
   bonusCredits: number;
+  nextResetAt: string | null;
 };
 
 function TarotPage() {
