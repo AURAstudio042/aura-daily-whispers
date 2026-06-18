@@ -12,6 +12,34 @@ import { claimAdTarot, getRewardsSummary } from "@/lib/aura/rewards.functions";
 import { renderNodeAsStoryBlob, nativeShareImage, downloadBlob, shareToWhatsApp } from "@/lib/aura/share";
 import { ShareSheet } from "@/components/aura/ShareSheet";
 import { toast } from "sonner";
+import tarotBack from "@/assets/tarot/back.jpg";
+import tarotDeli from "@/assets/tarot/deli.jpg";
+import tarotBuyucu from "@/assets/tarot/buyucu.jpg";
+import tarotYildiz from "@/assets/tarot/yildiz.jpg";
+import tarotAy from "@/assets/tarot/ay.jpg";
+import tarotGunes from "@/assets/tarot/gunes.jpg";
+import tarotImparatorice from "@/assets/tarot/imparatorice.jpg";
+import tarotAsiklar from "@/assets/tarot/asiklar.jpg";
+import tarotAdalet from "@/assets/tarot/adalet.jpg";
+import tarotKule from "@/assets/tarot/kule.jpg";
+import tarotDunya from "@/assets/tarot/dunya.jpg";
+import tarotErminise from "@/assets/tarot/erminise.jpg";
+import tarotCark from "@/assets/tarot/cark.jpg";
+
+const CARD_IMAGES: Record<string, string> = {
+  "Deli": tarotDeli,
+  "Büyücü": tarotBuyucu,
+  "Yıldız": tarotYildiz,
+  "Ay": tarotAy,
+  "Güneş": tarotGunes,
+  "İmparatoriçe": tarotImparatorice,
+  "Aşıklar": tarotAsiklar,
+  "Adalet": tarotAdalet,
+  "Kule": tarotKule,
+  "Dünya": tarotDunya,
+  "Erminişe": tarotErminise,
+  "Çark": tarotCark,
+};
 
 export const Route = createFileRoute("/tarot")({
   head: () => ({
@@ -259,43 +287,63 @@ function TarotPage() {
           <div className="pointer-events-none absolute -top-24 left-1/2 h-48 w-48 -translate-x-1/2 rounded-full bg-[color:var(--aura-purple)]/25 blur-3xl" />
           <div className="pointer-events-none absolute -bottom-20 right-0 h-40 w-40 rounded-full bg-[#b794d4]/15 blur-3xl" />
 
-          <div className="relative mx-auto my-3 grid h-64 w-44 place-items-center">
+          <div className="relative mx-auto my-3 h-80 w-52" style={{ perspective: "1200px" }}>
             <div
-              className="absolute inset-0 rounded-2xl border border-[color:var(--aura-lavender)]/30 transition-all duration-700"
-              style={{
-                transform: reveal ? "rotateY(180deg)" : "rotateY(0)",
-                background: reveal
-                  ? "linear-gradient(160deg, #1a0f2e 0%, #2a1a4a 100%)"
-                  : "linear-gradient(160deg, #0b0716 0%, #1a0f2e 100%)",
-                boxShadow: "0 20px 50px rgba(139,92,246,0.25)",
-                backfaceVisibility: "hidden",
-              }}
+              className="relative h-full w-full transition-transform duration-700"
+              style={{ transformStyle: "preserve-3d", transform: reveal ? "rotateY(180deg)" : "rotateY(0)" }}
             >
-              {!reveal && (
-                <div className="grid h-full place-items-center">
-                  <div className="serif text-7xl text-[color:var(--aura-lavender)]/70">✦</div>
-                </div>
-              )}
-            </div>
-            {reveal && result?.card && (
+              {/* BACK */}
               <div
-                className="absolute inset-0 grid place-items-center rounded-2xl border border-[color:var(--aura-lavender)]/50 p-4 text-center animate-aura-fade-in"
+                className="absolute inset-0 overflow-hidden rounded-2xl ring-1 ring-[color:var(--aura-lavender)]/25"
                 style={{
-                  background: "linear-gradient(160deg, #1a0f2e 0%, #3a2461 100%)",
-                  boxShadow: "0 0 40px rgba(183,148,212,0.35), inset 0 0 30px rgba(139,92,246,0.15)",
+                  backfaceVisibility: "hidden",
+                  WebkitBackfaceVisibility: "hidden",
+                  boxShadow: "0 25px 60px -10px rgba(139,92,246,0.45), 0 0 0 1px rgba(212,175,55,0.15) inset",
                 }}
               >
-                <div>
-                  <div className="serif text-5xl text-[color:var(--aura-lavender)]">{result.card.symbol}</div>
-                  <p className="mt-3 text-[10px] tracking-[0.35em] uppercase text-[color:var(--aura-muted)]">
-                    {result.categoryLabel}
-                  </p>
-                  <h2 className="serif mt-2 text-[26px] font-light leading-tight text-white">{result.card.name}</h2>
-                </div>
+                <img
+                  src={tarotBack}
+                  alt="Tarot kartı arkası"
+                  loading="lazy"
+                  width={512}
+                  height={768}
+                  className="h-full w-full object-cover"
+                />
+                <div className="pointer-events-none absolute inset-0 bg-gradient-to-tr from-[#0b0716]/30 via-transparent to-[#b794d4]/10" />
               </div>
-            )}
+
+              {/* FRONT */}
+              <div
+                className="absolute inset-0 overflow-hidden rounded-2xl ring-1 ring-[color:var(--aura-lavender)]/50"
+                style={{
+                  backfaceVisibility: "hidden",
+                  WebkitBackfaceVisibility: "hidden",
+                  transform: "rotateY(180deg)",
+                  boxShadow: "0 0 50px rgba(183,148,212,0.45), 0 0 0 1px rgba(212,175,55,0.25) inset",
+                }}
+              >
+                {reveal && result?.card && (
+                  <>
+                    <img
+                      src={CARD_IMAGES[result.card.name] ?? tarotBack}
+                      alt={result.card.name}
+                      loading="lazy"
+                      width={512}
+                      height={768}
+                      className="h-full w-full object-cover"
+                    />
+                    <div className="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-[#08060f]/90 via-[#08060f]/60 to-transparent p-3 text-center">
+                      <p className="text-[9px] tracking-[0.35em] uppercase text-[color:var(--aura-muted)]">
+                        {result.categoryLabel}
+                      </p>
+                      <h2 className="serif mt-1 text-[20px] font-light leading-tight text-white">{result.card.name}</h2>
+                    </div>
+                  </>
+                )}
+              </div>
+            </div>
             {loading && (
-              <div className="absolute inset-0 grid place-items-center text-[11px] tracking-[0.3em] uppercase text-[color:var(--aura-lavender)]">
+              <div className="absolute inset-0 grid place-items-center rounded-2xl bg-[#08060f]/40 text-[11px] tracking-[0.3em] uppercase text-[color:var(--aura-lavender)] backdrop-blur-sm">
                 ✦ Kartlar karılıyor ✦
               </div>
             )}
