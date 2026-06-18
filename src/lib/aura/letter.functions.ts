@@ -32,11 +32,16 @@ export const getLetterStatus = createServerFn({ method: "GET" })
       .maybeSingle();
     const tier = (profile?.tier as string) || "free";
 
-    const { data: rows } = await context.supabase
+    // The `letter` column is column-revoked from the authenticated role
+    // (sealed-body protection), so fetch via the trusted server-only client
+    // and null out the body until deliver_at has passed.
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: rows } = await supabaseAdmin
       .from("future_letters")
       .select("id, letter, created_at, deliver_at, opened_at, answers")
       .eq("user_id", context.userId)
       .order("created_at", { ascending: false });
+
 
     const now = Date.now();
     const letters: FutureLetter[] = (rows ?? []).map((r: any) => {
