@@ -168,15 +168,16 @@ Bugünün tarihi: ${today.toLocaleDateString("tr-TR")}.`;
       }
 
       const row: any = inserted;
+      const unlocked = new Date(row.deliver_at).getTime() <= Date.now();
       return {
         ok: true,
         letter: {
           id: row.id,
-          letter: row.letter,
+          letter: unlocked ? row.letter : null,
           created_at: row.created_at,
           deliver_at: row.deliver_at,
           opened_at: row.opened_at,
-          unlocked: new Date(row.deliver_at).getTime() <= Date.now(),
+          unlocked,
           answers: row.answers,
         },
       };
