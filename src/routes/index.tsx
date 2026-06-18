@@ -293,7 +293,7 @@ function Card({
           onClick={onShare}
           disabled={busy}
           aria-label={`${shareTitle} paylaş`}
-          className="absolute right-3 top-3 z-10 rounded-full border border-[color:var(--border)] bg-white/[0.03] p-2 text-[color:var(--aura-soft)] backdrop-blur-md transition hover:text-white disabled:opacity-50"
+          className="absolute right-3 top-3 rounded-full border border-[color:var(--border)] bg-white/[0.03] p-2 text-[color:var(--aura-soft)] backdrop-blur-md transition hover:text-white disabled:opacity-50"
         >
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
             <path d="M4 12v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7" />
