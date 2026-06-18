@@ -218,6 +218,23 @@ function ProfilPage() {
   );
 }
 
+function LinkRow({ to, label, badge }: { to: string; label: string; badge?: string }) {
+  return (
+    <li>
+      <Link
+        to={to}
+        className="flex w-full items-center justify-between gap-3 border-b border-[color:var(--border)] px-4 py-4 text-left last:border-b-0 transition-colors hover:bg-white/[0.02]"
+      >
+        <span className="text-[14px] text-white">{label}</span>
+        <span className="flex items-center gap-2 text-[12px] text-[color:var(--aura-soft)]">
+          {badge && <span className="rounded-full bg-gradient-to-r from-[#8b5cf6] to-[#b794d4] px-2 py-0.5 text-[9px] font-medium tracking-wider text-white">{badge}</span>}
+          <span className="text-[color:var(--aura-muted)]">›</span>
+        </span>
+      </Link>
+    </li>
+  );
+}
+
 function SettingRow({ label, value, locked, onClick }: { label: string; value: string; locked?: boolean; onClick?: () => void }) {
   return (
     <li>
