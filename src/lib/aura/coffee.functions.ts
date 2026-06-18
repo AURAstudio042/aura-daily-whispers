@@ -104,7 +104,20 @@ export const listCoffeeReadings = createServerFn({ method: "GET" })
       .eq("user_id", context.userId)
       .order("created_at", { ascending: false })
       .limit(50);
-    return (data ?? []) as CoffeeReadingRow[];
+    const rows = (data ?? []) as CoffeeReadingRow[];
+    // Mint short-lived signed URLs on demand. Legacy rows may already contain a
+    // full URL (http...) — leave those as-is; new rows store only the storage path.
+    await Promise.all(
+      rows.map(async (r) => {
+        if (!r.photo_url) return;
+        if (/^https?:\/\//i.test(r.photo_url)) return;
+        const { data: signed } = await context.supabase.storage
+          .from("coffee-photos")
+          .createSignedUrl(r.photo_url, 60 * 60); // 1 hour
+        r.photo_url = signed?.signedUrl ?? null;
+      }),
+    );
+    return rows;
   });
 
 const AnalyzeInput = z.object({
@@ -172,10 +185,9 @@ async function uploadPhoto(
       .from("coffee-photos")
       .upload(path, bytes, { contentType: mime, upsert: false });
     if (error) return null;
-    const { data: signed } = await supabase.storage
-      .from("coffee-photos")
-      .createSignedUrl(path, 60 * 60 * 24 * 365);
-    return signed?.signedUrl ?? path;
+    // Store only the storage path. Signed URLs are minted on demand at read time
+    // with a short TTL so leaked URLs cannot grant long-lived access.
+    return path;
   } catch {
     return null;
   }
