@@ -21,13 +21,15 @@ function translateAuthError(raw: string): string {
 }
 
 export function AuthScreen() {
-  const [mode, setMode] = useState<"login" | "signup">("login");
+  const [mode, setMode] = useState<"login" | "signup" | "forgot">("login");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState<string | null>(null);
   const [info, setInfo] = useState<string | null>(null);
+  const [resetEmail, setResetEmail] = useState("");
   const [resetSending, setResetSending] = useState(false);
+
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -57,26 +59,94 @@ export function AuthScreen() {
     }
   }
 
-  async function onForgotPassword() {
+  async function onForgotSubmit(e: React.FormEvent) {
+    e.preventDefault();
     setErr(null);
     setInfo(null);
-    if (!email.trim()) {
-      setErr("Önce e-posta adresini gir.");
+    const target = resetEmail.trim();
+    if (!target) {
+      setErr("Lütfen e-posta adresini gir.");
+      return;
+    }
+    // basic email validation
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(target)) {
+      setErr("Geçersiz bir e-posta adresi.");
       return;
     }
     setResetSending(true);
     try {
-      const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), {
-        redirectTo: window.location.origin,
+      const { error } = await supabase.auth.resetPasswordForEmail(target, {
+        redirectTo: `${window.location.origin}/reset-password`,
       });
       if (error) throw error;
-      setInfo("Şifre sıfırlama bağlantısı e-postana gönderildi.");
+      setInfo("Şifre sıfırlama bağlantısı e-posta adresine gönderildi.");
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : "Hata";
       setErr(translateAuthError(msg));
     } finally {
       setResetSending(false);
     }
+  }
+
+
+  if (mode === "forgot") {
+    return (
+      <div className="mx-auto min-h-[100dvh] w-full max-w-md px-6 py-10">
+        <div className="mb-10 text-center">
+          <p className="section-label">A · U · R · A</p>
+          <h1 className="mt-3 text-5xl font-light text-white">AURA ✦</h1>
+          <p className="mt-2 text-sm text-[color:var(--aura-soft)]">
+            Şifreni sıfırla
+          </p>
+        </div>
+
+        <form onSubmit={onForgotSubmit} className="aura-card animate-aura-fade-in space-y-5 p-6" noValidate>
+          <h2 className="text-2xl font-light text-white">Şifremi Unuttum</h2>
+          <p className="text-sm text-[color:var(--aura-soft)]">
+            E-posta adresini gir, sana yeni şifre belirleme bağlantısı gönderelim.
+          </p>
+
+          <div>
+            <label htmlFor="aura-reset-email" className="mb-2 block text-[10px] tracking-[0.3em] uppercase text-[color:var(--aura-muted)]">
+              E-posta
+            </label>
+            <input
+              id="aura-reset-email"
+              type="email"
+              value={resetEmail}
+              onChange={(e) => setResetEmail(e.target.value)}
+              required
+              autoComplete="email"
+              inputMode="email"
+              className={inputCls}
+            />
+          </div>
+
+          {err && (
+            <p role="alert" aria-live="polite" className="text-[12px] text-red-300">{err}</p>
+          )}
+          {info && (
+            <p role="status" aria-live="polite" className="text-[12px] text-[color:var(--aura-lavender)]">{info}</p>
+          )}
+
+          <button
+            type="submit"
+            disabled={resetSending}
+            className="aura-btn aura-btn-hover w-full disabled:opacity-40"
+          >
+            {resetSending ? "…" : "BAĞLANTIYI GÖNDER ✦"}
+          </button>
+
+          <button
+            type="button"
+            onClick={() => { setErr(null); setInfo(null); setMode("login"); }}
+            className="w-full text-center text-[11px] tracking-[0.2em] uppercase text-[color:var(--aura-muted)]"
+          >
+            Girişe dön
+          </button>
+        </form>
+      </div>
+    );
   }
 
   return (
@@ -149,11 +219,10 @@ export function AuthScreen() {
         {mode === "login" && (
           <button
             type="button"
-            onClick={onForgotPassword}
-            disabled={resetSending}
-            className="block w-full text-center text-[11px] tracking-[0.15em] text-[color:var(--aura-soft)] underline-offset-4 hover:underline disabled:opacity-50"
+            onClick={() => { setErr(null); setInfo(null); setResetEmail(email); setMode("forgot"); }}
+            className="block w-full text-center text-[11px] tracking-[0.15em] text-[color:var(--aura-soft)] underline-offset-4 hover:underline"
           >
-            {resetSending ? "Gönderiliyor…" : "Şifreni mi unuttun?"}
+            Şifreni mi unuttun?
           </button>
         )}
 
@@ -168,6 +237,7 @@ export function AuthScreen() {
     </div>
   );
 }
+
 
 const inputCls =
   "w-full rounded-xl border border-[color:var(--border)] bg-[#0d0917] px-4 py-3 text-[15px] text-white placeholder:text-[color:var(--aura-muted)] outline-none focus:border-[color:var(--aura-lavender)]";
