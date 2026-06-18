@@ -59,20 +59,27 @@ export function AuthScreen() {
     }
   }
 
-  async function onForgotPassword() {
+  async function onForgotSubmit(e: React.FormEvent) {
+    e.preventDefault();
     setErr(null);
     setInfo(null);
-    if (!email.trim()) {
-      setErr("Önce e-posta adresini gir.");
+    const target = resetEmail.trim();
+    if (!target) {
+      setErr("Lütfen e-posta adresini gir.");
+      return;
+    }
+    // basic email validation
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(target)) {
+      setErr("Geçersiz bir e-posta adresi.");
       return;
     }
     setResetSending(true);
     try {
-      const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), {
-        redirectTo: window.location.origin,
+      const { error } = await supabase.auth.resetPasswordForEmail(target, {
+        redirectTo: `${window.location.origin}/reset-password`,
       });
       if (error) throw error;
-      setInfo("Şifre sıfırlama bağlantısı e-postana gönderildi.");
+      setInfo("Şifre sıfırlama bağlantısı e-posta adresine gönderildi.");
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : "Hata";
       setErr(translateAuthError(msg));
@@ -80,6 +87,7 @@ export function AuthScreen() {
       setResetSending(false);
     }
   }
+
 
   return (
     <div className="mx-auto min-h-[100dvh] w-full max-w-md px-6 py-10">
