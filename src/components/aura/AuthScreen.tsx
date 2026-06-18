@@ -89,6 +89,66 @@ export function AuthScreen() {
   }
 
 
+  if (mode === "forgot") {
+    return (
+      <div className="mx-auto min-h-[100dvh] w-full max-w-md px-6 py-10">
+        <div className="mb-10 text-center">
+          <p className="section-label">A · U · R · A</p>
+          <h1 className="mt-3 text-5xl font-light text-white">AURA ✦</h1>
+          <p className="mt-2 text-sm text-[color:var(--aura-soft)]">
+            Şifreni sıfırla
+          </p>
+        </div>
+
+        <form onSubmit={onForgotSubmit} className="aura-card animate-aura-fade-in space-y-5 p-6" noValidate>
+          <h2 className="text-2xl font-light text-white">Şifremi Unuttum</h2>
+          <p className="text-sm text-[color:var(--aura-soft)]">
+            E-posta adresini gir, sana yeni şifre belirleme bağlantısı gönderelim.
+          </p>
+
+          <div>
+            <label htmlFor="aura-reset-email" className="mb-2 block text-[10px] tracking-[0.3em] uppercase text-[color:var(--aura-muted)]">
+              E-posta
+            </label>
+            <input
+              id="aura-reset-email"
+              type="email"
+              value={resetEmail}
+              onChange={(e) => setResetEmail(e.target.value)}
+              required
+              autoComplete="email"
+              inputMode="email"
+              className={inputCls}
+            />
+          </div>
+
+          {err && (
+            <p role="alert" aria-live="polite" className="text-[12px] text-red-300">{err}</p>
+          )}
+          {info && (
+            <p role="status" aria-live="polite" className="text-[12px] text-[color:var(--aura-lavender)]">{info}</p>
+          )}
+
+          <button
+            type="submit"
+            disabled={resetSending}
+            className="aura-btn aura-btn-hover w-full disabled:opacity-40"
+          >
+            {resetSending ? "…" : "BAĞLANTIYI GÖNDER ✦"}
+          </button>
+
+          <button
+            type="button"
+            onClick={() => { setErr(null); setInfo(null); setMode("login"); }}
+            className="w-full text-center text-[11px] tracking-[0.2em] uppercase text-[color:var(--aura-muted)]"
+          >
+            Girişe dön
+          </button>
+        </form>
+      </div>
+    );
+  }
+
   return (
     <div className="mx-auto min-h-[100dvh] w-full max-w-md px-6 py-10">
       <div className="mb-10 text-center">
@@ -159,11 +219,10 @@ export function AuthScreen() {
         {mode === "login" && (
           <button
             type="button"
-            onClick={onForgotPassword}
-            disabled={resetSending}
-            className="block w-full text-center text-[11px] tracking-[0.15em] text-[color:var(--aura-soft)] underline-offset-4 hover:underline disabled:opacity-50"
+            onClick={() => { setErr(null); setInfo(null); setResetEmail(email); setMode("forgot"); }}
+            className="block w-full text-center text-[11px] tracking-[0.15em] text-[color:var(--aura-soft)] underline-offset-4 hover:underline"
           >
-            {resetSending ? "Gönderiliyor…" : "Şifreni mi unuttun?"}
+            Şifreni mi unuttun?
           </button>
         )}
 
@@ -178,6 +237,7 @@ export function AuthScreen() {
     </div>
   );
 }
+
 
 const inputCls =
   "w-full rounded-xl border border-[color:var(--border)] bg-[#0d0917] px-4 py-3 text-[15px] text-white placeholder:text-[color:var(--aura-muted)] outline-none focus:border-[color:var(--aura-lavender)]";
