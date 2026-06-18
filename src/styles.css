@@ -68,6 +68,16 @@
   --aura-lavender: #b794d4;
   --aura-purple: #8b5cf6;
   --aura-gold: #d4b078;
+
+  /* Themeable accent glows (rgb tuples for rgba()) */
+  --aura-glow-1: 139, 92, 246;   /* primary */
+  --aura-glow-2: 183, 148, 212;  /* secondary */
+  --aura-glow-3: 212, 176, 120;  /* tertiary */
+  --aura-card-1: 28, 22, 44;
+  --aura-card-2: 15, 11, 24;
+  --aura-card-dark-1: 13, 9, 23;
+  --aura-card-dark-2: 5, 3, 9;
+  --aura-btn-grad: linear-gradient(135deg, #8b5cf6 0%, #b794d4 50%, #d4b078 130%);
 }
 
 .dark {
@@ -99,6 +109,14 @@
   --aura-lavender: #8a6a3a;
   --aura-purple: #5a4528;
   --aura-gold: #b8884a;
+  --aura-glow-1: 184, 136, 74;
+  --aura-glow-2: 138, 106, 58;
+  --aura-glow-3: 232, 226, 214;
+  --aura-card-1: 255, 255, 255;
+  --aura-card-2: 245, 241, 234;
+  --aura-card-dark-1: 232, 226, 214;
+  --aura-card-dark-2: 215, 207, 192;
+  --aura-btn-grad: linear-gradient(135deg, #1a1a1a 0%, #5a4528 60%, #b8884a 130%);
 }
 .theme-editorial body {
   background-image: none;
@@ -129,6 +147,14 @@
   --aura-lavender: #d4b078;
   --aura-purple: #b8884a;
   --aura-gold: #ffd98a;
+  --aura-glow-1: 212, 176, 120;
+  --aura-glow-2: 255, 217, 138;
+  --aura-glow-3: 184, 136, 74;
+  --aura-card-1: 36, 26, 12;
+  --aura-card-2: 18, 12, 5;
+  --aura-card-dark-1: 26, 20, 8;
+  --aura-card-dark-2: 10, 8, 5;
+  --aura-btn-grad: linear-gradient(135deg, #b8884a 0%, #d4b078 50%, #ffd98a 130%);
 }
 .theme-gold body {
   background-image:
@@ -161,6 +187,14 @@
   --aura-lavender: #6ba3ff;
   --aura-purple: #4a78d4;
   --aura-gold: #b8d4ff;
+  --aura-glow-1: 74, 120, 212;
+  --aura-glow-2: 107, 163, 255;
+  --aura-glow-3: 184, 212, 255;
+  --aura-card-1: 16, 26, 54;
+  --aura-card-2: 8, 14, 32;
+  --aura-card-dark-1: 10, 16, 36;
+  --aura-card-dark-2: 5, 8, 20;
+  --aura-btn-grad: linear-gradient(135deg, #4a78d4 0%, #6ba3ff 50%, #b8d4ff 130%);
 }
 .theme-midnight body {
   background-image:
@@ -176,9 +210,9 @@
   body {
     font-family: var(--font-sans);
     background-image:
-      radial-gradient(60% 40% at 20% 0%, rgba(139, 92, 246, 0.22), transparent 60%),
-      radial-gradient(50% 35% at 100% 30%, rgba(183, 148, 212, 0.14), transparent 60%),
-      radial-gradient(70% 50% at 50% 110%, rgba(212, 176, 120, 0.08), transparent 60%);
+      radial-gradient(60% 40% at 20% 0%, rgba(var(--aura-glow-1), 0.22), transparent 60%),
+      radial-gradient(50% 35% at 100% 30%, rgba(var(--aura-glow-2), 0.14), transparent 60%),
+      radial-gradient(70% 50% at 50% 110%, rgba(var(--aura-glow-3), 0.08), transparent 60%);
     background-attachment: fixed;
     min-height: 100vh;
   }
@@ -188,14 +222,14 @@
 @utility aura-card {
   position: relative;
   background:
-    radial-gradient(120% 80% at 0% 0%, rgba(139, 92, 246, 0.10), transparent 55%),
-    radial-gradient(120% 80% at 100% 100%, rgba(212, 176, 120, 0.05), transparent 55%),
-    linear-gradient(180deg, rgba(28, 22, 44, 0.92), rgba(15, 11, 24, 0.92));
-  border: 1px solid rgba(183, 148, 212, 0.14);
+    radial-gradient(120% 80% at 0% 0%, rgba(var(--aura-glow-1), 0.10), transparent 55%),
+    radial-gradient(120% 80% at 100% 100%, rgba(var(--aura-glow-3), 0.05), transparent 55%),
+    linear-gradient(180deg, rgba(var(--aura-card-1), 0.92), rgba(var(--aura-card-2), 0.92));
+  border: 1px solid var(--border);
   border-radius: 1.5rem;
   backdrop-filter: blur(14px) saturate(140%);
   box-shadow:
-    0 10px 40px rgba(0, 0, 0, 0.5),
+    0 10px 40px rgba(0, 0, 0, 0.35),
     0 1px 0 rgba(255, 255, 255, 0.04) inset,
     0 0 0 1px rgba(255, 255, 255, 0.02) inset;
 }
@@ -203,12 +237,12 @@
 @utility aura-card-dark {
   position: relative;
   background:
-    radial-gradient(80% 60% at 50% 0%, rgba(139, 92, 246, 0.18), transparent 60%),
-    linear-gradient(180deg, #0d0917 0%, #050309 100%);
-  border: 1px solid rgba(183, 148, 212, 0.22);
+    radial-gradient(80% 60% at 50% 0%, rgba(var(--aura-glow-1), 0.18), transparent 60%),
+    linear-gradient(180deg, rgb(var(--aura-card-dark-1)) 0%, rgb(var(--aura-card-dark-2)) 100%);
+  border: 1px solid var(--border);
   border-radius: 1.5rem;
   box-shadow:
-    0 16px 50px rgba(0, 0, 0, 0.7),
+    0 16px 50px rgba(0, 0, 0, 0.5),
     0 1px 0 rgba(255, 255, 255, 0.06) inset;
 }
 
@@ -222,24 +256,24 @@
 }
 
 @utility aura-btn {
-  background: linear-gradient(135deg, #8b5cf6 0%, #b794d4 50%, #d4b078 130%);
-  color: #ffffff;
+  background: var(--aura-btn-grad);
+  color: var(--primary-foreground);
   font-weight: 500;
   letter-spacing: 0.15em;
   border-radius: 999px;
   padding: 0.95rem 1.5rem;
   box-shadow:
-    0 10px 30px rgba(139, 92, 246, 0.45),
+    0 10px 30px rgba(var(--aura-glow-1), 0.45),
     0 1px 0 rgba(255, 255, 255, 0.25) inset;
   transition: transform 0.2s, box-shadow 0.2s;
 }
 @utility aura-btn-hover {
-  &:hover { transform: translateY(-1px); box-shadow: 0 14px 36px rgba(139, 92, 246, 0.6), 0 1px 0 rgba(255,255,255,0.3) inset; }
+  &:hover { transform: translateY(-1px); box-shadow: 0 14px 36px rgba(var(--aura-glow-1), 0.6), 0 1px 0 rgba(255,255,255,0.3) inset; }
 }
 
 @utility aura-divider {
   height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(183, 148, 212, 0.25), transparent);
+  background: linear-gradient(90deg, transparent, rgba(var(--aura-glow-2), 0.25), transparent);
 }
 
 @utility aura-glow {
