@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { fetchWeather, type LiveWeather } from "./weather.functions";
+import { logWeather } from "./debug-observer";
+
 
 function todayStamp(): string {
   const d = new Date();
@@ -33,21 +35,39 @@ export function useDailyWeather(city: string | undefined): LiveWeather | null {
     try {
       const cached = window.localStorage.getItem(key);
       if (cached) {
-        setWeather(JSON.parse(cached) as LiveWeather);
+        const parsed = JSON.parse(cached) as LiveWeather;
+        setWeather(parsed);
+        const ts = new Date().toISOString();
+        logWeather({
+          location: city,
+          requestedAt: ts,
+          respondedAt: ts,
+          cacheHit: true,
+          raw: parsed,
+        });
         return;
       }
     } catch {}
 
     let cancelled = false;
+    const requestedAt = new Date().toISOString();
     fetcher({ data: { city } })
       .then((res) => {
         if (cancelled || !res?.weather) return;
         setWeather(res.weather);
+        logWeather({
+          location: city,
+          requestedAt,
+          respondedAt: new Date().toISOString(),
+          cacheHit: false,
+          raw: res.weather,
+        });
         try {
           window.localStorage.setItem(key, JSON.stringify(res.weather));
         } catch {}
       })
       .catch(() => {});
+
 
     return () => {
       cancelled = true;

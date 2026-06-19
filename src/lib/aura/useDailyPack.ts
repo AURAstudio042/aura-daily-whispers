@@ -3,6 +3,8 @@ import { useServerFn } from "@tanstack/react-start";
 import { generateDailyPack, type DailyPack } from "./generate.functions";
 import type { AuraUser } from "./store";
 import { zodiacOf } from "./store";
+import { logDailyQuote } from "./debug-observer";
+
 
 function todayStamp(): string {
   const d = new Date();
@@ -34,10 +36,17 @@ export function useDailyPack(
     try {
       const cached = window.localStorage.getItem(key);
       if (cached) {
-        setPack(JSON.parse(cached) as DailyPack);
+        const parsed = JSON.parse(cached) as DailyPack;
+        setPack(parsed);
+        logDailyQuote({
+          key: `${key}::${parsed?.quote?.author ?? "anon"}`,
+          text: parsed?.quote?.text ?? "",
+          source: "cache",
+        });
         return;
       }
     } catch {}
+
 
     let cancelled = false;
     setLoading(true);
@@ -60,11 +69,17 @@ export function useDailyPack(
         if (cancelled) return;
         if (res?.pack) {
           setPack(res.pack);
+          logDailyQuote({
+            key: `${key}::${res.pack?.quote?.author ?? "anon"}`,
+            text: res.pack?.quote?.text ?? "",
+            source: "fresh",
+          });
           try {
             window.localStorage.setItem(key, JSON.stringify(res.pack));
           } catch {}
         }
       })
+
       .catch(() => {})
       .finally(() => {
         if (!cancelled) setLoading(false);
