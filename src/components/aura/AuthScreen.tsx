@@ -11,8 +11,8 @@ function translateAuthError(raw: string): string {
     return "Bu e-posta ile bir hesap zaten var. Giriş yapmayı dene.";
   if (m.includes("password") && m.includes("short"))
     return "Şifren en az 6 karakter olmalı.";
-  if (m.includes("rate limit") || m.includes("too many"))
-    return "Çok fazla deneme yaptın. Bir süre sonra tekrar dener misin?";
+  if (m.includes("rate limit") || m.includes("too many") || m.includes("you can only request this after") || m.includes("over_email_send_rate_limit"))
+    return "Az önce bir bağlantı gönderdik. Lütfen ~1 dakika bekleyip tekrar dene (ve spam / gereksiz klasörünü de kontrol et).";
   if (m.includes("invalid email"))
     return "Geçersiz bir e-posta adresi.";
   if (m.includes("network") || m.includes("failed to fetch"))
@@ -74,12 +74,18 @@ export function AuthScreen() {
       return;
     }
     setResetSending(true);
+    const redirectTo = `${window.location.origin}/reset-password`;
+    console.info("[auth][reset] requesting password reset", { email: target, redirectTo, at: new Date().toISOString() });
     try {
-      const { error } = await supabase.auth.resetPasswordForEmail(target, {
-        redirectTo: `${window.location.origin}/reset-password`,
+      const { data, error } = await supabase.auth.resetPasswordForEmail(target, {
+        redirectTo,
       });
-      if (error) throw error;
-      setInfo("Şifre sıfırlama bağlantısı e-posta adresine gönderildi.");
+      if (error) {
+        console.error("[auth][reset] failed", { email: target, message: error.message, status: (error as { status?: number }).status });
+        throw error;
+      }
+      console.info("[auth][reset] request accepted by backend", { email: target, data });
+      setInfo("Şifre sıfırlama bağlantısı e-posta adresine gönderildi. Gelmediyse spam / gereksiz klasörünü de kontrol et.");
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : "Hata";
       setErr(translateAuthError(msg));
