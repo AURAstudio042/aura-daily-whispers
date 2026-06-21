@@ -41,8 +41,14 @@ export function AuthScreen() {
     setInfo(null);
     setGoogleLoading(true);
     try {
+      // OAuth must return to the tab/origin that started the flow.
+      // Using a hardcoded production URL breaks preview + mobile in-app browsers
+      // (the originating tab never receives the session and shows a generic error
+      // even when Google auth succeeded server-side).
+      const origin =
+        typeof window !== "undefined" ? window.location.origin : APP_URL;
       const result = await lovable.auth.signInWithOAuth("google", {
-        redirect_uri: APP_URL,
+        redirect_uri: origin,
       });
       if (result.error) {
         const msg = result.error instanceof Error ? result.error.message : String(result.error);
