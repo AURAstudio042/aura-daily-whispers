@@ -522,8 +522,88 @@ export const QUOTES: Quote[] = [
   { text: "Hayat seni nereye götürürse götürsün, kalbini de yanına al.", category: "Yol" },
   { text: "Bekleyişin de bir anlamı var; her şey aynı anda çiçek açmaz.", category: "Sabır" },
 ];
-export function dailyQuote(): Quote {
-  return pick(QUOTES, "quote");
+// ── Quote selection: real random + mood-weighted + anti-repeat (14-day buffer)
+// Content (QUOTES array, categories, tone, length) is intentionally unchanged.
+// Only the selection/distribution layer is fixed here.
+
+const QUOTE_HISTORY_KEY = "aura:quote-history:v1";
+const QUOTE_HISTORY_DAYS = 14;
+const QUOTE_HISTORY_MAX = 60;
+
+type QuoteHistoryEntry = { text: string; at: number };
+
+function readQuoteHistory(): QuoteHistoryEntry[] {
+  if (typeof window === "undefined") return [];
+  try {
+    const raw = window.localStorage.getItem(QUOTE_HISTORY_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw) as QuoteHistoryEntry[];
+    const cutoff = Date.now() - QUOTE_HISTORY_DAYS * 86400000;
+    return parsed.filter((e) => e && typeof e.text === "string" && e.at > cutoff);
+  } catch {
+    return [];
+  }
+}
+
+function pushQuoteHistory(text: string) {
+  if (typeof window === "undefined") return;
+  try {
+    const next = [...readQuoteHistory(), { text, at: Date.now() }].slice(-QUOTE_HISTORY_MAX);
+    window.localStorage.setItem(QUOTE_HISTORY_KEY, JSON.stringify(next));
+  } catch {}
+}
+
+// Mood → preferred categories (soft bias, not a hard filter)
+const MOOD_QUOTE_BIAS: Record<Mood, string[]> = {
+  "Enerjik": ["İlham", "Ana karakter", "İddialı", "Güçlü"],
+  "Mutlu": ["Komik", "Romantik", "İlham", "Şefkat"],
+  "Stresli": ["Şefkat", "Sabır", "Bilgelik", "Öz Bakım", "Tasavvuf"],
+  "Yorgun": ["Şefkat", "Öz Bakım", "Sabır", "Bilgelik"],
+  "Romantik": ["Romantik", "Şiir", "Tasavvuf"],
+  "Odaklı": ["Felsefi", "Bilgelik", "İlham", "Yol"],
+};
+
+export function dailyQuote(mood?: Mood): Quote {
+  const history = readQuoteHistory();
+  const seen = new Set(history.map((e) => e.text));
+
+  // 1) Anti-repeat: drop quotes shown in last 14 days
+  let pool = QUOTES.filter((q) => !seen.has(q.text));
+  let blockReason = "";
+  if (pool.length < 3) {
+    blockReason = `anti-repeat pool too small (${pool.length}) — using global pool`;
+    pool = QUOTES.slice();
+  }
+
+  // 2) Mood weighting (soft): duplicate matching categories to bias random pick.
+  const biasCats = mood ? MOOD_QUOTE_BIAS[mood] ?? [] : [];
+  let weighted = pool.slice();
+  if (biasCats.length) {
+    const biased = pool.filter((q) => biasCats.includes(q.category));
+    if (biased.length >= 2) {
+      weighted = [...pool, ...biased, ...biased];
+    }
+  }
+
+  // 3) Real random selection (not deterministic by day/index)
+  const chosen = weighted[Math.floor(Math.random() * weighted.length)] ?? QUOTES[0];
+
+  if (typeof console !== "undefined") {
+    // eslint-disable-next-line no-console
+    console.debug("[aura:quote]", {
+      poolSize: QUOTES.length,
+      filteredCount: pool.length,
+      weightedCount: weighted.length,
+      blocked: history.length,
+      mood: mood ?? null,
+      selectedCategory: chosen.category,
+      selectedId: chosen.text.slice(0, 40),
+      blockReason: blockReason || null,
+    });
+  }
+
+  pushQuoteHistory(chosen.text);
+  return chosen;
 }
 
 // ── Weather mock (expanded)
