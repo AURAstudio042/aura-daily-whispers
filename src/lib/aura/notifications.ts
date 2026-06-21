@@ -2,6 +2,8 @@
 // Uses the browser Notification API. Works while the tab/PWA is open or
 // returns to focus. No backend / service-worker push.
 
+const ANTI_REPEAT_KEY = "aura:whisper:recent:v1";
+const ANTI_REPEAT_MAX = 10;
 const SIGN = "— AURA ✦";
 const STATE_KEY = "aura:notif:v1";
 
