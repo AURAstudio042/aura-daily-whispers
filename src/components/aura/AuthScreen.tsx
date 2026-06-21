@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { lovable } from "@/integrations/lovable";
 import { APP_URL, RESET_PASSWORD_URL } from "@/lib/app-url";
+
 
 function translateAuthError(raw: string): string {
   const m = raw.toLowerCase();
@@ -32,6 +34,34 @@ export function AuthScreen() {
   const [resetSending, setResetSending] = useState(false);
   const [pendingVerifyEmail, setPendingVerifyEmail] = useState<string | null>(null);
   const [resendingVerify, setResendingVerify] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
+
+  async function signInWithGoogle() {
+    setErr(null);
+    setInfo(null);
+    setGoogleLoading(true);
+    try {
+      const result = await lovable.auth.signInWithOAuth("google", {
+        redirect_uri: APP_URL,
+      });
+      if (result.error) {
+        const msg = result.error instanceof Error ? result.error.message : String(result.error);
+        setErr(translateAuthError(msg));
+        setGoogleLoading(false);
+        return;
+      }
+      if (result.redirected) {
+        // Browser is navigating to Google; keep loading state until redirect.
+        return;
+      }
+      // Tokens returned → session set; useUser picks it up.
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : "Google ile giriş başarısız.";
+      setErr(translateAuthError(msg));
+      setGoogleLoading(false);
+    }
+  }
+
 
   async function resendVerification() {
     if (!pendingVerifyEmail) return;
@@ -201,6 +231,24 @@ export function AuthScreen() {
           {mode === "login" ? "Giriş Yap" : "Hesap Oluştur"}
         </h2>
 
+        <button
+          type="button"
+          onClick={signInWithGoogle}
+          disabled={googleLoading || loading}
+          className="flex w-full items-center justify-center gap-3 rounded-xl border border-[color:var(--border)] bg-white px-4 py-3 text-[14px] font-medium text-[#1f1f1f] transition active:scale-[0.98] disabled:opacity-50"
+        >
+          <GoogleIcon />
+          {googleLoading ? "Google'a yönlendiriliyor…" : mode === "login" ? "Google ile Giriş Yap" : "Google ile Devam Et"}
+        </button>
+
+        <div className="flex items-center gap-3">
+          <span className="h-px flex-1 bg-[color:var(--border)]" />
+          <span className="text-[10px] tracking-[0.3em] uppercase text-[color:var(--aura-muted)]">veya</span>
+          <span className="h-px flex-1 bg-[color:var(--border)]" />
+        </div>
+
+
+
         <div>
           <label htmlFor="aura-email" className="mb-2 block text-[10px] tracking-[0.3em] uppercase text-[color:var(--aura-muted)]">
             E-posta
@@ -286,6 +334,18 @@ export function AuthScreen() {
   );
 }
 
+function GoogleIcon() {
+  return (
+    <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+      <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.76h3.56c2.08-1.92 3.28-4.74 3.28-8.09z" />
+      <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.56-2.76c-.99.66-2.25 1.06-3.72 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84A11 11 0 0 0 12 23z" />
+      <path fill="#FBBC05" d="M5.84 14.11A6.6 6.6 0 0 1 5.5 12c0-.73.13-1.45.34-2.11V7.05H2.18A11 11 0 0 0 1 12c0 1.77.42 3.45 1.18 4.95l3.66-2.84z" />
+      <path fill="#EA4335" d="M12 5.38c1.62 0 3.07.56 4.21 1.65l3.15-3.15C17.46 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.05l3.66 2.84C6.71 7.31 9.14 5.38 12 5.38z" />
+    </svg>
+  );
+}
+
 
 const inputCls =
+
   "w-full rounded-xl border border-[color:var(--border)] bg-[#0d0917] px-4 py-3 text-[15px] text-white placeholder:text-[color:var(--aura-muted)] outline-none focus:border-[color:var(--aura-lavender)]";
