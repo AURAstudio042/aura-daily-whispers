@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 import { AuraShell, SectionLabel, ShareSignature, Tag } from "@/components/aura/Shell";
 import { Onboarding } from "@/components/aura/Onboarding";
@@ -12,12 +12,15 @@ import {
   greetingHint,
   dailyHoroscope,
   dailyColors,
+  dynamicColors,
   dailyOutfit,
   dailyStone,
   dailyScent,
   dailyQuote,
   dailyWeather,
 } from "@/lib/aura/data";
+import { logMood, logVisit, computeDynamicState } from "@/lib/aura/userState";
+
 import amethystImg from "@/assets/stones/amethyst.jpg";
 import aquamarineImg from "@/assets/stones/aquamarine.jpg";
 import roseImg from "@/assets/stones/rose.jpg";
@@ -58,6 +61,10 @@ function BugunPage() {
     : mock;
   const { pack, loading } = useDailyPack(u, { temp: weather.temp, cond: weather.cond });
 
+  // Behavioral tracking — feeds the dynamic palette shift.
+  useEffect(() => { logVisit(); }, []);
+  useEffect(() => { logMood(u?.mood); }, [u?.mood]);
+
   if (!ready) return <div className="min-h-screen" />;
   if (!authed) return <AuthScreen />;
   if (!u) return <Onboarding />;
@@ -65,9 +72,22 @@ function BugunPage() {
   const name = userName(u);
   const z = zodiacOf(u);
 
+  const dyn = computeDynamicState(u.mood);
   const horo = pack?.horoscope ?? dailyHoroscope(z, u.mood);
-  const colors = pack?.colors ?? dailyColors(u.style, u.mood);
+  // Dynamic palette: base (style + zodiac + mood) + weekly behavioral shift.
+  // Falls back to dailyColors only if dyn has zero signal AND no pack colors.
+  const colors = dyn.sampleSize > 0
+    ? dynamicColors({
+        style: u.style,
+        zodiac: z,
+        mood: u.mood,
+        tendency: dyn.tendency,
+        energy: dyn.energy,
+        dominantMood: dyn.dominantMood,
+      })
+    : (pack?.colors ?? dailyColors(u.style, u.mood));
   const outfitMock = dailyOutfit(z, u.style, u.mood);
+
   const outfit = {
     top: pack?.outfit.top ?? outfitMock.top,
     bottom: pack?.outfit.bottom ?? outfitMock.bottom,

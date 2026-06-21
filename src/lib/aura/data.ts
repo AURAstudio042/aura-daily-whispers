@@ -355,6 +355,59 @@ export function dailyColors(style?: string, mood?: Mood): Color[] {
   return pickN(pool, 4, "colors-" + (style ?? "") + (mood ?? ""));
 }
 
+// ── Dynamic palette: base (kişilik/astrolojik) + weekly behavioral shift.
+// `tendency` & `energy` come from the last-7-day mood log; `weekKey` makes the
+// palette evolve once per ISO week without fully resetting.
+const TENDENCY_BIAS: Record<"calm" | "balanced" | "high", string[]> = {
+  calm: ["Lavanta", "Buz Mavi", "Adaçayı", "Sis Grisi", "Pudra", "Krem"],
+  balanced: ["Şampanya", "Krem", "Lila", "Zeytin", "Karamel", "Toprak"],
+  high: ["Mercan", "Altın", "Şeftali", "Bordo", "Petrol", "Gece Mavisi"],
+};
+
+export type DynamicColorInput = {
+  style?: string;
+  zodiac?: ZodiacKey;
+  mood?: Mood;
+  tendency?: "calm" | "balanced" | "high";
+  energy?: number;       // 0..1
+  dominantMood?: Mood;
+  weekKey?: string;      // ISO week id, e.g. "2026-W25"
+};
+
+export function dynamicColors(input: DynamicColorInput): Color[] {
+  const { style, zodiac, mood, tendency = "balanced", energy = 0.5, dominantMood, weekKey } = input;
+  const wk = weekKey ?? weekId();
+  const baseSalt = `dyn-base|${style ?? ""}|${zodiac ?? ""}|${mood ?? ""}`;
+  const shiftSalt = `dyn-shift|${wk}|${tendency}|${dominantMood ?? ""}|${energy.toFixed(1)}`;
+
+  // 1) Base palette — stable per (style, zodiac, mood); 3 picks.
+  const basePool = mood
+    ? [...COLOR_POOL, ...COLOR_POOL.filter((c) => (MOOD_COLOR_BIAS[mood] ?? []).includes(c.name))]
+    : COLOR_POOL;
+  const base = pickNByKey(basePool, 3, baseSalt);
+
+  // 2) Dynamic shift — 1-2 colors driven by recent behavior; rotates weekly.
+  const shiftBias = new Set<string>([
+    ...TENDENCY_BIAS[tendency],
+    ...(dominantMood ? MOOD_COLOR_BIAS[dominantMood] ?? [] : []),
+  ]);
+  const shiftPool = COLOR_POOL.filter((c) => shiftBias.has(c.name) && !base.some((b) => b.name === c.name));
+  const shiftCount = energy > 0.7 || energy < 0.3 ? 2 : 1; // stronger shift at extremes
+  const shift = pickNByKey(shiftPool.length ? shiftPool : COLOR_POOL, shiftCount, shiftSalt);
+
+  // 3) Final — base + shift, capped at 4, de-duped, order by shift index for evolution feel.
+  const merged: Color[] = [];
+  const seen = new Set<string>();
+  for (const c of [...base, ...shift]) {
+    if (seen.has(c.name)) continue;
+    seen.add(c.name);
+    merged.push(c);
+    if (merged.length >= 4) break;
+  }
+  return merged;
+}
+
+
 // ── Outfit (expanded pools + mood/zodiac influence)
 const TOPS = [
   "İpek bluz", "Yumuşak kaşmir kazak", "Beyaz oversize gömlek", "Krem triko",
