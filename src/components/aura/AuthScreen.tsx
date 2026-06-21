@@ -231,6 +231,24 @@ export function AuthScreen() {
           {mode === "login" ? "Giriş Yap" : "Hesap Oluştur"}
         </h2>
 
+        <button
+          type="button"
+          onClick={signInWithGoogle}
+          disabled={googleLoading || loading}
+          className="flex w-full items-center justify-center gap-3 rounded-xl border border-[color:var(--border)] bg-white px-4 py-3 text-[14px] font-medium text-[#1f1f1f] transition active:scale-[0.98] disabled:opacity-50"
+        >
+          <GoogleIcon />
+          {googleLoading ? "Google'a yönlendiriliyor…" : mode === "login" ? "Google ile Giriş Yap" : "Google ile Devam Et"}
+        </button>
+
+        <div className="flex items-center gap-3">
+          <span className="h-px flex-1 bg-[color:var(--border)]" />
+          <span className="text-[10px] tracking-[0.3em] uppercase text-[color:var(--aura-muted)]">veya</span>
+          <span className="h-px flex-1 bg-[color:var(--border)]" />
+        </div>
+
+
+
         <div>
           <label htmlFor="aura-email" className="mb-2 block text-[10px] tracking-[0.3em] uppercase text-[color:var(--aura-muted)]">
             E-posta
