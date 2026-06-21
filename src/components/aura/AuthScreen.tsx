@@ -78,7 +78,6 @@ export function AuthScreen() {
           setInfo("Hesabın oluşturuldu ✦ E-postana gönderdiğimiz bağlantıyla doğrulamayı tamamla.");
         }
       } else {
-      } else {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
       }
