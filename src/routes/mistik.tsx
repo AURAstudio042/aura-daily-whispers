@@ -246,13 +246,6 @@ function MistikPage() {
               ? `✦ Kartı Aç (${adCredits} hak) ✦`
               : "✦ Reklam izle & aç ✦"}
         </button>
-        {!unlimited && (
-          <AdRewardModalGate
-            open={adModalOpen}
-            onClose={() => setAdModalOpen(false)}
-            onGranted={onAdGranted}
-          />
-        )}
       ) : (
         <div className="flex gap-2">
           <button
