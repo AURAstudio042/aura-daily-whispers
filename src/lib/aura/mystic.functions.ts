@@ -84,18 +84,23 @@ Aşağıdaki yapıya tam uyan bir JSON döndür:
         prompt,
       });
 
+      let card: MysticCardContent;
       try {
         const parsed = JSON.parse(extractJson(res.text));
         const cat = String(parsed.category ?? "").trim();
         const quote = String(parsed.quote ?? "").replace(/^["""']|["""']$/g, "").trim();
         const whisper = String(parsed.whisper ?? "").trim();
         const valid = MYSTIC_CATEGORIES.includes(cat as any) && quote.length > 5 && whisper.length > 3;
-        if (!valid || quote === data.avoidQuote) return pickFallback(data.avoidQuote);
-        return { category: cat as MysticCardContent["category"], quote, whisper };
+        if (!valid || quote === data.avoidQuote) card = pickFallback(data.avoidQuote);
+        else card = { category: cat as MysticCardContent["category"], quote, whisper };
       } catch {
-        return pickFallback(data.avoidQuote);
+        card = pickFallback(data.avoidQuote);
       }
+      if (!gate.unlimited) await consumeAdCreditServer(context.supabase, context.userId, "mystic");
+      return card;
     } catch {
-      return pickFallback(data.avoidQuote);
+      const card = pickFallback(data.avoidQuote);
+      if (!gate.unlimited) await consumeAdCreditServer(context.supabase, context.userId, "mystic");
+      return card;
     }
   });
