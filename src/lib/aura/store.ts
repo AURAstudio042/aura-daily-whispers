@@ -111,6 +111,20 @@ export function useUser(): [AuraUser | null, (u: AuraUser | null) => void, boole
           .eq("id", session.user.id)
           .maybeSingle();
         if (!mounted) return;
+        // Soft-deleted accounts cannot use the app — sign them out immediately.
+        if (row && (row as { deleted_at?: string | null }).deleted_at) {
+          try { await supabase.auth.signOut(); } catch {}
+          const { wipeLocalAuraData } = await import("./wipe");
+          wipeLocalAuraData();
+          if (typeof window !== "undefined") {
+            const { toast } = await import("sonner");
+            toast.error("Bu hesap silme aşamasında. Giriş yapamazsınız.");
+          }
+          setAuthed(false);
+          setU(null);
+          setReady(true);
+          return;
+        }
         if (row && row.birth_date) {
           const next = rowToUser(row);
           cacheUser(next);
@@ -120,6 +134,7 @@ export function useUser(): [AuraUser | null, (u: AuraUser | null) => void, boole
           setU(null);
         }
         setReady(true);
+
       } catch (e) {
         console.error("[aura] loadFromSession:", e);
         if (mounted) setReady(true);
