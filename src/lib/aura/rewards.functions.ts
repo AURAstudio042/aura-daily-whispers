@@ -115,8 +115,21 @@ export const getRewardsSummary = createServerFn({ method: "GET" })
     const { supabase, userId } = context;
     const code = await ensureCode(supabase, userId);
 
+    // Best-effort lazy activation — promotes any of THIS user's pending
+    // referrals (as referred) whose 24h window has elapsed.
+    try {
+      await activatePendingInternal(userId);
+    } catch {
+      // never block the summary on activation failure
+    }
+
     const [{ count: refCount }, { data: credits }, { data: trials }, { data: adGrant }] = await Promise.all([
-      supabase.from("referrals").select("id", { count: "exact", head: true }).eq("referrer_id", userId),
+      // Only ACTIVATED referrals count toward "real growth".
+      supabase
+        .from("referrals")
+        .select("id", { count: "exact", head: true })
+        .eq("referrer_id", userId)
+        .not("activated_at", "is", null),
       supabase.from("bonus_tarot_credits").select("id, consumed_at, source").eq("user_id", userId),
       supabase.from("aura_plus_trials").select("starts_at, ends_at").eq("user_id", userId).order("ends_at", { ascending: false }),
       supabase.from("ad_tarot_grants").select("id").eq("user_id", userId).eq("week_start", mondayOfWeekUTC()).maybeSingle(),
