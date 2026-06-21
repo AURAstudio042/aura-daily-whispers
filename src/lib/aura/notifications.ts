@@ -79,9 +79,6 @@ export function hasAsked(): boolean {
   return !!readState().asked;
 }
 
-function fire(title: string, body: string) {
-  if (typeof window === "undefined" || !("Notification" in window)) return;
-  if (Notification.permission !== "granted") return;
 function fire(title: string, body: string, opts?: { sign?: boolean }) {
   if (typeof window === "undefined" || !("Notification" in window)) return;
   if (Notification.permission !== "granted") return;
