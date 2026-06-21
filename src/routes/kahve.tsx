@@ -13,6 +13,7 @@ import {
   type CoffeeReadingRow,
 } from "@/lib/aura/coffee.functions";
 import { grantAdCredit, type GrantAdCreditResult } from "@/lib/aura/ad-credits.functions";
+import { useInterstitial } from "@/components/aura/InterstitialAdProvider";
 import { shareNodeAsStory } from "@/lib/aura/share";
 
 export const Route = createFileRoute("/kahve")({
@@ -105,6 +106,8 @@ function KahvePage() {
       if (res.ok) {
         setReading(res.reading);
         setStatus(res.status);
+        // Natural transition: ad shown after content completion.
+        triggerInterstitial("coffee-reading");
         // refresh history
         try {
           const h = await listFn();
