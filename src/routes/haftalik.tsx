@@ -93,12 +93,13 @@ function HaftalikPage() {
         <p className="text-[15px] text-[color:var(--aura-soft)]">{w.motivation}</p>
       </Section>
 
-      <Section title="✓ Mini Hedefler">
+      <Section title={`✓ Mini Hedefler (${doneCount}/${w.goals.length})`}>
+        <p className="mb-3 text-[12px] text-[color:var(--aura-muted)]">5 hedefi tamamlayınca yeni 5 hedef gelir.</p>
         <ul className="space-y-3">
           {w.goals.map((g, i) => (
-            <li key={i}>
+            <li key={`${state.cycle}-${i}`}>
               <button
-                onClick={() => setChecked((p) => ({ ...p, [i]: !p[i] }))}
+                onClick={() => setChecked(i)}
                 className="flex w-full items-center gap-3 text-left"
               >
                 <span className={`grid h-6 w-6 shrink-0 place-items-center rounded-full border ${checked[i] ? "border-[color:var(--aura-lavender)] bg-[color:var(--aura-lavender)]/30 text-white" : "border-[color:var(--border)]"}`}>
@@ -110,6 +111,7 @@ function HaftalikPage() {
           ))}
         </ul>
       </Section>
+
 
       <Section title="🌿 Öz Bakım Enerjisi">
         <p className="text-[13px] text-[color:var(--aura-muted)]">Haftanın Kokusu</p>
