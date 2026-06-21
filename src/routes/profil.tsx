@@ -243,13 +243,73 @@ function ProfilPage() {
 
       <button
         onClick={() => { clearUser(); }}
-        className="mb-6 w-full rounded-full border border-[color:var(--border)] py-3 text-[11px] tracking-[0.3em] uppercase text-[color:var(--aura-muted)]"
+        className="mb-4 w-full rounded-full border border-[color:var(--border)] py-3 text-[11px] tracking-[0.3em] uppercase text-[color:var(--aura-muted)]"
       >
         Çıkış Yap
       </button>
+
+      <SectionLabel n="✦" title="Tehlikeli Alan" />
+      <div className="mb-10 rounded-2xl border border-red-500/30 bg-red-500/5 p-5">
+        <p className="text-[13px] text-white">Hesabımı Sil</p>
+        <p className="mt-1 text-[12px] leading-relaxed text-[color:var(--aura-muted)]">
+          Profilin, fısıltıların, haftalık hedeflerin, ruh hali geçmişin ve tüm
+          AURA verin silinir. 7 gün içinde geri alma hakkın var; sonrasında
+          işlem geri alınamaz.
+        </p>
+        <button
+          onClick={() => setDeleteOpen(true)}
+          className="mt-4 w-full rounded-full border border-red-500/50 py-3 text-[11px] tracking-[0.3em] uppercase text-red-300 transition-colors hover:bg-red-500/10"
+        >
+          Hesabımı Sil
+        </button>
+      </div>
+
+      {deleteOpen && (
+        <div className="fixed inset-0 z-50 grid place-items-center bg-black/70 p-4">
+          <div className="w-full max-w-sm rounded-2xl border border-[color:var(--border)] bg-[color:var(--card)] p-6">
+            <p className="text-[10px] tracking-[0.3em] uppercase text-red-300">Geri Dönüşü Yok</p>
+            <h3 className="serif mt-2 text-xl text-white">Hesabını silmek üzeresin</h3>
+            <p className="mt-3 text-[13px] leading-relaxed text-[color:var(--aura-soft)]">
+              Bu işlem hesabını <span className="text-white">silme kuyruğuna</span> alır.
+              Girişin anında kapanır. 7 gün içinde geri yükleyebilirsin;
+              sonrasında tüm verin kalıcı olarak silinir.
+            </p>
+            <label className="mt-4 block text-[12px] text-[color:var(--aura-muted)]">
+              Onaylamak için <span className="text-white">{CONFIRM_PHRASE}</span> yaz:
+            </label>
+            <input
+              autoFocus
+              value={deletePhrase}
+              onChange={(e) => setDeletePhrase(e.target.value)}
+              className="mt-2 w-full rounded-lg border border-[color:var(--border)] bg-black/30 px-3 py-2 text-[14px] text-white outline-none focus:border-red-500/60"
+              placeholder={CONFIRM_PHRASE}
+              disabled={deleting}
+            />
+            <div className="mt-5 flex gap-3">
+              <button
+                type="button"
+                onClick={() => { setDeleteOpen(false); setDeletePhrase(""); }}
+                disabled={deleting}
+                className="flex-1 rounded-full border border-[color:var(--border)] py-2.5 text-[11px] tracking-[0.2em] uppercase text-[color:var(--aura-soft)]"
+              >
+                Vazgeç
+              </button>
+              <button
+                type="button"
+                onClick={handleDeleteAccount}
+                disabled={deleting || deletePhrase.trim().toUpperCase() !== CONFIRM_PHRASE}
+                className="flex-1 rounded-full bg-red-500/80 py-2.5 text-[11px] font-medium tracking-[0.2em] uppercase text-white disabled:opacity-40"
+              >
+                {deleting ? "Siliniyor…" : "Sil"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </AuraShell>
   );
 }
+
 
 function LinkRow({ to, label, badge }: { to: string; label: string; badge?: string }) {
   return (
