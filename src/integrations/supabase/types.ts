@@ -428,6 +428,7 @@ export type Database = {
           birth_time: string | null
           city: string | null
           created_at: string
+          deleted_at: string | null
           gender: string | null
           hair_color: string | null
           has_children: boolean | null
@@ -448,6 +449,7 @@ export type Database = {
           birth_time?: string | null
           city?: string | null
           created_at?: string
+          deleted_at?: string | null
           gender?: string | null
           hair_color?: string | null
           has_children?: boolean | null
@@ -468,6 +470,7 @@ export type Database = {
           birth_time?: string | null
           city?: string | null
           created_at?: string
+          deleted_at?: string | null
           gender?: string | null
           hair_color?: string | null
           has_children?: boolean | null
@@ -760,6 +763,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      cancel_account_deletion: { Args: never; Returns: boolean }
       delete_email: {
         Args: { message_id: number; queue_name: string }
         Returns: boolean
@@ -785,6 +789,7 @@ export type Database = {
           read_ct: number
         }[]
       }
+      request_account_deletion: { Args: never; Returns: boolean }
     }
     Enums: {
       app_role: "admin" | "moderator" | "user"
