@@ -43,6 +43,7 @@ function MistikPage() {
   const genCard = useServerFn(generateMysticCard);
   const fetchTier = useServerFn(getUserTier);
   const fetchCredits = useServerFn(getAdCredits);
+  const { trigger: triggerInterstitial } = useInterstitial();
   const favs = useFavs();
 
   const refreshCredits = useCallback(() => {
