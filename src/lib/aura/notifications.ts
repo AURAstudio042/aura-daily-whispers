@@ -25,6 +25,60 @@ export const WHISPERS = [
   "Bazı günler sadece geçer, bir şey öğretmek zorunda değil.",
 ];
 
+function readRecentWhispers(): number[] {
+  if (typeof window === "undefined") return [];
+  try {
+    const raw = window.localStorage.getItem(ANTI_REPEAT_KEY);
+    const arr = raw ? (JSON.parse(raw) as number[]) : [];
+    return Array.isArray(arr) ? arr.filter((n) => Number.isInteger(n)) : [];
+  } catch { return []; }
+}
+
+function pushRecentWhisper(idx: number) {
+  if (typeof window === "undefined") return;
+  try {
+    const recent = readRecentWhispers().filter((i) => i !== idx);
+    recent.push(idx);
+    while (recent.length > ANTI_REPEAT_MAX) recent.shift();
+    window.localStorage.setItem(ANTI_REPEAT_KEY, JSON.stringify(recent));
+  } catch { /* ignore */ }
+}
+
+/**
+ * Anti-repeat weighted random whisper selection.
+ * - Excludes the last ANTI_REPEAT_MAX whispers shown.
+ * - Never returns the immediately previous one (no consecutive repeats).
+ * - Falls back gracefully if the pool is small.
+ */
+export function pickNextWhisper(): string {
+  const recent = readRecentWhispers();
+  const last = recent[recent.length - 1];
+  const blocked = new Set(recent);
+  let pool = WHISPERS.map((_, i) => i).filter((i) => !blocked.has(i));
+  if (pool.length === 0) {
+    // Pool exhausted vs history — drop oldest blocks, but always avoid `last`.
+    pool = WHISPERS.map((_, i) => i).filter((i) => i !== last);
+    if (pool.length === 0) pool = WHISPERS.map((_, i) => i);
+  }
+  // Weighted: less-recently-shown items get higher weight.
+  const recencyRank = new Map<number, number>();
+  recent.forEach((i, pos) => recencyRank.set(i, pos + 1));
+  const weights = pool.map((i) => {
+    const rank = recencyRank.get(i);
+    // Never-shown → highest weight; otherwise older = heavier.
+    return rank == null ? ANTI_REPEAT_MAX + 2 : rank;
+  });
+  const total = weights.reduce((s, w) => s + w, 0);
+  let r = Math.random() * total;
+  let chosenIdx = pool[0];
+  for (let k = 0; k < pool.length; k++) {
+    r -= weights[k];
+    if (r <= 0) { chosenIdx = pool[k]; break; }
+  }
+  pushRecentWhisper(chosenIdx);
+  return WHISPERS[chosenIdx];
+}
+
 type DayState = {
   date: string;            // yyyy-mm-dd
   morningFired?: boolean;
