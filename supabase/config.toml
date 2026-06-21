@@ -1,1 +1,12 @@
 project_id = "vzlwmhitlhfancxhvhvv"
+
+[auth]
+site_url = "https://aura-daily-whispers.lovable.app"
+additional_redirect_urls = [
+  "https://aura-daily-whispers.lovable.app",
+  "https://aura-daily-whispers.lovable.app/reset-password",
+  "https://id-preview--4a8fe8ff-ddf8-4833-9f31-3a0d4098b454.lovable.app",
+  "https://id-preview--4a8fe8ff-ddf8-4833-9f31-3a0d4098b454.lovable.app/reset-password",
+  "http://localhost:8080",
+  "http://localhost:8080/reset-password"
+]
