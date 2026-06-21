@@ -276,6 +276,14 @@ function MistikPage() {
         </p>
       )}
 
+      {adModalOpen && (
+        <AdRewardModal
+          source="mystic"
+          onGranted={onAdGranted}
+          onClose={() => setAdModalOpen(false)}
+        />
+      )}
+
       <ShareSignature />
 
       <ShareSheet
