@@ -93,7 +93,10 @@ function MistikPage() {
       const safe = next.quote === avoidQuote ? pickFallback(avoidQuote) : next;
       setCard(safe);
       if (typeof window !== "undefined") window.localStorage.setItem(LAST_KEY, safe.quote);
-      setTimeout(() => setOpened(true), 250);
+      setTimeout(() => {
+        setOpened(true);
+        triggerInterstitial("mystic-card");
+      }, 250);
     } catch {
       const fb = pickFallback(avoidQuote);
       setCard(fb);
