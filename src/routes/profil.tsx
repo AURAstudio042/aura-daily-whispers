@@ -29,7 +29,12 @@ function ProfilPage() {
   const [rewards, setRewards] = useState<RewardsSummary | null>(null);
   const [notifTime, setNotifTime] = useState<string>("07:00");
   const [theme, setTheme] = useTheme();
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [deletePhrase, setDeletePhrase] = useState("");
+  const [deleting, setDeleting] = useState(false);
   const fetchSummary = useServerFn(getRewardsSummary);
+  const deleteAccountFn = useServerFn(requestAccountDeletion);
+
 
   useEffect(() => {
     if (typeof window !== "undefined") {
