@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { lovable } from "@/integrations/lovable";
 import { APP_URL, RESET_PASSWORD_URL } from "@/lib/app-url";
+
 
 function translateAuthError(raw: string): string {
   const m = raw.toLowerCase();
