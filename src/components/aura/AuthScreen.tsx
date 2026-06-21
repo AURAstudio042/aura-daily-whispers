@@ -252,6 +252,17 @@ export function AuthScreen() {
           {loading ? "…" : mode === "login" ? "GİRİŞ YAP ✦" : "DEVAM ✦"}
         </button>
 
+        {mode === "signup" && pendingVerifyEmail && (
+          <button
+            type="button"
+            onClick={resendVerification}
+            disabled={resendingVerify}
+            className="block w-full text-center text-[11px] tracking-[0.2em] uppercase text-[color:var(--aura-lavender)] underline-offset-4 hover:underline disabled:opacity-40"
+          >
+            {resendingVerify ? "Gönderiliyor…" : "Doğrulama mailini tekrar gönder ✦"}
+          </button>
+        )}
+
         {mode === "login" && (
           <button
             type="button"
