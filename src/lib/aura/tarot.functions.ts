@@ -112,13 +112,22 @@ export const drawTarot = createServerFn({ method: "POST" })
     // Determine whether we will consume a bonus credit
     let bonusCreditIdToConsume: string | null = null;
     const allowedByTier = tier !== "free" && limit.allowed;
+    let useAdCredit = false;
     if (!allowedByTier) {
       const credits = await fetchBonusCredits(context.supabase, context.userId);
-      if (credits.length === 0) {
-        if (tier === "free") return { ok: false, reason: "free", limit };
-        return { ok: false, reason: "limit", limit };
+      if (credits.length > 0) {
+        bonusCreditIdToConsume = credits[0].id;
+      } else {
+        // Last-resort payment path: unified ad credit (free users earn 1 per ad).
+        const { hasAdCreditServer } = await import("./ad-credits.functions");
+        const gate = await hasAdCreditServer(context.supabase, context.userId);
+        if (!gate.unlimited && gate.balance > 0) {
+          useAdCredit = true;
+        } else {
+          if (tier === "free") return { ok: false, reason: "free", limit };
+          return { ok: false, reason: "limit", limit };
+        }
       }
-      bonusCreditIdToConsume = credits[0].id;
     }
 
     const card = pickCard();
@@ -181,7 +190,12 @@ Bu karta ve bu kategoriye özel, 3-4 cümlelik kişisel, sıcak ve şiirsel bir 
       bonusRemaining = remaining.length;
       // Tier limit stays unchanged when bonus is used
     } else {
-      limit = tarotLimitFor(tier, used + 1);
+      if (useAdCredit) {
+        const { consumeAdCreditServer } = await import("./ad-credits.functions");
+        await consumeAdCreditServer(context.supabase, context.userId, "tarot");
+      } else {
+        limit = tarotLimitFor(tier, used + 1);
+      }
       const remaining = await fetchBonusCredits(context.supabase, context.userId);
       bonusRemaining = remaining.length;
     }

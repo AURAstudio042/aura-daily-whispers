@@ -14,6 +14,30 @@ export type Database = {
   }
   public: {
     Tables: {
+      ad_credits_ledger: {
+        Row: {
+          created_at: string
+          delta: number
+          id: string
+          reason: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          delta: number
+          id?: string
+          reason: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          delta?: number
+          id?: string
+          reason?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       ad_tarot_grants: {
         Row: {
           created_at: string

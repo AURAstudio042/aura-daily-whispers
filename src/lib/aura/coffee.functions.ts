@@ -213,19 +213,12 @@ export const analyzeCoffeeReading = createServerFn({ method: "POST" })
       };
     }
 
-    // Free-tier: consume a server-issued ad grant (replaces client-controlled adWatched flag)
-    let grantIdToConsume: string | null = null;
+    // Free-tier gate: must have an unspent ad credit. Consumed only after
+    // a SUCCESSFUL reading so "unclear" outcomes don't burn the credit.
     if (status.tier === "free") {
-      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-      const { data: grant } = await supabaseAdmin
-        .from("coffee_ad_grants")
-        .select("id")
-        .eq("user_id", context.userId)
-        .is("consumed_at", null)
-        .order("created_at", { ascending: true })
-        .limit(1)
-        .maybeSingle();
-      if (!grant) {
+      const { hasAdCreditServer } = await import("./ad-credits.functions");
+      const gate = await hasAdCreditServer(context.supabase, context.userId);
+      if (!gate.unlimited && gate.balance <= 0) {
         return {
           ok: false,
           reason: "ad_required",
@@ -233,7 +226,6 @@ export const analyzeCoffeeReading = createServerFn({ method: "POST" })
           status,
         };
       }
-      grantIdToConsume = grant.id as string;
     }
 
 
@@ -346,13 +338,9 @@ Bu kullanıcının kahve fincanı fotoğrafını incele ve falını oku. Burç e
         };
       }
 
-      if (grantIdToConsume) {
-        const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-        await supabaseAdmin
-          .from("coffee_ad_grants")
-          .update({ consumed_at: new Date().toISOString() })
-          .eq("id", grantIdToConsume)
-          .eq("user_id", context.userId);
+      if (status.tier === "free") {
+        const { consumeAdCreditServer } = await import("./ad-credits.functions");
+        await consumeAdCreditServer(context.supabase, context.userId, "coffee");
       }
 
       const newStatus = await buildStatus(context.supabase, context.userId);

@@ -29,7 +29,16 @@ function extractJson(text: string): string {
 export const generateMysticCard = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => InputSchema.parse(d))
-  .handler(async ({ data }): Promise<MysticCardContent> => {
+  .handler(async ({ data, context }): Promise<MysticCardContent> => {
+    // Free-tier gate: must have ad credit. Consumed on success only.
+    const { hasAdCreditServer, consumeAdCreditServer } = await import("./ad-credits.functions");
+    const gate = await hasAdCreditServer(context.supabase, context.userId);
+    if (!gate.unlimited && gate.balance <= 0) {
+      // Falls back gracefully so the UI can still show *something* if the
+      // client somehow bypasses the gate; the gate is enforced at the
+      // route level via getAdCredits/AdRewardModal.
+      return pickFallback(data.avoidQuote);
+    }
     try {
       const key = process.env.LOVABLE_API_KEY;
       if (!key) return pickFallback(data.avoidQuote);
@@ -75,18 +84,23 @@ Aşağıdaki yapıya tam uyan bir JSON döndür:
         prompt,
       });
 
+      let card: MysticCardContent;
       try {
         const parsed = JSON.parse(extractJson(res.text));
         const cat = String(parsed.category ?? "").trim();
         const quote = String(parsed.quote ?? "").replace(/^["""']|["""']$/g, "").trim();
         const whisper = String(parsed.whisper ?? "").trim();
         const valid = MYSTIC_CATEGORIES.includes(cat as any) && quote.length > 5 && whisper.length > 3;
-        if (!valid || quote === data.avoidQuote) return pickFallback(data.avoidQuote);
-        return { category: cat as MysticCardContent["category"], quote, whisper };
+        if (!valid || quote === data.avoidQuote) card = pickFallback(data.avoidQuote);
+        else card = { category: cat as MysticCardContent["category"], quote, whisper };
       } catch {
-        return pickFallback(data.avoidQuote);
+        card = pickFallback(data.avoidQuote);
       }
+      if (!gate.unlimited) await consumeAdCreditServer(context.supabase, context.userId, "mystic");
+      return card;
     } catch {
-      return pickFallback(data.avoidQuote);
+      const card = pickFallback(data.avoidQuote);
+      if (!gate.unlimited) await consumeAdCreditServer(context.supabase, context.userId, "mystic");
+      return card;
     }
   });
