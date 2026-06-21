@@ -213,11 +213,12 @@ export const analyzeCoffeeReading = createServerFn({ method: "POST" })
       };
     }
 
-    // Free-tier: consume one unified ad credit (earned via rewarded ad).
+    // Free-tier gate: must have an unspent ad credit. Consumed only after
+    // a SUCCESSFUL reading so "unclear" outcomes don't burn the credit.
     if (status.tier === "free") {
-      const { consumeAdCreditServer } = await import("./ad-credits.functions");
-      const spend = await consumeAdCreditServer(context.supabase, context.userId, "coffee");
-      if (!spend.ok) {
+      const { hasAdCreditServer } = await import("./ad-credits.functions");
+      const gate = await hasAdCreditServer(context.supabase, context.userId);
+      if (!gate.unlimited && gate.balance <= 0) {
         return {
           ok: false,
           reason: "ad_required",
@@ -337,7 +338,10 @@ Bu kullanıcının kahve fincanı fotoğrafını incele ve falını oku. Burç e
         };
       }
 
-      // Ad credit (if any) was already consumed above before AI invocation.
+      if (status.tier === "free") {
+        const { consumeAdCreditServer } = await import("./ad-credits.functions");
+        await consumeAdCreditServer(context.supabase, context.userId, "coffee");
+      }
 
       const newStatus = await buildStatus(context.supabase, context.userId);
       return {

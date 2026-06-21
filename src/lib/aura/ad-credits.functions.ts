@@ -122,6 +122,16 @@ export const grantAdCredit = createServerFn({ method: "POST" })
  * NOT exposed as a server fn — calling code must already have verified the
  * caller via requireSupabaseAuth and own its own admin import.
  */
+export async function hasAdCreditServer(
+  supabase: any,
+  userId: string,
+): Promise<{ unlimited: boolean; balance: number }> {
+  if (await isUnlimitedTier(supabase, userId)) return { unlimited: true, balance: 0 };
+  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  const balance = await readBalance(supabaseAdmin, userId);
+  return { unlimited: false, balance };
+}
+
 export async function consumeAdCreditServer(
   supabase: any,
   userId: string,
