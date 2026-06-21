@@ -10,8 +10,12 @@ import { RewardsCard } from "@/components/aura/RewardsCard";
 import { ReferralCard } from "@/components/aura/ReferralCard";
 import { useUser, userName, userCity, zodiacOf, clearUser, saveUser } from "@/lib/aura/store";
 import { getRewardsSummary, type RewardsSummary } from "@/lib/aura/rewards.functions";
+import { requestAccountDeletion } from "@/lib/aura/account.functions";
+import { wipeLocalAuraData } from "@/lib/aura/wipe";
+import { supabase } from "@/integrations/supabase/client";
 import { STYLES, type StyleType } from "@/lib/aura/data";
 import { useTheme, THEMES, type ThemeId } from "@/hooks/useTheme";
+
 
 const NOTIF_TIME_KEY = "aura:notif-time";
 
