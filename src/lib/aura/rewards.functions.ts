@@ -1,6 +1,48 @@
 import { createServerFn } from "@tanstack/react-start";
+import { getRequest } from "@tanstack/react-start/server";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+
+/**
+ * REFERRAL ABUSE PROTECTION
+ *
+ * Rules enforced server-side at redeem and activation time:
+ *  1. Self-referral blocked (referrer === referred).
+ *  2. Email must be verified (auth.users.email_confirmed_at) before the
+ *     referral counts toward rewards.
+ *  3. Same device fingerprint can appear in at most MAX_PER_DEVICE referrals
+ *     as the referred party (default 2).
+ *  4. Same IP hash can appear in at most MAX_PER_IP referrals as the
+ *     referred party (default 3 — softer than device because NAT/CGNAT).
+ *  5. Device fingerprint of the new user must NOT match the referrer's
+ *     signup_device_hash (blocks "create alt account on my own phone").
+ *  6. Rewards (credits + milestones) are NOT granted at redeem time.
+ *     The row is inserted with activated_at=NULL. activatePendingReferrals
+ *     promotes it after 24h IF the new user is verified AND has activity.
+ */
+const MAX_PER_DEVICE = 2;
+const MAX_PER_IP = 3;
+const ACTIVATION_DELAY_MS = 24 * 60 * 60 * 1000;
+
+async function sha256Hex(input: string): Promise<string> {
+  const buf = new TextEncoder().encode(input);
+  const digest = await crypto.subtle.digest("SHA-256", buf);
+  return Array.from(new Uint8Array(digest))
+    .map((b) => b.toString(16).padStart(2, "0")).join("");
+}
+
+function extractIp(): string | null {
+  try {
+    const req = getRequest();
+    const h = req?.headers;
+    if (!h) return null;
+    const xff = h.get("x-forwarded-for");
+    if (xff) return xff.split(",")[0].trim();
+    return h.get("cf-connecting-ip") || h.get("x-real-ip") || null;
+  } catch {
+    return null;
+  }
+}
 
 export type RewardsSummary = {
   referralCode: string;
