@@ -2,12 +2,12 @@
 // Uses the browser Notification API. Works while the tab/PWA is open or
 // returns to focus. No backend / service-worker push.
 
-const SIGN = "— AURA ✨";
+const SIGN = "— AURA ✦";
 const STATE_KEY = "aura:notif:v1";
 
 // Humanized whisper pool. Tone: a calm, wise close friend texting you.
 // Structure per message: 1 feeling line + 1 grounding/depth line + (optional) soft closer.
-// Rules: short, everyday Turkish. No motivational clichés, no heavy metaphors, no emojis, no signatures.
+// Rules: short, everyday Turkish. No motivational clichés, no heavy metaphors, no emojis. Signature added in fire().
 export const WHISPERS = [
   "Bugün biraz yavaşlasan da olur. Her şeye yetişmek zorunda değilsin.",
   "İçinden geçenleri bastırma. Sadece fark et, yeter şimdilik.",
@@ -194,7 +194,7 @@ export function startAuraNotifications({ name, hint, notificationTime = "07:00" 
       if (t <= Date.now()) return; // missed while offline — skip silently
       scheduleAt(t, () => {
         const msg = WHISPERS[Math.floor(Math.random() * WHISPERS.length)];
-        fire("Bir an için…", msg, { sign: false });
+        fire("AURA'dan bir fısıltı", msg);
         const cur = readState();
         cur.whisperFired = [...(cur.whisperFired ?? []), t];
         writeState(cur);
