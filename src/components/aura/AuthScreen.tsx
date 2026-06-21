@@ -29,6 +29,35 @@ export function AuthScreen() {
   const [info, setInfo] = useState<string | null>(null);
   const [resetEmail, setResetEmail] = useState("");
   const [resetSending, setResetSending] = useState(false);
+  const [pendingVerifyEmail, setPendingVerifyEmail] = useState<string | null>(null);
+  const [resendingVerify, setResendingVerify] = useState(false);
+
+  async function resendVerification() {
+    if (!pendingVerifyEmail) return;
+    setErr(null);
+    setInfo(null);
+    setResendingVerify(true);
+    console.info("[auth][resend] requesting signup verification resend", { email: pendingVerifyEmail });
+    try {
+      const { error } = await supabase.auth.resend({
+        type: "signup",
+        email: pendingVerifyEmail,
+        options: { emailRedirectTo: window.location.origin },
+      });
+      if (error) {
+        console.error("[auth][resend] failed", { message: error.message });
+        throw error;
+      }
+      setInfo("Doğrulama maili tekrar gönderildi ✦ Gelmediyse spam / gereksiz klasörünü de kontrol et.");
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : "Hata";
+      setErr(translateAuthError(msg));
+    } finally {
+      setResendingVerify(false);
+    }
+  }
+
+
 
 
   async function submit(e: React.FormEvent) {
