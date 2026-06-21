@@ -452,4 +452,3 @@ export const activatePendingReferrals = createServerFn({ method: "POST" })
     }
     return { activated };
   });
-  });
