@@ -7,12 +7,12 @@ import { Onboarding } from "@/components/aura/Onboarding";
 import { useUser, userName, zodiacOf } from "@/lib/aura/store";
 import {
   analyzeCoffeeReading,
-  claimCoffeeAd,
   getCoffeeStatus,
   listCoffeeReadings,
   type CoffeeStatus,
   type CoffeeReadingRow,
 } from "@/lib/aura/coffee.functions";
+import { grantAdCredit, type GrantAdCreditResult } from "@/lib/aura/ad-credits.functions";
 import { shareNodeAsStory } from "@/lib/aura/share";
 
 export const Route = createFileRoute("/kahve")({
@@ -41,7 +41,7 @@ function KahvePage() {
   const [u, , ready, authed] = useUser();
   const statusFn = useServerFn(getCoffeeStatus);
   const analyzeFn = useServerFn(analyzeCoffeeReading);
-  const claimAdFn = useServerFn(claimCoffeeAd);
+  const grantAd = useServerFn(grantAdCredit);
   const listFn = useServerFn(listCoffeeReadings);
 
   const [status, setStatus] = useState<CoffeeStatus | null>(null);
@@ -124,17 +124,8 @@ function KahvePage() {
 
 
   const startAdAndAnalyze = async (dataUrl: string) => {
-    // Claim a server-side ad grant first; server validates and rate-limits.
-    try {
-      const claim = (await claimAdFn()) as { ok: boolean };
-      if (!claim?.ok) {
-        setError("Reklam doğrulanamadı, lütfen tekrar dene.");
-        return;
-      }
-    } catch {
-      setError("Reklam doğrulanamadı, lütfen tekrar dene.");
-      return;
-    }
+    // Run the rewarded-ad countdown first, then call grantAdCredit so the
+    // server records +1 credit. The analyze handler then consumes it.
     setAdWatching(true);
     setAdCountdown(5);
     if (adIntervalRef.current) clearInterval(adIntervalRef.current);
@@ -146,7 +137,21 @@ function KahvePage() {
             adIntervalRef.current = null;
           }
           setAdWatching(false);
-          runAnalysis(dataUrl);
+          (async () => {
+            try {
+              const res = (await grantAd({
+                data: { source: "coffee", adDurationMs: 5000 },
+              })) as GrantAdCreditResult;
+              if (!res.ok && res.reason !== "unlimited") {
+                setError("Reklam doğrulanamadı, lütfen tekrar dene.");
+                return;
+              }
+            } catch {
+              setError("Reklam doğrulanamadı, lütfen tekrar dene.");
+              return;
+            }
+            runAnalysis(dataUrl);
+          })();
           return 0;
         }
         return s - 1;
