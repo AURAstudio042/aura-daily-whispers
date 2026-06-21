@@ -71,7 +71,7 @@ export function AuthScreen() {
         const { data, error } = await supabase.auth.signUp({
           email,
           password,
-          options: { emailRedirectTo: window.location.origin },
+          options: { emailRedirectTo: APP_URL },
         });
         if (error) throw error;
         if (data.user && !data.session) {
