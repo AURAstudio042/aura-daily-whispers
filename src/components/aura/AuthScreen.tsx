@@ -43,7 +43,7 @@ export function AuthScreen() {
       const { error } = await supabase.auth.resend({
         type: "signup",
         email: pendingVerifyEmail,
-        options: { emailRedirectTo: window.location.origin },
+        options: { emailRedirectTo: APP_URL },
       });
       if (error) {
         console.error("[auth][resend] failed", { message: error.message });
