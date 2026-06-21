@@ -237,11 +237,22 @@ function MistikPage() {
       {!card ? (
         <button
           onClick={onUnlock}
-          disabled={loading || adWatching}
+          disabled={loading}
           className="aura-btn aura-btn-hover w-full text-[13px] disabled:opacity-60"
         >
-          {adWatching ? "✦ Lütfen bekle ✦" : unlimited ? "✦ Kartı Aç ✦" : "✦ Reklam izle & aç ✦"}
+          {unlimited
+            ? "✦ Kartı Aç ✦"
+            : adCredits > 0
+              ? `✦ Kartı Aç (${adCredits} hak) ✦`
+              : "✦ Reklam izle & aç ✦"}
         </button>
+        {!unlimited && (
+          <AdRewardModalGate
+            open={adModalOpen}
+            onClose={() => setAdModalOpen(false)}
+            onGranted={onAdGranted}
+          />
+        )}
       ) : (
         <div className="flex gap-2">
           <button
