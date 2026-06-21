@@ -92,6 +92,30 @@ function ProfilPage() {
     toast(`${plan} aboneliği yakında ✦`, { description: "Lansman sonrası aktif olacak." });
   };
 
+  const CONFIRM_PHRASE = "HESABIMI SİL";
+  const handleDeleteAccount = async () => {
+    if (deletePhrase.trim().toUpperCase() !== CONFIRM_PHRASE) {
+      toast.error(`Onay için "${CONFIRM_PHRASE}" yaz.`);
+      return;
+    }
+    setDeleting(true);
+    try {
+      await deleteAccountFn();
+      wipeLocalAuraData();
+      try { await supabase.auth.signOut(); } catch {}
+      toast.success("Hesabın silme kuyruğuna alındı. 7 gün içinde geri alma hakkın var.");
+      setDeleteOpen(false);
+      setDeletePhrase("");
+      if (typeof window !== "undefined") window.location.href = "/";
+    } catch (e) {
+      console.error(e);
+      toast.error("Silme işlemi başarısız oldu. Lütfen tekrar dene.");
+    } finally {
+      setDeleting(false);
+    }
+  };
+
+
 
   return (
     <AuraShell>
