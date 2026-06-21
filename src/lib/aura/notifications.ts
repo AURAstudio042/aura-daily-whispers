@@ -82,8 +82,12 @@ export function hasAsked(): boolean {
 function fire(title: string, body: string) {
   if (typeof window === "undefined" || !("Notification" in window)) return;
   if (Notification.permission !== "granted") return;
+function fire(title: string, body: string, opts?: { sign?: boolean }) {
+  if (typeof window === "undefined" || !("Notification" in window)) return;
+  if (Notification.permission !== "granted") return;
   try {
-    const text = body.trim().endsWith(SIGN) ? body : `${body}\n\n${SIGN}`;
+    const withSign = opts?.sign ?? true;
+    const text = !withSign || body.trim().endsWith(SIGN) ? body : `${body}\n\n${SIGN}`;
     new Notification(title, {
       body: text,
       icon: "/favicon.ico",
