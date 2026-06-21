@@ -13,6 +13,7 @@ import { useEffect, useRef, type ReactNode } from "react";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { Toaster } from "@/components/ui/sonner";
+import { InterstitialAdProvider } from "@/components/aura/InterstitialAdProvider";
 
 function NotFoundComponent() {
   return (
@@ -137,11 +138,13 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <ReferralCapture />
-      <PageViewTracker />
-      {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-      <Outlet />
-      <Toaster position="top-center" richColors closeButton />
+      <InterstitialAdProvider>
+        <ReferralCapture />
+        <PageViewTracker />
+        {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
+        <Outlet />
+        <Toaster position="top-center" richColors closeButton />
+      </InterstitialAdProvider>
     </QueryClientProvider>
   );
 }

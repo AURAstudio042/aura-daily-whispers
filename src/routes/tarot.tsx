@@ -10,6 +10,7 @@ import { useUser, userName } from "@/lib/aura/store";
 import { TAROT_CATEGORIES } from "@/lib/aura/tarot-data";
 import { drawTarot, getTarotStatus, type TarotReadingResult } from "@/lib/aura/tarot.functions";
 import { claimAdTarot, getRewardsSummary } from "@/lib/aura/rewards.functions";
+import { useInterstitial } from "@/components/aura/InterstitialAdProvider";
 import { renderNodeAsStoryBlob, nativeShareImage, downloadBlob, shareToWhatsApp } from "@/lib/aura/share";
 import { ShareSheet } from "@/components/aura/ShareSheet";
 import { toast } from "sonner";
@@ -99,6 +100,8 @@ function TarotPage() {
   const canDraw = !isFree ? (status?.limit.allowed || bonus > 0) : bonus > 0;
   const name = userName(u);
 
+  const { trigger: triggerInterstitial } = useInterstitial();
+
   const onDraw = async () => {
     if (!category || loading || !canDraw) return;
     setLoading(true);
@@ -108,7 +111,11 @@ function TarotPage() {
       setTimeout(() => {
         setResult(r);
         setReveal(true);
-        if (r.ok) refreshAll();
+        if (r.ok) {
+          refreshAll();
+          // Natural transition: ad shown after reading is revealed.
+          triggerInterstitial("tarot-result");
+        }
         setLoading(false);
       }, 900);
     } catch {

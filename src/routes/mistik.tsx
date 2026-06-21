@@ -11,6 +11,7 @@ import { getAdCredits } from "@/lib/aura/ad-credits.functions";
 import { pickFallback, timeOfDay, type MysticCardContent } from "@/lib/aura/mystic-data";
 import { ShareSheet } from "@/components/aura/ShareSheet";
 import { AdRewardModal } from "@/components/aura/AdRewardModal";
+import { useInterstitial } from "@/components/aura/InterstitialAdProvider";
 import { downloadBlob, nativeShareImage, renderNodeAsStoryBlob, shareToWhatsApp } from "@/lib/aura/share";
 
 export const Route = createFileRoute("/mistik")({
@@ -42,6 +43,7 @@ function MistikPage() {
   const genCard = useServerFn(generateMysticCard);
   const fetchTier = useServerFn(getUserTier);
   const fetchCredits = useServerFn(getAdCredits);
+  const { trigger: triggerInterstitial } = useInterstitial();
   const favs = useFavs();
 
   const refreshCredits = useCallback(() => {
@@ -92,7 +94,10 @@ function MistikPage() {
       const safe = next.quote === avoidQuote ? pickFallback(avoidQuote) : next;
       setCard(safe);
       if (typeof window !== "undefined") window.localStorage.setItem(LAST_KEY, safe.quote);
-      setTimeout(() => setOpened(true), 250);
+      setTimeout(() => {
+        setOpened(true);
+        triggerInterstitial("mystic-card");
+      }, 250);
     } catch {
       const fb = pickFallback(avoidQuote);
       setCard(fb);
