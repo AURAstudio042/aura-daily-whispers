@@ -5,14 +5,22 @@
 const SIGN = "— AURA ✨";
 const STATE_KEY = "aura:notif:v1";
 
+// Humanized whisper pool. Tone: a calm, wise close friend texting you.
+// Structure per message: 1 feeling line + 1 grounding/depth line + (optional) soft closer.
+// Rules: short, everyday Turkish. No motivational clichés, no heavy metaphors, no emojis, no signatures.
 export const WHISPERS = [
-  "Kendine biraz daha nazik davranmanın günüdür. 🌸",
-  "Küçük ilerlemeler de ilerlemedir. ✨",
-  "Bazı kapılar kapanmadı, sadece sana ait değiller. 🌙",
-  "Sahne senin. Rolünü küçültme.",
-  "Bugün hiçbir şey yapmadın ama en azından kötü karar da vermedin. ☕",
-  "Işığını kısmayı reddeden insanlar, bazı gözleri rahatsız eder.",
-  "Hayatının başrolü olmak kibir değil, sorumluluktur.",
+  "Bugün biraz yavaşlasan da olur. Her şeye yetişmek zorunda değilsin.",
+  "İçinden geçenleri bastırma. Sadece fark et, yeter şimdilik.",
+  "Aklındaki o konu var ya — bugün çözmek zorunda değilsin.",
+  "Kendine bir bardak su koy. Küçük şeyler bazen en çok iyi gelen oluyor.",
+  "Herkese cevap vermek zorunda değilsin. Sessizlik de bir cevap.",
+  "Bugün iyi hissetmiyorsan, o da geçerli. Kendini zorlama.",
+  "Bir an dur ve nefes al. Sadece bu kadar; başka bir şey istemiyorum senden.",
+  "Olmayan bir şeye üzülüyor olabilirsin. Olanlara bakmayı dene biraz.",
+  "Aklın çok yorgun bugün, farkındayım. Telefonu bir süre bırakmak iyi gelebilir.",
+  "Kendini açıklamak zorunda değilsin. Anlayan zaten anlıyor.",
+  "Bugün küçük bir iyilik yap kendine. Listeden değil, içinden geleni.",
+  "Bazı günler sadece geçer, bir şey öğretmek zorunda değil.",
 ];
 
 type DayState = {
@@ -71,11 +79,12 @@ export function hasAsked(): boolean {
   return !!readState().asked;
 }
 
-function fire(title: string, body: string) {
+function fire(title: string, body: string, opts?: { sign?: boolean }) {
   if (typeof window === "undefined" || !("Notification" in window)) return;
   if (Notification.permission !== "granted") return;
   try {
-    const text = body.trim().endsWith(SIGN) ? body : `${body}\n\n${SIGN}`;
+    const withSign = opts?.sign ?? true;
+    const text = !withSign || body.trim().endsWith(SIGN) ? body : `${body}\n\n${SIGN}`;
     new Notification(title, {
       body: text,
       icon: "/favicon.ico",
@@ -185,7 +194,7 @@ export function startAuraNotifications({ name, hint, notificationTime = "07:00" 
       if (t <= Date.now()) return; // missed while offline — skip silently
       scheduleAt(t, () => {
         const msg = WHISPERS[Math.floor(Math.random() * WHISPERS.length)];
-        fire("AURA · Whisper", msg);
+        fire("Bir an için…", msg, { sign: false });
         const cur = readState();
         cur.whisperFired = [...(cur.whisperFired ?? []), t];
         writeState(cur);
