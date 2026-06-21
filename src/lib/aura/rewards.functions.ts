@@ -201,24 +201,88 @@ export const claimAdTarot = createServerFn({ method: "POST" })
   });
 
 export type RedeemReferralResult =
-  | { ok: true; alreadyRedeemed?: boolean }
-  | { ok: false; reason: "invalid" | "self" | "already" | "error" };
+  | { ok: true; alreadyRedeemed?: boolean; pendingActivation?: boolean }
+  | {
+      ok: false;
+      reason:
+        | "invalid"
+        | "self"
+        | "already"
+        | "error"
+        | "email_unverified"
+        | "device_limit"
+        | "ip_limit"
+        | "same_device_as_referrer"
+        | "missing_device";
+    };
+
+/**
+ * Award credits + check milestone for a freshly ACTIVATED referral.
+ * Wrapped so both redeem (rare premium activation path) and
+ * activatePendingInternal reuse the exact same idempotent logic.
+ */
+async function grantActivatedRewards(admin: any, referrerId: string, referredUserId: string) {
+  // Credits: idempotent because we tag the source per-referral.
+  await admin.from("bonus_tarot_credits").upsert(
+    [
+      { user_id: referrerId, source: `referral_referrer:${referredUserId}` },
+      { user_id: referredUserId, source: `referral_welcome:${referredUserId}` },
+    ],
+    { onConflict: "user_id,source", ignoreDuplicates: true },
+  );
+
+  // Milestone count uses ACTIVATED referrals only.
+  const { count } = await admin
+    .from("referrals")
+    .select("id", { count: "exact", head: true })
+    .eq("referrer_id", referrerId)
+    .not("activated_at", "is", null);
+  const total = count ?? 0;
+  if (total > 0 && total % MILESTONE_EVERY === 0) {
+    const milestoneSource = `referral_milestone_${total / MILESTONE_EVERY}`;
+    const { data: existingTrial } = await admin
+      .from("aura_plus_trials")
+      .select("id")
+      .eq("user_id", referrerId)
+      .eq("source", milestoneSource)
+      .maybeSingle();
+    if (!existingTrial) {
+      const ends = new Date(Date.now() + TRIAL_DAYS_PER_MILESTONE * 86400000);
+      await admin.from("aura_plus_trials").insert({
+        user_id: referrerId,
+        ends_at: ends.toISOString(),
+        source: milestoneSource,
+      });
+    }
+  }
+}
 
 export const redeemReferral = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((d: unknown) => z.object({ code: z.string().min(3).max(12) }).parse(d))
+  .inputValidator((d: unknown) =>
+    z
+      .object({
+        code: z.string().min(3).max(12),
+        deviceHash: z.string().min(16).max(128).optional(),
+      })
+      .parse(d),
+  )
   .handler(async ({ data, context }): Promise<RedeemReferralResult> => {
     const { supabase, userId } = context;
     const code = data.code.toUpperCase().trim();
     const admin = await getAdmin();
 
+    if (!data.deviceHash) return { ok: false, reason: "missing_device" };
+
     // Already referred?
     const { data: existing } = await supabase
       .from("referrals")
-      .select("id")
+      .select("id, activated_at")
       .eq("referred_user_id", userId)
       .maybeSingle();
-    if (existing) return { ok: true, alreadyRedeemed: true };
+    if (existing) {
+      return { ok: true, alreadyRedeemed: true, pendingActivation: !existing.activated_at };
+    }
 
     // Look up referrer via admin client — referral_codes is owner-read only
     const { data: codeRow } = await admin
@@ -230,47 +294,162 @@ export const redeemReferral = createServerFn({ method: "POST" })
     const referrerId = codeRow.user_id as string;
     if (referrerId === userId) return { ok: false, reason: "self" };
 
+    // Hash device + IP server-side. Device hash arrives pre-hashed from the
+    // client; re-hash with a server pepper so the value at rest can't be
+    // looked up from a leaked client fingerprint.
+    const pepper = process.env.SUPABASE_PUBLISHABLE_KEY ?? "aura-pepper";
+    const deviceHash = await sha256Hex(`${data.deviceHash}|${pepper}`);
+    const ip = extractIp();
+    const ipHash = ip ? await sha256Hex(`${ip}|${pepper}`) : null;
+
+    // Rule: device can be the referred party at most MAX_PER_DEVICE times.
+    const { count: deviceCount } = await admin
+      .from("referrals")
+      .select("id", { count: "exact", head: true })
+      .eq("device_hash", deviceHash);
+    if ((deviceCount ?? 0) >= MAX_PER_DEVICE) return { ok: false, reason: "device_limit" };
+
+    // Rule: IP can be the referred party at most MAX_PER_IP times (softer
+    // because of NAT / corporate / mobile carrier sharing).
+    if (ipHash) {
+      const { count: ipCount } = await admin
+        .from("referrals")
+        .select("id", { count: "exact", head: true })
+        .eq("ip_hash", ipHash);
+      if ((ipCount ?? 0) >= MAX_PER_IP) return { ok: false, reason: "ip_limit" };
+    }
+
+    // Rule: cannot be the same physical device as the referrer's signup.
+    const { data: refProfile } = await admin
+      .from("profiles")
+      .select("signup_device_hash")
+      .eq("id", referrerId)
+      .maybeSingle();
+    if (refProfile?.signup_device_hash && refProfile.signup_device_hash === deviceHash) {
+      return { ok: false, reason: "same_device_as_referrer" };
+    }
+
+    // Stamp this user's signup device (one-time write — null only).
+    await admin
+      .from("profiles")
+      .update({ signup_device_hash: deviceHash, signup_ip_hash: ipHash })
+      .eq("id", userId)
+      .is("signup_device_hash", null);
+
+    // Rule: email must be verified on auth.users.
+    const { data: userRow } = await admin.auth.admin.getUserById(userId);
+    const emailVerifiedAt = (userRow?.user as any)?.email_confirmed_at ?? null;
+
+    // Insert PENDING — activated_at stays null until the 24h window passes
+    // AND the user is email-verified AND has app activity.
     const { error: insErr } = await admin.from("referrals").insert({
       referrer_id: referrerId,
       referred_user_id: userId,
       code,
-      rewarded_at: new Date().toISOString(),
+      device_hash: deviceHash,
+      ip_hash: ipHash,
+      email_verified_at: emailVerifiedAt,
+      activated_at: null,
+      rewarded_at: null,
     });
     if (insErr) return { ok: false, reason: "error" };
 
+    return { ok: true, pendingActivation: true };
+  });
 
-    // Grant credits: 1 for referrer, 1 welcome for new user (privileged)
-    await admin.from("bonus_tarot_credits").insert([
-      { user_id: referrerId, source: "referral_referrer" },
-      { user_id: userId, source: "referral_welcome" },
-    ]);
+/**
+ * Promotes any pending referrals where this user IS the referred party
+ * once the 24h cooling-off window elapses AND email is verified AND
+ * the account has real activity (any tarot/coffee/saved_quotes row, or
+ * profile.updated_at moved at least once after signup).
+ *
+ * Safe to call frequently — bounded by the count of pending rows.
+ */
+async function activatePendingInternal(referredUserId: string): Promise<void> {
+  const admin = await getAdmin();
+  const cutoff = new Date(Date.now() - ACTIVATION_DELAY_MS).toISOString();
 
-    // Milestone: every 4 referrals = 7-day AURA+ trial
-    const { count } = await supabase
+  const { data: pending } = await admin
+    .from("referrals")
+    .select("id, referrer_id, email_verified_at, created_at")
+    .eq("referred_user_id", referredUserId)
+    .is("activated_at", null)
+    .lte("created_at", cutoff);
+
+  const rows = (pending ?? []) as Array<{
+    id: string;
+    referrer_id: string;
+    email_verified_at: string | null;
+    created_at: string;
+  }>;
+  if (rows.length === 0) return;
+
+  // Re-check email verification — may have happened after redeem.
+  let emailVerifiedAt: string | null = rows[0].email_verified_at;
+  if (!emailVerifiedAt) {
+    const { data: userRow } = await admin.auth.admin.getUserById(referredUserId);
+    emailVerifiedAt = (userRow?.user as any)?.email_confirmed_at ?? null;
+    if (!emailVerifiedAt) return; // still unverified — keep pending
+  }
+
+  // Activity proof: any of these signals counts.
+  const [{ count: tarotCount }, { count: coffeeCount }, { count: quotesCount }] = await Promise.all([
+    admin.from("tarot_readings").select("id", { count: "exact", head: true }).eq("user_id", referredUserId),
+    admin.from("coffee_readings").select("id", { count: "exact", head: true }).eq("user_id", referredUserId),
+    admin.from("saved_quotes").select("id", { count: "exact", head: true }).eq("user_id", referredUserId),
+  ]);
+  const hasActivity = (tarotCount ?? 0) + (coffeeCount ?? 0) + (quotesCount ?? 0) > 0;
+  if (!hasActivity) return;
+
+  for (const row of rows) {
+    const nowIso = new Date().toISOString();
+    const { error } = await admin
       .from("referrals")
-      .select("id", { count: "exact", head: true })
-      .eq("referrer_id", referrerId);
-    const total = count ?? 0;
-    if (total > 0 && total % MILESTONE_EVERY === 0) {
-      // Idempotency: tag each milestone with a deterministic source so a
-      // re-run (race / retry) cannot grant the same milestone twice.
-      const milestoneSource = `referral_milestone_${total / MILESTONE_EVERY}`;
-      const { data: existingTrial } = await admin
-        .from("aura_plus_trials")
-        .select("id")
-        .eq("user_id", referrerId)
-        .eq("source", milestoneSource)
-        .maybeSingle();
-      if (!existingTrial) {
-        const ends = new Date(Date.now() + TRIAL_DAYS_PER_MILESTONE * 86400000);
-        await admin.from("aura_plus_trials").insert({
-          user_id: referrerId,
-          ends_at: ends.toISOString(),
-          source: milestoneSource,
-        });
-      }
+      .update({
+        activated_at: nowIso,
+        rewarded_at: nowIso,
+        email_verified_at: emailVerifiedAt,
+      })
+      .eq("id", row.id)
+      .is("activated_at", null); // race guard
+    if (error) continue;
+    await grantActivatedRewards(admin, row.referrer_id, referredUserId);
+  }
+}
+
+/**
+ * Public entrypoint a referrer can call to attempt activation of THEIR
+ * pending referrals (e.g. after a new sign-up logs into the app for the
+ * first time, the referrer can pull a fresh count). Returns the number
+ * of referrals that just activated.
+ */
+export const activatePendingReferrals = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }): Promise<{ activated: number }> => {
+    const admin = await getAdmin();
+    const cutoff = new Date(Date.now() - ACTIVATION_DELAY_MS).toISOString();
+    const { data: pending } = await admin
+      .from("referrals")
+      .select("referred_user_id")
+      .eq("referrer_id", context.userId)
+      .is("activated_at", null)
+      .lte("created_at", cutoff);
+    const ids = Array.from(new Set((pending ?? []).map((r: any) => r.referred_user_id as string)));
+    let activated = 0;
+    for (const uid of ids) {
+      const before = await admin
+        .from("referrals")
+        .select("id", { count: "exact", head: true })
+        .eq("referred_user_id", uid)
+        .not("activated_at", "is", null);
+      await activatePendingInternal(uid);
+      const after = await admin
+        .from("referrals")
+        .select("id", { count: "exact", head: true })
+        .eq("referred_user_id", uid)
+        .not("activated_at", "is", null);
+      activated += Math.max(0, (after.count ?? 0) - (before.count ?? 0));
     }
-
-
-    return { ok: true };
+    return { activated };
+  });
   });
