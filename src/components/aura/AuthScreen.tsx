@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { APP_URL, RESET_PASSWORD_URL } from "@/lib/app-url";
 
 function translateAuthError(raw: string): string {
   const m = raw.toLowerCase();
@@ -42,7 +43,7 @@ export function AuthScreen() {
       const { error } = await supabase.auth.resend({
         type: "signup",
         email: pendingVerifyEmail,
-        options: { emailRedirectTo: window.location.origin },
+        options: { emailRedirectTo: APP_URL },
       });
       if (error) {
         console.error("[auth][resend] failed", { message: error.message });
@@ -70,7 +71,7 @@ export function AuthScreen() {
         const { data, error } = await supabase.auth.signUp({
           email,
           password,
-          options: { emailRedirectTo: window.location.origin },
+          options: { emailRedirectTo: APP_URL },
         });
         if (error) throw error;
         if (data.user && !data.session) {
@@ -104,7 +105,7 @@ export function AuthScreen() {
       return;
     }
     setResetSending(true);
-    const redirectTo = `${window.location.origin}/reset-password`;
+    const redirectTo = RESET_PASSWORD_URL;
     console.info("[auth][reset] requesting password reset", { email: target, redirectTo, at: new Date().toISOString() });
     try {
       const { data, error } = await supabase.auth.resetPasswordForEmail(target, {
