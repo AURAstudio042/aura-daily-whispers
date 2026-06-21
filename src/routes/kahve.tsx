@@ -43,6 +43,7 @@ function KahvePage() {
   const statusFn = useServerFn(getCoffeeStatus);
   const analyzeFn = useServerFn(analyzeCoffeeReading);
   const grantAd = useServerFn(grantAdCredit);
+  const { trigger: triggerInterstitial } = useInterstitial();
   const listFn = useServerFn(listCoffeeReadings);
 
   const [status, setStatus] = useState<CoffeeStatus | null>(null);

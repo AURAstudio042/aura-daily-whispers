@@ -11,6 +11,7 @@ import { getAdCredits } from "@/lib/aura/ad-credits.functions";
 import { pickFallback, timeOfDay, type MysticCardContent } from "@/lib/aura/mystic-data";
 import { ShareSheet } from "@/components/aura/ShareSheet";
 import { AdRewardModal } from "@/components/aura/AdRewardModal";
+import { useInterstitial } from "@/components/aura/InterstitialAdProvider";
 import { downloadBlob, nativeShareImage, renderNodeAsStoryBlob, shareToWhatsApp } from "@/lib/aura/share";
 
 export const Route = createFileRoute("/mistik")({
