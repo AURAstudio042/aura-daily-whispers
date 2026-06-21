@@ -34,6 +34,34 @@ export function AuthScreen() {
   const [resetSending, setResetSending] = useState(false);
   const [pendingVerifyEmail, setPendingVerifyEmail] = useState<string | null>(null);
   const [resendingVerify, setResendingVerify] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
+
+  async function signInWithGoogle() {
+    setErr(null);
+    setInfo(null);
+    setGoogleLoading(true);
+    try {
+      const result = await lovable.auth.signInWithOAuth("google", {
+        redirect_uri: APP_URL,
+      });
+      if (result.error) {
+        const msg = result.error instanceof Error ? result.error.message : String(result.error);
+        setErr(translateAuthError(msg));
+        setGoogleLoading(false);
+        return;
+      }
+      if (result.redirected) {
+        // Browser is navigating to Google; keep loading state until redirect.
+        return;
+      }
+      // Tokens returned → session set; useUser picks it up.
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : "Google ile giriş başarısız.";
+      setErr(translateAuthError(msg));
+      setGoogleLoading(false);
+    }
+  }
+
 
   async function resendVerification() {
     if (!pendingVerifyEmail) return;
