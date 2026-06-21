@@ -7,7 +7,7 @@ const STATE_KEY = "aura:notif:v1";
 
 // Humanized whisper pool. Tone: a calm, wise close friend texting you.
 // Structure per message: 1 feeling line + 1 grounding/depth line + (optional) soft closer.
-// Rules: short, everyday Turkish. No motivational clichés, no heavy metaphors, no emojis, no signatures.
+// Rules: short, everyday Turkish. No motivational clichés, no heavy metaphors, no emojis. Signature added in fire().
 export const WHISPERS = [
   "Bugün biraz yavaşlasan da olur. Her şeye yetişmek zorunda değilsin.",
   "İçinden geçenleri bastırma. Sadece fark et, yeter şimdilik.",
