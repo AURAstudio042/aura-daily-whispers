@@ -7,8 +7,10 @@ import { Onboarding } from "@/components/aura/Onboarding";
 import { useUser, userName, zodiacOf, toggleFav, useFavs } from "@/lib/aura/store";
 import { generateMysticCard } from "@/lib/aura/mystic.functions";
 import { getUserTier } from "@/lib/aura/tier.functions";
+import { getAdCredits } from "@/lib/aura/ad-credits.functions";
 import { pickFallback, timeOfDay, type MysticCardContent } from "@/lib/aura/mystic-data";
 import { ShareSheet } from "@/components/aura/ShareSheet";
+import { AdRewardModal } from "@/components/aura/AdRewardModal";
 import { downloadBlob, nativeShareImage, renderNodeAsStoryBlob, shareToWhatsApp } from "@/lib/aura/share";
 
 export const Route = createFileRoute("/mistik")({
@@ -29,6 +31,8 @@ function MistikPage() {
   const [opened, setOpened] = useState(false);
   const [loading, setLoading] = useState(false);
   const [adWatching, setAdWatching] = useState(false);
+  const [adModalOpen, setAdModalOpen] = useState(false);
+  const [adCredits, setAdCredits] = useState(0);
   const [shareOpen, setShareOpen] = useState(false);
   const [shareBusy, setShareBusy] = useState(false);
   const [tier, setTier] = useState<"free" | "plus" | "premium">("free");
@@ -37,7 +41,14 @@ function MistikPage() {
 
   const genCard = useServerFn(generateMysticCard);
   const fetchTier = useServerFn(getUserTier);
+  const fetchCredits = useServerFn(getAdCredits);
   const favs = useFavs();
+
+  const refreshCredits = useCallback(() => {
+    fetchCredits()
+      .then((r) => setAdCredits(r?.balance ?? 0))
+      .catch(() => {});
+  }, [fetchCredits]);
 
   useEffect(() => {
     if (!authed) return;
@@ -47,10 +58,11 @@ function MistikPage() {
         if (!cancelled && r?.tier) setTier(r.tier);
       })
       .catch(() => {});
+    refreshCredits();
     return () => {
       cancelled = true;
     };
-  }, [authed, fetchTier]);
+  }, [authed, fetchTier, refreshCredits]);
 
   // Ensure ad timer never outlives the page
   useEffect(() => {
@@ -101,14 +113,20 @@ function MistikPage() {
 
   const onUnlock = async () => {
     if (unlimited) { drawCard(); return; }
-    setAdWatching(true);
-    // Mock ad: 3s wait, then draw
-    if (adTimerRef.current) clearTimeout(adTimerRef.current);
-    adTimerRef.current = setTimeout(async () => {
-      adTimerRef.current = null;
-      setAdWatching(false);
+    if (adCredits > 0) {
+      // Already paid by a prior ad — spend now.
       await drawCard();
-    }, 3000);
+      refreshCredits();
+      return;
+    }
+    setAdModalOpen(true);
+  };
+
+  const onAdGranted = async (balance: number) => {
+    setAdCredits(balance);
+    setAdModalOpen(false);
+    await drawCard();
+    refreshCredits();
   };
 
   const onNew = () => { setOpened(false); setCard(null); drawCard(); };
