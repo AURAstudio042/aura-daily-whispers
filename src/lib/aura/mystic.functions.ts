@@ -29,7 +29,16 @@ function extractJson(text: string): string {
 export const generateMysticCard = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((d: unknown) => InputSchema.parse(d))
-  .handler(async ({ data }): Promise<MysticCardContent> => {
+  .handler(async ({ data, context }): Promise<MysticCardContent> => {
+    // Free-tier gate: must have ad credit. Consumed on success only.
+    const { hasAdCreditServer, consumeAdCreditServer } = await import("./ad-credits.functions");
+    const gate = await hasAdCreditServer(context.supabase, context.userId);
+    if (!gate.unlimited && gate.balance <= 0) {
+      // Falls back gracefully so the UI can still show *something* if the
+      // client somehow bypasses the gate; the gate is enforced at the
+      // route level via getAdCredits/AdRewardModal.
+      return pickFallback(data.avoidQuote);
+    }
     try {
       const key = process.env.LOVABLE_API_KEY;
       if (!key) return pickFallback(data.avoidQuote);
