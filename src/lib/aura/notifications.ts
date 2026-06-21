@@ -193,7 +193,7 @@ export function startAuraNotifications({ name, hint, notificationTime = "07:00" 
       if (fired.has(t)) return;
       if (t <= Date.now()) return; // missed while offline — skip silently
       scheduleAt(t, () => {
-        const msg = WHISPERS[Math.floor(Math.random() * WHISPERS.length)];
+        const msg = pickNextWhisper();
         fire("AURA'dan bir fısıltı", msg);
         const cur = readState();
         cur.whisperFired = [...(cur.whisperFired ?? []), t];
