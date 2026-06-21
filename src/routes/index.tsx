@@ -90,7 +90,7 @@ function BugunPage() {
   const scent = pack?.scent
     ? { scents: pack.scent.names.split(/[,·]\s*/).map((s) => s.trim()).filter(Boolean), feel: pack.scent.feeling }
     : { scents: scentMock.scents, feel: scentMock.feel };
-  const quote = pack?.quote ?? dailyQuote();
+  const quote = pack?.quote ?? dailyQuote(u.mood);
   const morning = pack?.greeting ?? greetingHint(z);
 
 
