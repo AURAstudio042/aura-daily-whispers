@@ -29,6 +29,35 @@ export function AuthScreen() {
   const [info, setInfo] = useState<string | null>(null);
   const [resetEmail, setResetEmail] = useState("");
   const [resetSending, setResetSending] = useState(false);
+  const [pendingVerifyEmail, setPendingVerifyEmail] = useState<string | null>(null);
+  const [resendingVerify, setResendingVerify] = useState(false);
+
+  async function resendVerification() {
+    if (!pendingVerifyEmail) return;
+    setErr(null);
+    setInfo(null);
+    setResendingVerify(true);
+    console.info("[auth][resend] requesting signup verification resend", { email: pendingVerifyEmail });
+    try {
+      const { error } = await supabase.auth.resend({
+        type: "signup",
+        email: pendingVerifyEmail,
+        options: { emailRedirectTo: window.location.origin },
+      });
+      if (error) {
+        console.error("[auth][resend] failed", { message: error.message });
+        throw error;
+      }
+      setInfo("Doğrulama maili tekrar gönderildi ✦ Gelmediyse spam / gereksiz klasörünü de kontrol et.");
+    } catch (e: unknown) {
+      const msg = e instanceof Error ? e.message : "Hata";
+      setErr(translateAuthError(msg));
+    } finally {
+      setResendingVerify(false);
+    }
+  }
+
+
 
 
   async function submit(e: React.FormEvent) {
@@ -45,6 +74,7 @@ export function AuthScreen() {
         });
         if (error) throw error;
         if (data.user && !data.session) {
+          setPendingVerifyEmail(email);
           setInfo("Hesabın oluşturuldu ✦ E-postana gönderdiğimiz bağlantıyla doğrulamayı tamamla.");
         }
       } else {
@@ -221,6 +251,17 @@ export function AuthScreen() {
         >
           {loading ? "…" : mode === "login" ? "GİRİŞ YAP ✦" : "DEVAM ✦"}
         </button>
+
+        {mode === "signup" && pendingVerifyEmail && (
+          <button
+            type="button"
+            onClick={resendVerification}
+            disabled={resendingVerify}
+            className="block w-full text-center text-[11px] tracking-[0.2em] uppercase text-[color:var(--aura-lavender)] underline-offset-4 hover:underline disabled:opacity-40"
+          >
+            {resendingVerify ? "Gönderiliyor…" : "Doğrulama mailini tekrar gönder ✦"}
+          </button>
+        )}
 
         {mode === "login" && (
           <button
