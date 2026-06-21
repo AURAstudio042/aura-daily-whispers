@@ -644,51 +644,164 @@ export function greetingHint(z: ZodiacKey): string {
 }
 
 // ── Weekly
-export function weeklyAura(z: ZodiacKey, mood?: Mood) {
-  const themes = [
-    "Sınır koyma haftası",
-    "Yumuşak başlangıçlar haftası",
-    "Görünür olma haftası",
-    "İçe dönüş haftası",
-    "Cesur sözler haftası",
-    "Sadeleşme haftası",
-    "Bağlantı kurma haftası",
-  ];
-  const goals = [
-    "Bu hafta bir 'hayır' demeyi dene",
-    "Günde 10 dakika telefonsuz yürüyüş",
-    "Sevdiğin birine sebepsiz bir mesaj",
-    "Bir akşam kendine yemek pişir",
-    "Bir kitabın 20 sayfasını oku",
-    "Erken uyanıp bir kahve sessizliği yaşa",
-    "Bir gün sosyal medyaya hiç bakma",
-    "Bir dostuna küçük bir hediye al",
-    "Bir akşam mum ışığında yemek ye",
-  ];
-  const socials = [
-    "Bu hafta yakın çevren seni daha çok duymak istiyor. Kısa ama içten cümleler kurmak yeter.",
-    "Bu hafta yeni biriyle tanışma ihtimalin yüksek; açık ol ama acele etme.",
-    "Eski bir bağlantı bu hafta yeniden açılabilir; ne hissettiğine dikkat et.",
-  ];
-  const motivations = [
-    "Enerjini büyük hedeflere değil, küçük tutarlılıklara ver — gerisini hafta kendi getirir.",
-    "Bu hafta plan değil, prensip seni taşıyacak: ne yapmayacağına karar ver.",
-    "Bir şeyi bitirmek yenisine başlamaktan daha tatmin edici olacak bu hafta.",
-  ];
-  const rituals = [
-    "Sabahları 3 dakika derin nefes — burnundan 4, tutuş 4, ağızdan 6.",
-    "Yatmadan önce 5 dakika telefonsuz oturma.",
-    "Akşamları bir bardak sıcak su + limon ritüeli.",
-    "Sabah ilk işin pencereyi aç ve gökyüzüne bak.",
-  ];
+// ISO week id (e.g. "2026-W25") — stable for a full Mon–Sun cycle.
+export function weekId(d: Date = new Date()): string {
+  const t = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+  const day = t.getUTCDay() || 7;
+  t.setUTCDate(t.getUTCDate() + 4 - day);
+  const yearStart = new Date(Date.UTC(t.getUTCFullYear(), 0, 1));
+  const week = Math.ceil((((t.getTime() - yearStart.getTime()) / 86400000) + 1) / 7);
+  return `${t.getUTCFullYear()}-W${String(week).padStart(2, "0")}`;
+}
+
+// Deterministic pick helpers seeded by an explicit key (no dayStamp / session).
+function pickByKey<T>(arr: T[], key: string): T {
+  return arr[hash(key) % arr.length];
+}
+function pickNByKey<T>(arr: T[], n: number, key: string): T[] {
+  const copy = [...arr];
+  const out: T[] = [];
+  let seed = hash(key) || 1;
+  while (out.length < Math.min(n, copy.length)) {
+    seed = (Math.imul(seed, 1103515245) + 12345) & 0x7fffffff;
+    out.push(copy.splice(seed % copy.length, 1)[0]);
+  }
+  return out;
+}
+
+// 50+ mini goals across 5 categories.
+const WEEKLY_GOALS: string[] = [
+  // Öz bakım
+  "Bir akşam telefonu uzağa bırakıp erken yat",
+  "Sabah ilk işin bir bardak su iç",
+  "Bir akşam sıcak duş + sade bir bakım rutini yap",
+  "Bir gün makyajsız / sadelikle dışarı çık",
+  "Bir akşam 10 dakika cilt bakımına ayır",
+  "Bir öğle arası 15 dakika uzanıp gözlerini kapat",
+  "Sabah uyandığında 3 derin nefes al",
+  "Bir gece kafeini öğleden sonra kes",
+  "Bir akşam kendine çay demle ve sessizce iç",
+  "Bir gün saçını / kendini biraz şımart",
+  // Üretkenlik
+  "Bir günü sadece tek bir önemli işe ayır",
+  "Masanı / çantanı 10 dakikada topla",
+  "Bir e-posta kutusunu sıfırla",
+  "Bir günü 'sadece bitirme' günü ilan et",
+  "Sabah 3 maddelik bir günlük plan yaz",
+  "Bir tane erteleyip durduğun küçük işi bitir",
+  "Telefonundaki gereksiz bir uygulamayı sil",
+  "Bir günü bildirimsiz geçir",
+  "Çalışma alanını yeniden düzenle",
+  "Bir alışkanlığı 3 gün üst üste tekrar et",
+  // Mental sağlık
+  "Bir şeye 'hayır' demeyi dene",
+  "Bir günü sosyal medyaya bakmadan geçir",
+  "10 dakikalık bir meditasyon dene",
+  "Aklındakileri bir sayfaya boşalt",
+  "Bir gün haberleri kapat",
+  "Kendine yumuşak bir cümle yaz ve sakla",
+  "Bir karar için 24 saat beklemeyi dene",
+  "Bugün hissettiğin 3 duyguyu yaz",
+  "Bir günü 'yargılamadan' geçirmeyi dene",
+  "Kendine küçük bir teşekkür notu yaz",
+  // Fiziksel aktivite
+  "Günde 10 dakika telefonsuz yürüyüş",
+  "Bir gün asansör yerine merdiven",
+  "Sabah 5 dakika esneme",
+  "Bir akşam yürüyüşe çık",
+  "Bir gün 8.000 adım hedefi",
+  "Bir öğleden sonra dans et",
+  "Bir gün bisiklet / yürüyüş gibi açık hava",
+  "Yatmadan önce 5 dakika boyun-omuz gevşetme",
+  "Bir gün öğle arası kısa bir tur at",
+  "Bir akşam telefonsuz bir spor / yoga videosu",
+  // Sosyal
+  "Sevdiğin birine sebepsiz bir mesaj at",
+  "Uzun zamandır görüşmediğin birini ara",
+  "Bir dostuna küçük bir hediye al",
+  "Birine içten bir teşekkür söyle",
+  "Bir akşamı sevdiğin biriyle yemek için ayır",
+  "Bir tanıdığa kalpten bir iltifat et",
+  "Aileden birine bugün nasılsın diye sor",
+  "Bir arkadaşınla telefonsuz 30 dakika geçir",
+  "Yeni biriyle kısa bir sohbet kur",
+  "Bir kişiye bugün 'iyi ki varsın' de",
+  // Bonus
+  "Bir kitabın 20 sayfasını oku",
+  "Bir akşam mum ışığında yemek ye",
+  "Erken uyanıp bir kahve sessizliği yaşa",
+  "Bir akşam kendine yemek pişir",
+];
+
+const WEEKLY_THEMES = [
+  "Sınır koyma haftası",
+  "Yumuşak başlangıçlar haftası",
+  "Görünür olma haftası",
+  "İçe dönüş haftası",
+  "Cesur sözler haftası",
+  "Sadeleşme haftası",
+  "Bağlantı kurma haftası",
+  "Toparlanma haftası",
+  "Küçük cesaretler haftası",
+  "Yavaşlama haftası",
+  "Yeniden başlama haftası",
+  "Şefkat haftası",
+];
+const WEEKLY_SOCIALS = [
+  "Bu hafta yakın çevren seni daha çok duymak istiyor. Kısa ama içten cümleler kurmak yeter.",
+  "Bu hafta yeni biriyle tanışma ihtimalin yüksek; açık ol ama acele etme.",
+  "Eski bir bağlantı bu hafta yeniden açılabilir; ne hissettiğine dikkat et.",
+  "Bu hafta sessiz kalmak da bir cevap olabilir; her mesaja anında dönmek zorunda değilsin.",
+  "Birinin yanında olmak bu hafta sandığından daha çok şey ifade edecek.",
+  "Bu hafta kendi alanını korumak ilişkilerine iyi gelecek.",
+  "Bu hafta bir konuşmayı ertelemek yerine açmak işine yarar.",
+];
+const WEEKLY_MOTIVATIONS = [
+  "Enerjini büyük hedeflere değil, küçük tutarlılıklara ver — gerisini hafta kendi getirir.",
+  "Bu hafta plan değil, prensip seni taşıyacak: ne yapmayacağına karar ver.",
+  "Bir şeyi bitirmek yenisine başlamaktan daha tatmin edici olacak bu hafta.",
+  "Bu hafta hız değil, yön önemli. Yavaş ama doğru yöne git.",
+  "Mükemmel değil, başlamış olmak yeter bu hafta.",
+  "Küçük bir adım bile bu hafta seni beklediğinden uzağa götürür.",
+];
+const WEEKLY_RITUALS = [
+  "Sabahları 3 dakika derin nefes — burnundan 4, tutuş 4, ağızdan 6.",
+  "Yatmadan önce 5 dakika telefonsuz oturma.",
+  "Akşamları bir bardak sıcak su + limon ritüeli.",
+  "Sabah ilk işin pencereyi aç ve gökyüzüne bak.",
+  "Her akşam günün üç güzel anını yaz.",
+  "Sabah uyanır uyanmaz 1 dakika esne.",
+  "Akşam duşunda bir niyet belirle.",
+  "Her sabah bir cümlelik bir minnet notu yaz.",
+];
+const WEEKLY_SCENTS = [
+  "Sandal & vanilya",
+  "Bergamot & yasemin",
+  "Gül & tonka",
+  "Vetiver & tütsü",
+  "Greyfurt & nane",
+  "Lavanta & beyaz misk",
+  "Şeftali & ud",
+  "Yeşil çay & limon kabuğu",
+  "Mür & deri",
+  "Iris & beyaz çay",
+];
+
+export function weeklyAura(z: ZodiacKey, mood?: Mood, wId?: string, cycle = 0) {
+  const wk = wId ?? weekId();
+  const m = mood ?? "";
+  const base = `${wk}|${z}|${m}|c${cycle}`;
+  const goals = pickNByKey(WEEKLY_GOALS, 5, base + "|goals");
   return {
-    theme: pick(themes, "wtheme-" + z + (mood ?? "")),
-    social: pick(socials, "wsoc-" + z),
-    motivation: pick(motivations, "wmot-" + z + (mood ?? "")),
-    goals: pickN(goals, 4, "wgoals-" + z + (mood ?? "")),
-    scent: pick(["Sandal & vanilya", "Bergamot & yasemin", "Gül & tonka", "Vetiver & tütsü", "Greyfurt & nane"], "wsc-" + (mood ?? "")),
-    color: pick(COLOR_POOL, "wcol-" + z).name,
-    ritual: pick(rituals, "writ-" + z),
-    quote: pick(QUOTES, "wq"),
+    theme: pickByKey(WEEKLY_THEMES, base + "|theme"),
+    social: pickByKey(WEEKLY_SOCIALS, base + "|social"),
+    motivation: pickByKey(WEEKLY_MOTIVATIONS, base + "|mot"),
+    goals,
+    scent: pickByKey(WEEKLY_SCENTS, base + "|scent"),
+    color: pickByKey(COLOR_POOL, base + "|color").name,
+    ritual: pickByKey(WEEKLY_RITUALS, base + "|ritual"),
+    quote: pickByKey(QUOTES, base + "|quote"),
+    weekId: wk,
+    cycle,
   };
 }

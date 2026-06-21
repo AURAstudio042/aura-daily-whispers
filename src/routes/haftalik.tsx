@@ -1,10 +1,10 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { AuraShell, SectionLabel, ShareSignature } from "@/components/aura/Shell";
 import { Onboarding } from "@/components/aura/Onboarding";
 import { AuthScreen } from "@/components/aura/AuthScreen";
 import { useUser, zodiacOf } from "@/lib/aura/store";
-import { weeklyAura } from "@/lib/aura/data";
+import { weeklyAura, weekId } from "@/lib/aura/data";
 import { MonthlyAnalysisSection } from "@/components/aura/MonthlyAnalysis";
 
 export const Route = createFileRoute("/haftalik")({
@@ -12,21 +12,66 @@ export const Route = createFileRoute("/haftalik")({
   component: HaftalikPage,
 });
 
+type WeeklyState = { weekId: string; cycle: number; checked: Record<number, boolean> };
+const WEEKLY_STATE_KEY = "aura:weekly-state:v1";
+
+function loadWeeklyState(wk: string): WeeklyState {
+  if (typeof window === "undefined") return { weekId: wk, cycle: 0, checked: {} };
+  try {
+    const raw = window.localStorage.getItem(WEEKLY_STATE_KEY);
+    if (raw) {
+      const s = JSON.parse(raw) as WeeklyState;
+      if (s && s.weekId === wk) return s;
+    }
+  } catch {}
+  return { weekId: wk, cycle: 0, checked: {} };
+}
+function saveWeeklyState(s: WeeklyState) {
+  try { window.localStorage.setItem(WEEKLY_STATE_KEY, JSON.stringify(s)); } catch {}
+}
+
 function HaftalikPage() {
   const [u, , ready, authed] = useUser();
-  const [checked, setChecked] = useState<Record<number, boolean>>({});
+  const wk = weekId();
+  const [state, setState] = useState<WeeklyState>(() => loadWeeklyState(wk));
+
+  // Hafta değiştiyse otomatik sıfırla.
+  useEffect(() => {
+    if (state.weekId !== wk) {
+      const next = { weekId: wk, cycle: 0, checked: {} };
+      setState(next);
+      saveWeeklyState(next);
+    }
+  }, [wk, state.weekId]);
+
+  useEffect(() => { saveWeeklyState(state); }, [state]);
+
   if (!ready) return <div className="min-h-screen" />;
   if (!authed) return <AuthScreen />;
   if (!u) return <Onboarding />;
 
   const z = zodiacOf(u);
-  const w = weeklyAura(z, u.mood);
+  const w = weeklyAura(z, u.mood, wk, state.cycle);
+  const checked = state.checked;
+
+  const setChecked = (i: number) => {
+    setState((p) => {
+      const nextChecked = { ...p.checked, [i]: !p.checked[i] };
+      const allDone = w.goals.every((_, idx) => nextChecked[idx]);
+      if (allDone) {
+        // 5/5 tamamlandı → yeni cycle, taze 5 hedef.
+        return { weekId: p.weekId, cycle: p.cycle + 1, checked: {} };
+      }
+      return { ...p, checked: nextChecked };
+    });
+  };
 
   const now = new Date();
   const monday = new Date(now);
   monday.setDate(now.getDate() - ((now.getDay() + 6) % 7));
   const sunday = new Date(monday); sunday.setDate(monday.getDate() + 6);
   const fmt = (d: Date) => `${d.getDate()} ${["Oca","Şub","Mar","Nis","May","Haz","Tem","Ağu","Eyl","Eki","Kas","Ara"][d.getMonth()]}`;
+  const doneCount = w.goals.filter((_, i) => checked[i]).length;
 
   return (
     <AuraShell>
@@ -48,12 +93,13 @@ function HaftalikPage() {
         <p className="text-[15px] text-[color:var(--aura-soft)]">{w.motivation}</p>
       </Section>
 
-      <Section title="✓ Mini Hedefler">
+      <Section title={`✓ Mini Hedefler (${doneCount}/${w.goals.length})`}>
+        <p className="mb-3 text-[12px] text-[color:var(--aura-muted)]">5 hedefi tamamlayınca yeni 5 hedef gelir.</p>
         <ul className="space-y-3">
           {w.goals.map((g, i) => (
-            <li key={i}>
+            <li key={`${state.cycle}-${i}`}>
               <button
-                onClick={() => setChecked((p) => ({ ...p, [i]: !p[i] }))}
+                onClick={() => setChecked(i)}
                 className="flex w-full items-center gap-3 text-left"
               >
                 <span className={`grid h-6 w-6 shrink-0 place-items-center rounded-full border ${checked[i] ? "border-[color:var(--aura-lavender)] bg-[color:var(--aura-lavender)]/30 text-white" : "border-[color:var(--border)]"}`}>
@@ -65,6 +111,7 @@ function HaftalikPage() {
           ))}
         </ul>
       </Section>
+
 
       <Section title="🌿 Öz Bakım Enerjisi">
         <p className="text-[13px] text-[color:var(--aura-muted)]">Haftanın Kokusu</p>
