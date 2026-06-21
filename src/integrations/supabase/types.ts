@@ -317,6 +317,27 @@ export type Database = {
         }
         Relationships: []
       }
+      interstitial_ad_log: {
+        Row: {
+          id: string
+          placement: string
+          shown_at: string
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          placement: string
+          shown_at?: string
+          user_id: string
+        }
+        Update: {
+          id?: string
+          placement?: string
+          shown_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       monthly_analyses: {
         Row: {
           content: Json
