@@ -1,37 +1,38 @@
-import { createContext, useCallback, useContext, useEffect, useRef, useState, type ReactNode } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+  type ReactNode,
+} from "react";
 import { useServerFn } from "@tanstack/react-start";
-import { getUserTier } from "@/lib/aura/tier.functions";
+import {
+  shouldShowInterstitial,
+  recordInterstitialShown,
+} from "@/lib/aura/interstitial.functions";
 
 /**
- * INTERSTITIAL AD COORDINATOR
+ * INTERSTITIAL AD COORDINATOR (server-controlled)
  *
- * Free users only. Plus / Premium / active trial → skipped entirely.
+ * The decision to show is made server-side via shouldShowInterstitial:
+ *   - Premium / Plus / active trial → never shown.
+ *   - 10-minute global cooldown (hard floor, server-enforced).
+ *   - Same-placement 30-minute cooldown.
+ *   - Rolling-24h daily cap (server-enforced; client cannot bypass).
  *
- * Frequency policy (client-enforced; UX guard, not security):
- *   - MIN_COOLDOWN_MS between any two interstitials (spam guard)
- *   - SAME_PLACEMENT_COOLDOWN_MS between two ads on the same placement
- *   - First-session grace: never show within FIRST_SESSION_GRACE_MS of app open
- *
- * State persisted in localStorage so cooldown survives reloads but resets
- * on logout / app uninstall.
- *
- * Placements call `trigger("placement-name")` at natural transition points
- * (after a tarot result renders, after a coffee reading saved, etc.). The
- * coordinator decides whether to actually display the ad.
+ * Client-side guards are intentionally kept as a *UX* layer only — they avoid
+ * extra round-trips and a brief first-session grace. They are NOT a security
+ * boundary; the server is the truth source.
  */
 
-const LAST_TS_KEY = "aura:interstitial:last_ts";
-const LAST_PLACEMENT_KEY = "aura:interstitial:last_placement";
-const SESSION_START_KEY = "aura:interstitial:session_start";
-
-// 12 min average cooldown — sits in the user-requested 10-20 min band.
-const MIN_COOLDOWN_MS = 12 * 60 * 1000;
-const SAME_PLACEMENT_COOLDOWN_MS = 30 * 60 * 1000;
 const FIRST_SESSION_GRACE_MS = 90 * 1000;
+const SESSION_START_KEY = "aura:interstitial:session_start";
 const AD_DURATION_SEC = 20;
 
 type Ctx = {
-  /** Request an interstitial at the named placement. No-op if cooldown / premium. */
+  /** Request an interstitial at the named placement. Server may decline. */
   trigger: (placement: string) => void;
 };
 
@@ -40,32 +41,12 @@ export const useInterstitial = () => useContext(InterstitialContext);
 
 export function InterstitialAdProvider({ children }: { children: ReactNode }) {
   const [open, setOpen] = useState(false);
-  const [unlimited, setUnlimited] = useState<boolean | null>(null);
-  const fetchTier = useServerFn(getUserTier);
+  const [pendingPlacement, setPendingPlacement] = useState<string | null>(null);
+  const inFlightRef = useRef(false);
   const sessionStartRef = useRef<number>(0);
+  const askServer = useServerFn(shouldShowInterstitial);
+  const recordServer = useServerFn(recordInterstitialShown);
 
-  // One-time tier check; refreshes on auth change via window event from auth flow.
-  useEffect(() => {
-    let cancelled = false;
-    const load = () => {
-      fetchTier()
-        .then((r) => {
-          if (cancelled) return;
-          const t = (r?.tier as string | undefined) ?? "free";
-          setUnlimited(t === "plus" || t === "premium" || !!r?.trialEndsAt);
-        })
-        .catch(() => !cancelled && setUnlimited(false));
-    };
-    load();
-    const onAuth = () => load();
-    window.addEventListener("aura:auth-changed", onAuth);
-    return () => {
-      cancelled = true;
-      window.removeEventListener("aura:auth-changed", onAuth);
-    };
-  }, [fetchTier]);
-
-  // Capture session start (per tab) used for the grace period.
   useEffect(() => {
     if (typeof window === "undefined") return;
     let started = Number(sessionStorage.getItem(SESSION_START_KEY) || 0);
@@ -79,30 +60,42 @@ export function InterstitialAdProvider({ children }: { children: ReactNode }) {
   const trigger = useCallback(
     (placement: string) => {
       if (typeof window === "undefined") return;
-      if (unlimited !== false) return; // null (loading) or true (premium) → skip
+      if (open || inFlightRef.current) return;
       if (Date.now() - sessionStartRef.current < FIRST_SESSION_GRACE_MS) return;
 
-      const lastTs = Number(localStorage.getItem(LAST_TS_KEY) || 0);
-      const lastPlacement = localStorage.getItem(LAST_PLACEMENT_KEY);
-      const now = Date.now();
-      if (now - lastTs < MIN_COOLDOWN_MS) return;
-      if (lastPlacement === placement && now - lastTs < SAME_PLACEMENT_COOLDOWN_MS) return;
-
-      // Defer one frame so the screen the user just landed on paints first;
-      // this matches the "natural transition point" UX intent.
-      requestAnimationFrame(() => {
-        localStorage.setItem(LAST_TS_KEY, String(Date.now()));
-        localStorage.setItem(LAST_PLACEMENT_KEY, placement);
-        setOpen(true);
-      });
+      inFlightRef.current = true;
+      askServer({ data: { placement } })
+        .then((res) => {
+          if (!res || res.show !== true) return;
+          // Defer one frame so the screen the user just landed on paints first.
+          requestAnimationFrame(() => {
+            setPendingPlacement(placement);
+            setOpen(true);
+          });
+        })
+        .catch(() => {
+          // Network/auth error → silently skip. Server stays the truth source.
+        })
+        .finally(() => {
+          inFlightRef.current = false;
+        });
     },
-    [unlimited],
+    [askServer, open],
   );
+
+  const onClose = useCallback(() => {
+    setOpen(false);
+    // Record only after the user actually sat through the ad.
+    if (pendingPlacement) {
+      recordServer({ data: { placement: pendingPlacement } }).catch(() => {});
+      setPendingPlacement(null);
+    }
+  }, [pendingPlacement, recordServer]);
 
   return (
     <InterstitialContext.Provider value={{ trigger }}>
       {children}
-      {open && <InterstitialAdModal onClose={() => setOpen(false)} duration={AD_DURATION_SEC} />}
+      {open && <InterstitialAdModal onClose={onClose} duration={AD_DURATION_SEC} />}
     </InterstitialContext.Provider>
   );
 }
