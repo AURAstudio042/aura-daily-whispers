@@ -205,7 +205,9 @@ function ReferralCapture() {
         const { data: { session } } = await supabase.auth.getSession();
         if (!session) return;
         const { redeemReferral } = await import("@/lib/aura/rewards.functions");
-        const res = await redeemReferral({ data: { code: pending } });
+        const { getDeviceFingerprint } = await import("@/lib/aura/device-fingerprint");
+        const deviceHash = await getDeviceFingerprint();
+        const res = await redeemReferral({ data: { code: pending, deviceHash } });
         if (cancelled) return;
         // Clear pending whether success, invalid, self, or already
         if (res.ok || (!res.ok && res.reason !== "error")) {
