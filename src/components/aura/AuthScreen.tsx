@@ -105,7 +105,7 @@ export function AuthScreen() {
       return;
     }
     setResetSending(true);
-    const redirectTo = `${window.location.origin}/reset-password`;
+    const redirectTo = RESET_PASSWORD_URL;
     console.info("[auth][reset] requesting password reset", { email: target, redirectTo, at: new Date().toISOString() });
     try {
       const { data, error } = await supabase.auth.resetPasswordForEmail(target, {
