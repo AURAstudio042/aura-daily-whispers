@@ -2,7 +2,7 @@
 // Uses the browser Notification API. Works while the tab/PWA is open or
 // returns to focus. No backend / service-worker push.
 
-const SIGN = "— AURA ✨";
+const SIGN = "— AURA ✦";
 const STATE_KEY = "aura:notif:v1";
 
 // Humanized whisper pool. Tone: a calm, wise close friend texting you.
