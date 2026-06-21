@@ -462,6 +462,8 @@ export type Database = {
           name: string | null
           notification_time: string
           relationship_status: string | null
+          signup_device_hash: string | null
+          signup_ip_hash: string | null
           skin_tone: string | null
           style_type: string | null
           tier: string
@@ -483,6 +485,8 @@ export type Database = {
           name?: string | null
           notification_time?: string
           relationship_status?: string | null
+          signup_device_hash?: string | null
+          signup_ip_hash?: string | null
           skin_tone?: string | null
           style_type?: string | null
           tier?: string
@@ -504,6 +508,8 @@ export type Database = {
           name?: string | null
           notification_time?: string
           relationship_status?: string | null
+          signup_device_hash?: string | null
+          signup_ip_hash?: string | null
           skin_tone?: string | null
           style_type?: string | null
           tier?: string
@@ -559,25 +565,37 @@ export type Database = {
       }
       referrals: {
         Row: {
+          activated_at: string | null
           code: string
           created_at: string
+          device_hash: string | null
+          email_verified_at: string | null
           id: string
+          ip_hash: string | null
           referred_user_id: string
           referrer_id: string
           rewarded_at: string | null
         }
         Insert: {
+          activated_at?: string | null
           code: string
           created_at?: string
+          device_hash?: string | null
+          email_verified_at?: string | null
           id?: string
+          ip_hash?: string | null
           referred_user_id: string
           referrer_id: string
           rewarded_at?: string | null
         }
         Update: {
+          activated_at?: string | null
           code?: string
           created_at?: string
+          device_hash?: string | null
+          email_verified_at?: string | null
           id?: string
+          ip_hash?: string | null
           referred_user_id?: string
           referrer_id?: string
           rewarded_at?: string | null
