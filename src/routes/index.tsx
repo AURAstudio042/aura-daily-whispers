@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 import { AuraShell, SectionLabel, ShareSignature, Tag } from "@/components/aura/Shell";
 import { Onboarding } from "@/components/aura/Onboarding";
@@ -12,12 +12,15 @@ import {
   greetingHint,
   dailyHoroscope,
   dailyColors,
+  dynamicColors,
   dailyOutfit,
   dailyStone,
   dailyScent,
   dailyQuote,
   dailyWeather,
 } from "@/lib/aura/data";
+import { logMood, logVisit, computeDynamicState } from "@/lib/aura/userState";
+
 import amethystImg from "@/assets/stones/amethyst.jpg";
 import aquamarineImg from "@/assets/stones/aquamarine.jpg";
 import roseImg from "@/assets/stones/rose.jpg";
