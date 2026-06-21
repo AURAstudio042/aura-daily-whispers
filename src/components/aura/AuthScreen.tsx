@@ -74,8 +74,10 @@ export function AuthScreen() {
         });
         if (error) throw error;
         if (data.user && !data.session) {
+          setPendingVerifyEmail(email);
           setInfo("Hesabın oluşturuldu ✦ E-postana gönderdiğimiz bağlantıyla doğrulamayı tamamla.");
         }
+      } else {
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
