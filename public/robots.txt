@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /reset-password
+Disallow: /lovable/
+
+Sitemap: https://aura-daily-whispers.lovable.app/sitemap.xml
