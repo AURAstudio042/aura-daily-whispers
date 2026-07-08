@@ -12,12 +12,12 @@ import { EmailChangeEmail } from '@/lib/email-templates/email-change'
 import { ReauthenticationEmail } from '@/lib/email-templates/reauthentication'
 
 const EMAIL_SUBJECTS: Record<string, string> = {
-  signup: 'Confirm your email',
-  invite: "You've been invited",
-  magiclink: 'Your login link',
-  recovery: 'Reset your password',
-  email_change: 'Confirm your new email',
-  reauthentication: 'Your verification code',
+  signup: "AURA'ya hoş geldin ✦",
+  invite: "AURA'ya davet edildin ✦",
+  magiclink: "AURA'ya giriş bağlantın",
+  recovery: 'Bir şeyleri yeniden başlatmak bazen iyidir',
+  email_change: "AURA hesabının e-postasını onayla",
+  reauthentication: 'AURA doğrulama kodun',
 }
 
 // Template mapping
