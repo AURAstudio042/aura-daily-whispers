@@ -105,6 +105,28 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "manifest", href: "/manifest.webmanifest" },
       { rel: "apple-touch-icon", href: "/icon.svg" },
     ],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@graph": [
+            {
+              "@type": "Organization",
+              name: "AURA",
+              url: "https://aura-daily-whispers.lovable.app",
+              description: "AURA — kişisel günlük yaşam yoldaşın. Burç, tarot, stil, taş ve koku önerileriyle her gün taze.",
+            },
+            {
+              "@type": "WebSite",
+              name: "AURA",
+              url: "https://aura-daily-whispers.lovable.app",
+              inLanguage: "tr-TR",
+            },
+          ],
+        }),
+      },
+    ],
   }),
   shellComponent: RootShell,
   component: RootComponent,
