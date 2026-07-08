@@ -396,19 +396,19 @@ export type Database = {
         Row: {
           id: number
           route: string
-          user_id: string | null
+          user_id: string
           viewed_at: string
         }
         Insert: {
           id?: number
           route: string
-          user_id?: string | null
+          user_id: string
           viewed_at?: string
         }
         Update: {
           id?: number
           route?: string
-          user_id?: string | null
+          user_id?: string
           viewed_at?: string
         }
         Relationships: []
@@ -653,21 +653,21 @@ export type Database = {
           id: number
           kind: string
           ref_id: string | null
-          user_id: string | null
+          user_id: string
         }
         Insert: {
           created_at?: string
           id?: number
           kind: string
           ref_id?: string | null
-          user_id?: string | null
+          user_id: string
         }
         Update: {
           created_at?: string
           id?: number
           kind?: string
           ref_id?: string | null
-          user_id?: string | null
+          user_id?: string
         }
         Relationships: []
       }
