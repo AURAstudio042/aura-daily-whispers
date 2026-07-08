@@ -28,6 +28,7 @@ import { Route as ArsivRouteImport } from './routes/arsiv'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as TarotIndexRouteImport } from './routes/tarot.index'
+import { Route as TarotTekKartRouteImport } from './routes/tarot.tek-kart'
 import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
 import { Route as LovableEmailAuthWebhookRouteImport } from './routes/lovable/email/auth/webhook'
 import { Route as LovableEmailAuthPreviewRouteImport } from './routes/lovable/email/auth/preview'
@@ -127,6 +128,11 @@ const TarotIndexRoute = TarotIndexRouteImport.update({
   path: '/tarot/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TarotTekKartRoute = TarotTekKartRouteImport.update({
+  id: '/tarot/tek-kart',
+  path: '/tarot/tek-kart',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LovableEmailQueueProcessRoute =
   LovableEmailQueueProcessRouteImport.update({
     id: '/lovable/email/queue/process',
@@ -163,6 +169,7 @@ export interface FileRoutesByFullPath {
   '/reset-password': typeof ResetPasswordRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/stilist': typeof StilistRoute
+  '/tarot/tek-kart': typeof TarotTekKartRoute
   '/tarot/': typeof TarotIndexRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
@@ -187,6 +194,7 @@ export interface FileRoutesByTo {
   '/reset-password': typeof ResetPasswordRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/stilist': typeof StilistRoute
+  '/tarot/tek-kart': typeof TarotTekKartRoute
   '/tarot': typeof TarotIndexRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
@@ -212,6 +220,7 @@ export interface FileRoutesById {
   '/reset-password': typeof ResetPasswordRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/stilist': typeof StilistRoute
+  '/tarot/tek-kart': typeof TarotTekKartRoute
   '/tarot/': typeof TarotIndexRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
@@ -238,6 +247,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/sitemap.xml'
     | '/stilist'
+    | '/tarot/tek-kart'
     | '/tarot/'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
@@ -262,6 +272,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/sitemap.xml'
     | '/stilist'
+    | '/tarot/tek-kart'
     | '/tarot'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
@@ -286,6 +297,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/sitemap.xml'
     | '/stilist'
+    | '/tarot/tek-kart'
     | '/tarot/'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
@@ -311,6 +323,7 @@ export interface RootRouteChildren {
   ResetPasswordRoute: typeof ResetPasswordRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   StilistRoute: typeof StilistRoute
+  TarotTekKartRoute: typeof TarotTekKartRoute
   TarotIndexRoute: typeof TarotIndexRoute
   LovableEmailAuthPreviewRoute: typeof LovableEmailAuthPreviewRoute
   LovableEmailAuthWebhookRoute: typeof LovableEmailAuthWebhookRoute
@@ -452,6 +465,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TarotIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/tarot/tek-kart': {
+      id: '/tarot/tek-kart'
+      path: '/tarot/tek-kart'
+      fullPath: '/tarot/tek-kart'
+      preLoaderRoute: typeof TarotTekKartRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/lovable/email/queue/process': {
       id: '/lovable/email/queue/process'
       path: '/lovable/email/queue/process'
@@ -495,6 +515,7 @@ const rootRouteChildren: RootRouteChildren = {
   ResetPasswordRoute: ResetPasswordRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   StilistRoute: StilistRoute,
+  TarotTekKartRoute: TarotTekKartRoute,
   TarotIndexRoute: TarotIndexRoute,
   LovableEmailAuthPreviewRoute: LovableEmailAuthPreviewRoute,
   LovableEmailAuthWebhookRoute: LovableEmailAuthWebhookRoute,
