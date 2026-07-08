@@ -9,7 +9,6 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as TarotRouteImport } from './routes/tarot'
 import { Route as StilistRouteImport } from './routes/stilist'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
@@ -28,15 +27,11 @@ import { Route as ArsivTasRouteImport } from './routes/arsiv-tas'
 import { Route as ArsivRouteImport } from './routes/arsiv'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as TarotIndexRouteImport } from './routes/tarot.index'
 import { Route as LovableEmailQueueProcessRouteImport } from './routes/lovable/email/queue/process'
 import { Route as LovableEmailAuthWebhookRouteImport } from './routes/lovable/email/auth/webhook'
 import { Route as LovableEmailAuthPreviewRouteImport } from './routes/lovable/email/auth/preview'
 
-const TarotRoute = TarotRouteImport.update({
-  id: '/tarot',
-  path: '/tarot',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const StilistRoute = StilistRouteImport.update({
   id: '/stilist',
   path: '/stilist',
@@ -127,6 +122,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TarotIndexRoute = TarotIndexRouteImport.update({
+  id: '/tarot/',
+  path: '/tarot/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LovableEmailQueueProcessRoute =
   LovableEmailQueueProcessRouteImport.update({
     id: '/lovable/email/queue/process',
@@ -163,7 +163,7 @@ export interface FileRoutesByFullPath {
   '/reset-password': typeof ResetPasswordRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/stilist': typeof StilistRoute
-  '/tarot': typeof TarotRoute
+  '/tarot/': typeof TarotIndexRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
@@ -187,7 +187,7 @@ export interface FileRoutesByTo {
   '/reset-password': typeof ResetPasswordRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/stilist': typeof StilistRoute
-  '/tarot': typeof TarotRoute
+  '/tarot': typeof TarotIndexRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
@@ -212,7 +212,7 @@ export interface FileRoutesById {
   '/reset-password': typeof ResetPasswordRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/stilist': typeof StilistRoute
-  '/tarot': typeof TarotRoute
+  '/tarot/': typeof TarotIndexRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
   '/lovable/email/auth/webhook': typeof LovableEmailAuthWebhookRoute
   '/lovable/email/queue/process': typeof LovableEmailQueueProcessRoute
@@ -238,7 +238,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/sitemap.xml'
     | '/stilist'
-    | '/tarot'
+    | '/tarot/'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
     | '/lovable/email/queue/process'
@@ -286,7 +286,7 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/sitemap.xml'
     | '/stilist'
-    | '/tarot'
+    | '/tarot/'
     | '/lovable/email/auth/preview'
     | '/lovable/email/auth/webhook'
     | '/lovable/email/queue/process'
@@ -311,7 +311,7 @@ export interface RootRouteChildren {
   ResetPasswordRoute: typeof ResetPasswordRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   StilistRoute: typeof StilistRoute
-  TarotRoute: typeof TarotRoute
+  TarotIndexRoute: typeof TarotIndexRoute
   LovableEmailAuthPreviewRoute: typeof LovableEmailAuthPreviewRoute
   LovableEmailAuthWebhookRoute: typeof LovableEmailAuthWebhookRoute
   LovableEmailQueueProcessRoute: typeof LovableEmailQueueProcessRoute
@@ -319,13 +319,6 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/tarot': {
-      id: '/tarot'
-      path: '/tarot'
-      fullPath: '/tarot'
-      preLoaderRoute: typeof TarotRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/stilist': {
       id: '/stilist'
       path: '/stilist'
@@ -452,6 +445,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/tarot/': {
+      id: '/tarot/'
+      path: '/tarot'
+      fullPath: '/tarot/'
+      preLoaderRoute: typeof TarotIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/lovable/email/queue/process': {
       id: '/lovable/email/queue/process'
       path: '/lovable/email/queue/process'
@@ -495,7 +495,7 @@ const rootRouteChildren: RootRouteChildren = {
   ResetPasswordRoute: ResetPasswordRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   StilistRoute: StilistRoute,
-  TarotRoute: TarotRoute,
+  TarotIndexRoute: TarotIndexRoute,
   LovableEmailAuthPreviewRoute: LovableEmailAuthPreviewRoute,
   LovableEmailAuthWebhookRoute: LovableEmailAuthWebhookRoute,
   LovableEmailQueueProcessRoute: LovableEmailQueueProcessRoute,
