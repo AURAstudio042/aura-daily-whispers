@@ -43,7 +43,7 @@ const CARD_IMAGES: Record<string, string> = {
   "Çark": tarotCark,
 };
 
-export const Route = createFileRoute("/tarot")({
+export const Route = createFileRoute("/tarot/")({
   head: () => ({
     meta: [
       { title: "Tarot ✦ AURA — Kartlar Sana Ne Diyor" },
