@@ -1,0 +1,26 @@
+# AURA
+
+> AURA — kişisel günlük yaşam yoldaşın. Burç, tarot, kahve falı, stil, taş ve koku önerileriyle her gün taze.
+
+AURA, kullanıcılara günlük burç yorumları, tarot çekimleri, Türk kahve falı okuması, mistik kart mesajları, doğum haritası analizleri, gezegen takibi ve kişisel stil önerileri sunan bir mistik yaşam yoldaşı uygulamasıdır. İçerikler Türkçedir.
+
+## Pages
+
+- [Bugün — Günlük Ritüelin](/): Günün burç yorumu, renk paleti, stil, taş, koku ve söz.
+- [Tarot](/tarot): Günlük tarot kartı çekimi ve yorumu.
+- [Kahve Falı](/kahve): Fincandan Türk kahve falı okuması.
+- [Mistik Kart](/mistik): Kalbinden geçen bir mesaj için mistik kart.
+- [Haftalık Enerji](/haftalik): Haftanın enerjisi ve odak noktası.
+- [Aylık Analiz](/aylik): Ayın derin astrolojik analizi.
+- [Doğum Haritası](/dogum-haritasi): Güneş, ay, yükselen ve gezegen konumları.
+- [Gezegen Takibi](/gezegenler): Günün gezegen konumları ve burcuna etkileri.
+- [Özel Gün Analizi](/ozel-gun): Doğum günü, yıl dönümü gibi özel günler için analiz.
+- [Kişisel Stilist](/stilist): Bugünün kombini ve stil önerileri.
+- [AURA Mektubun](/mektup): AURA'dan sana özel bir mektup.
+- [Arşiv](/arsiv): Geçmiş AURA günlerin ve kaydettiğin sözler.
+- [Taş & Koku Arşivi](/arsiv-tas): Sana önerilen tüm taşlar ve kokular.
+
+## Optional
+
+- [Gizlilik & Güvenlik](/gizlilik): Veri kullanım ve gizlilik politikası.
+- [Güven Merkezi](/guven): Veri işleme ve güvenlik uygulamaları.
