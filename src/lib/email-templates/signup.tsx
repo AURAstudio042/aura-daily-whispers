@@ -21,30 +21,30 @@ interface SignupEmailProps {
 export const SignupEmail = ({ confirmationUrl }: SignupEmailProps) => (
   <Html lang="tr" dir="ltr">
     <Head />
-    <Preview>AURA'ya hoş geldin ✦</Preview>
-    <Body style={main}>
-      <Container style={container}>
-        <Text style={mark}>✦ AURA</Text>
-        <Heading style={h1}>AURA'ya hoş geldin.</Heading>
+      <Preview>AURA'ya hoş geldin</Preview>
+      <Body style={main}>
+        <Container style={container}>
+          <Text style={mark}>✦ AURA</Text>
+          <Heading style={h1}>AURA'ya hoş geldin.</Heading>
 
-        <Text style={text}>
-          Bunu okuduğunda belki sadece bir kayıt işlemi gibi görünüyor…
-        </Text>
-        <Text style={text}>
-          Ama biz seni biraz önce hissettik.
-        </Text>
-        <Text style={text}>
-          Bazen doğru zaman diye bir şey vardır… ve seninki belki de buydu.
-        </Text>
+          <Text style={text}>
+            Bunu okuduğunda belki sadece bir kayıt işlemi gibi görünüyor…
+          </Text>
+          <Text style={text}>
+            Ama biz seni biraz önce hissettik.
+          </Text>
+          <Text style={text}>
+            Bazen doğru zaman diye bir şey vardır… ve seninki belki de buydu.
+          </Text>
 
-        <Text style={{ ...text, marginTop: '28px' }}>
-          Bizi tamamlamak için küçük bir adım kaldı — aşağıdaki bağlantı
-          seni sistemde tanımamız için bir anahtar.
-        </Text>
+          <Text style={{ ...text, marginTop: '28px' }}>
+            Bizi tamamlamak için küçük bir adım kaldı.
+            Bu sadece bir doğrulama değil — seni sistemde tanımamız için bir anahtar.
+          </Text>
 
-        <Button style={button} href={confirmationUrl}>
-          Hesabımı doğrula
-        </Button>
+          <Button style={button} href={confirmationUrl}>
+            AURA hesabımı doğrula
+          </Button>
 
         <Text style={signature}>— AURA ✨</Text>
 
