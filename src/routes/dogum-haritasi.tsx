@@ -12,7 +12,14 @@ export const Route = createFileRoute("/dogum-haritasi")({
     meta: [
       { title: "Doğum Haritası ✦ AURA" },
       { name: "description", content: "Güneş, ay, yükselen ve gezegen konumların — kişiye özel astrolojik analiz." },
+      { property: "og:title", content: "Doğum Haritası ✦ AURA" },
+      { property: "og:description", content: "Güneş, ay, yükselen ve gezegen konumların — kişiye özel astrolojik analiz." },
+      { property: "og:url", content: "https://aura-daily-whispers.lovable.app/dogum-haritasi" },
+      { property: "og:type", content: "website" },
+      { name: "twitter:title", content: "Doğum Haritası ✦ AURA" },
+      { name: "twitter:description", content: "Güneş, ay, yükselen ve gezegen konumların — kişiye özel astrolojik analiz." },
     ],
+    links: [{ rel: "canonical", href: "https://aura-daily-whispers.lovable.app/dogum-haritasi" }],
   }),
   component: BirthChartPage,
 });

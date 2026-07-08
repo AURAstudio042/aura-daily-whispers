@@ -9,7 +9,19 @@ import { dailyColors, dailyStone, dailyScent, QUOTES, pick } from "@/lib/aura/da
 import { listCoffeeReadings, type CoffeeReadingRow } from "@/lib/aura/coffee.functions";
 
 export const Route = createFileRoute("/arsiv")({
-  head: () => ({ meta: [{ title: "Arşiv ✦ AURA" }, { name: "description", content: "Geçmiş AURA günlerin ve kaydettiğin sözler." }] }),
+  head: () => ({
+    meta: [
+      { title: "Arşiv ✦ AURA" },
+      { name: "description", content: "Geçmiş AURA günlerin, kahve falların ve kaydettiğin sözler." },
+      { property: "og:title", content: "Arşiv ✦ AURA" },
+      { property: "og:description", content: "Geçmiş AURA günlerin, kahve falların ve kaydettiğin sözler." },
+      { property: "og:url", content: "https://aura-daily-whispers.lovable.app/arsiv" },
+      { property: "og:type", content: "website" },
+      { name: "twitter:title", content: "Arşiv ✦ AURA" },
+      { name: "twitter:description", content: "Geçmiş AURA günlerin, kahve falların ve kaydettiğin sözler." },
+    ],
+    links: [{ rel: "canonical", href: "https://aura-daily-whispers.lovable.app/arsiv" }],
+  }),
   component: ArsivPage,
 });
 

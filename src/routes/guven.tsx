@@ -4,13 +4,16 @@ import { AuraShell } from "@/components/aura/Shell";
 export const Route = createFileRoute("/guven")({
   head: () => ({
     meta: [
-      { title: "Güven ve Gizlilik ✦ AURA" },
-      {
-        name: "description",
-        content:
-          "AURA'nın güvenlik, gizlilik ve veri koruma yaklaşımı. Verilerinin nasıl saklandığını ve korunduğunu öğren.",
-      },
+      { title: "Güven Merkezi ✦ AURA" },
+      { name: "description", content: "AURA'nın veri işleme, güvenlik uygulamaları ve şeffaflık raporları." },
+      { property: "og:title", content: "Güven Merkezi ✦ AURA" },
+      { property: "og:description", content: "AURA'nın veri işleme, güvenlik uygulamaları ve şeffaflık raporları." },
+      { property: "og:url", content: "https://aura-daily-whispers.lovable.app/guven" },
+      { property: "og:type", content: "website" },
+      { name: "twitter:title", content: "Güven Merkezi ✦ AURA" },
+      { name: "twitter:description", content: "AURA'nın veri işleme, güvenlik uygulamaları ve şeffaflık raporları." },
     ],
+    links: [{ rel: "canonical", href: "https://aura-daily-whispers.lovable.app/guven" }],
   }),
   component: TrustPage,
 });

@@ -16,9 +16,16 @@ import { shareNodeAsStory } from "@/lib/aura/share";
 export const Route = createFileRoute("/mektup")({
   head: () => ({
     meta: [
-      { title: "Gelecekteki Kendinden Mektup ✦ AURA" },
-      { name: "description", content: "Üç ay sonraki kendinden bir mektup." },
+      { title: "AURA Mektubun ✦" },
+      { name: "description", content: "Kalbinden geçenleri AURA'ya yaz — sana özel bir mektup gelsin." },
+      { property: "og:title", content: "AURA Mektubun ✦" },
+      { property: "og:description", content: "Kalbinden geçenleri AURA'ya yaz — sana özel bir mektup gelsin." },
+      { property: "og:url", content: "https://aura-daily-whispers.lovable.app/mektup" },
+      { property: "og:type", content: "website" },
+      { name: "twitter:title", content: "AURA Mektubun ✦" },
+      { name: "twitter:description", content: "Kalbinden geçenleri AURA'ya yaz — sana özel bir mektup gelsin." },
     ],
+    links: [{ rel: "canonical", href: "https://aura-daily-whispers.lovable.app/mektup" }],
   }),
   component: MektupPage,
 });

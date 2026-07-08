@@ -20,11 +20,15 @@ export const Route = createFileRoute("/kahve")({
   head: () => ({
     meta: [
       { title: "Kahve Falım ☕ AURA" },
-      {
-        name: "description",
-        content: "Türk kahve falı — AURA fincanını okur, sana özel bir yorum bırakır.",
-      },
+      { name: "description", content: "Türk kahve falı — AURA fincanını okur, sana özel bir yorum bırakır." },
+      { property: "og:title", content: "Kahve Falım ☕ AURA" },
+      { property: "og:description", content: "Türk kahve falı — AURA fincanını okur, sana özel bir yorum bırakır." },
+      { property: "og:url", content: "https://aura-daily-whispers.lovable.app/kahve" },
+      { property: "og:type", content: "website" },
+      { name: "twitter:title", content: "Kahve Falım ☕ AURA" },
+      { name: "twitter:description", content: "Türk kahve falı — AURA fincanını okur, sana özel bir yorum bırakır." },
     ],
+    links: [{ rel: "canonical", href: "https://aura-daily-whispers.lovable.app/kahve" }],
   }),
   component: KahvePage,
 });

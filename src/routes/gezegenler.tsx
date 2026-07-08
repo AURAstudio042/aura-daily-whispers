@@ -12,7 +12,14 @@ export const Route = createFileRoute("/gezegenler")({
     meta: [
       { title: "Gezegen Takibi ✦ AURA" },
       { name: "description", content: "Bugünkü gezegen konumları ve burcuna etkileri." },
+      { property: "og:title", content: "Gezegen Takibi ✦ AURA" },
+      { property: "og:description", content: "Bugünkü gezegen konumları ve burcuna etkileri." },
+      { property: "og:url", content: "https://aura-daily-whispers.lovable.app/gezegenler" },
+      { property: "og:type", content: "website" },
+      { name: "twitter:title", content: "Gezegen Takibi ✦ AURA" },
+      { name: "twitter:description", content: "Bugünkü gezegen konumları ve burcuna etkileri." },
     ],
+    links: [{ rel: "canonical", href: "https://aura-daily-whispers.lovable.app/gezegenler" }],
   }),
   component: PlanetsPage,
 });

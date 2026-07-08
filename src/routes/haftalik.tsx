@@ -8,7 +8,19 @@ import { weeklyAura, weekId } from "@/lib/aura/data";
 import { MonthlyAnalysisSection } from "@/components/aura/MonthlyAnalysis";
 
 export const Route = createFileRoute("/haftalik")({
-  head: () => ({ meta: [{ title: "Haftalık ✦ AURA" }, { name: "description", content: "Bu haftanın enerjisi, odak noktası ve mini hedefleri." }] }),
+  head: () => ({
+    meta: [
+      { title: "Haftalık Enerji ✦ AURA" },
+      { name: "description", content: "Bu haftanın enerjisi, odak noktası ve mini hedefleri." },
+      { property: "og:title", content: "Haftalık Enerji ✦ AURA" },
+      { property: "og:description", content: "Bu haftanın enerjisi, odak noktası ve mini hedefleri." },
+      { property: "og:url", content: "https://aura-daily-whispers.lovable.app/haftalik" },
+      { property: "og:type", content: "website" },
+      { name: "twitter:title", content: "Haftalık Enerji ✦ AURA" },
+      { name: "twitter:description", content: "Bu haftanın enerjisi, odak noktası ve mini hedefleri." },
+    ],
+    links: [{ rel: "canonical", href: "https://aura-daily-whispers.lovable.app/haftalik" }],
+  }),
   component: HaftalikPage,
 });
 
