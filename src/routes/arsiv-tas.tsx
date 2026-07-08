@@ -17,7 +17,14 @@ export const Route = createFileRoute("/arsiv-tas")({
     meta: [
       { title: "Taş & Koku Arşivi ✦ AURA" },
       { name: "description", content: "Sana önerilen tüm taşların ve kokuların kişisel arşivi." },
+      { property: "og:title", content: "Taş & Koku Arşivi ✦ AURA" },
+      { property: "og:description", content: "Sana önerilen tüm taşların ve kokuların kişisel arşivi." },
+      { property: "og:url", content: "https://aura-daily-whispers.lovable.app/arsiv-tas" },
+      { property: "og:type", content: "website" },
+      { name: "twitter:title", content: "Taş & Koku Arşivi ✦ AURA" },
+      { name: "twitter:description", content: "Sana önerilen tüm taşların ve kokuların kişisel arşivi." },
     ],
+    links: [{ rel: "canonical", href: "https://aura-daily-whispers.lovable.app/arsiv-tas" }],
   }),
   component: ArchivePage,
 });

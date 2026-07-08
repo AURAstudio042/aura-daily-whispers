@@ -14,9 +14,16 @@ import {
 export const Route = createFileRoute("/ozel-gun")({
   head: () => ({
     meta: [
-      { title: "Özel Gün ✦ AURA" },
-      { name: "description", content: "Düğün, mülakat, romantik buluşma — özel günlerin için AI tabanlı hazırlık rehberi." },
+      { title: "Özel Gün Analizi ✦ AURA" },
+      { name: "description", content: "Doğum günün, yıl dönümün ya da özel bir günün için kişisel astrolojik analiz." },
+      { property: "og:title", content: "Özel Gün Analizi ✦ AURA" },
+      { property: "og:description", content: "Doğum günün, yıl dönümün ya da özel bir günün için kişisel astrolojik analiz." },
+      { property: "og:url", content: "https://aura-daily-whispers.lovable.app/ozel-gun" },
+      { property: "og:type", content: "website" },
+      { name: "twitter:title", content: "Özel Gün Analizi ✦ AURA" },
+      { name: "twitter:description", content: "Doğum günün, yıl dönümün ya da özel bir günün için kişisel astrolojik analiz." },
     ],
+    links: [{ rel: "canonical", href: "https://aura-daily-whispers.lovable.app/ozel-gun" }],
   }),
   component: OzelGunPage,
 });

@@ -20,7 +20,19 @@ import { useTheme, THEMES, type ThemeId } from "@/hooks/useTheme";
 const NOTIF_TIME_KEY = "aura:notif-time";
 
 export const Route = createFileRoute("/profil")({
-  head: () => ({ meta: [{ title: "Profil ✦ AURA" }, { name: "description", content: "Profilin, ayarların ve AURA+ üyelik." }] }),
+  head: () => ({
+    meta: [
+      { title: "Profilim ✦ AURA" },
+      { name: "description", content: "Profil ayarların, tercihleriniz ve AURA aboneliğin." },
+      { property: "og:title", content: "Profilim ✦ AURA" },
+      { property: "og:description", content: "Profil ayarların, tercihleriniz ve AURA aboneliğin." },
+      { property: "og:url", content: "https://aura-daily-whispers.lovable.app/profil" },
+      { property: "og:type", content: "website" },
+      { name: "twitter:title", content: "Profilim ✦ AURA" },
+      { name: "twitter:description", content: "Profil ayarların, tercihleriniz ve AURA aboneliğin." },
+    ],
+    links: [{ rel: "canonical", href: "https://aura-daily-whispers.lovable.app/profil" }],
+  }),
   component: ProfilPage,
 });
 

@@ -46,9 +46,16 @@ const CARD_IMAGES: Record<string, string> = {
 export const Route = createFileRoute("/tarot")({
   head: () => ({
     meta: [
-      { title: "Tarot ✦ AURA" },
-      { name: "description", content: "Kartlar sana ne söylüyor? Kategori seç, kartını aç." },
+      { title: "Tarot ✦ AURA — Kartlar Sana Ne Diyor" },
+      { name: "description", content: "Günlük tarot çekimi ve kişisel yorum — AURA ile." },
+      { property: "og:title", content: "Tarot ✦ AURA — Kartlar Sana Ne Diyor" },
+      { property: "og:description", content: "Günlük tarot çekimi ve kişisel yorum — AURA ile." },
+      { property: "og:url", content: "https://aura-daily-whispers.lovable.app/tarot" },
+      { property: "og:type", content: "website" },
+      { name: "twitter:title", content: "Tarot ✦ AURA — Kartlar Sana Ne Diyor" },
+      { name: "twitter:description", content: "Günlük tarot çekimi ve kişisel yorum — AURA ile." },
     ],
+    links: [{ rel: "canonical", href: "https://aura-daily-whispers.lovable.app/tarot" }],
   }),
   component: TarotPage,
 });

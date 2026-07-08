@@ -4,6 +4,13 @@ import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/reset-password")({
   ssr: false,
+  head: () => ({
+    meta: [
+      { title: "Şifre Sıfırla ✦ AURA" },
+      { name: "description", content: "AURA hesap şifreni sıfırla." },
+      { name: "robots", content: "noindex, nofollow" },
+    ],
+  }),
   component: ResetPasswordPage,
 });
 

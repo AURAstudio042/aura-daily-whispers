@@ -4,18 +4,15 @@ export const Route = createFileRoute("/gizlilik")({
   head: () => ({
     meta: [
       { title: "Gizlilik & Güvenlik ✦ AURA" },
-      {
-        name: "description",
-        content:
-          "AURA'nın gizlilik, güvenlik ve veri kullanım yaklaşımı. Hesabınızın ve verilerinizin nasıl korunduğu hakkında.",
-      },
+      { name: "description", content: "AURA'nın gizlilik, güvenlik ve veri kullanım yaklaşımı." },
       { property: "og:title", content: "Gizlilik & Güvenlik ✦ AURA" },
-      {
-        property: "og:description",
-        content:
-          "AURA'nın gizlilik, güvenlik ve veri kullanım yaklaşımı.",
-      },
+      { property: "og:description", content: "AURA'nın gizlilik, güvenlik ve veri kullanım yaklaşımı." },
+      { property: "og:url", content: "https://aura-daily-whispers.lovable.app/gizlilik" },
+      { property: "og:type", content: "website" },
+      { name: "twitter:title", content: "Gizlilik & Güvenlik ✦ AURA" },
+      { name: "twitter:description", content: "AURA'nın gizlilik, güvenlik ve veri kullanım yaklaşımı." },
     ],
+    links: [{ rel: "canonical", href: "https://aura-daily-whispers.lovable.app/gizlilik" }],
   }),
   component: TrustPage,
 });

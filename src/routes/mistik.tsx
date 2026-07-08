@@ -17,9 +17,16 @@ import { downloadBlob, nativeShareImage, renderNodeAsStoryBlob, shareToWhatsApp 
 export const Route = createFileRoute("/mistik")({
   head: () => ({
     meta: [
-      { title: "Mistik ✦ AURA" },
-      { name: "description", content: "Mistik Kart — kalbinden geçen bir mesaj." },
+      { title: "Mistik Kart ✦ AURA" },
+      { name: "description", content: "Mistik Kart — kalbinden geçen bir mesaj, AURA'dan." },
+      { property: "og:title", content: "Mistik Kart ✦ AURA" },
+      { property: "og:description", content: "Mistik Kart — kalbinden geçen bir mesaj, AURA'dan." },
+      { property: "og:url", content: "https://aura-daily-whispers.lovable.app/mistik" },
+      { property: "og:type", content: "website" },
+      { name: "twitter:title", content: "Mistik Kart ✦ AURA" },
+      { name: "twitter:description", content: "Mistik Kart — kalbinden geçen bir mesaj, AURA'dan." },
     ],
+    links: [{ rel: "canonical", href: "https://aura-daily-whispers.lovable.app/mistik" }],
   }),
   component: MistikPage,
 });

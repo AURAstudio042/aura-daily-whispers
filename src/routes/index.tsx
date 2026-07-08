@@ -42,9 +42,16 @@ import { useDailyWeather, weatherNote } from "@/lib/aura/useDailyWeather";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Bugün ✦ AURA" },
+      { title: "Bugün ✦ AURA — Günlük Ritüelin" },
       { name: "description", content: "Günlük AURA paketin: burç, renk, stil, taş, koku ve günün sözü." },
+      { property: "og:title", content: "Bugün ✦ AURA — Günlük Ritüelin" },
+      { property: "og:description", content: "Günlük AURA paketin: burç, renk, stil, taş, koku ve günün sözü." },
+      { property: "og:url", content: "https://aura-daily-whispers.lovable.app/" },
+      { property: "og:type", content: "website" },
+      { name: "twitter:title", content: "Bugün ✦ AURA — Günlük Ritüelin" },
+      { name: "twitter:description", content: "Günlük AURA paketin: burç, renk, stil, taş, koku ve günün sözü." },
     ],
+    links: [{ rel: "canonical", href: "https://aura-daily-whispers.lovable.app/" }],
   }),
   component: BugunPage,
 });

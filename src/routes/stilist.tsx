@@ -11,9 +11,16 @@ import { askStylist, getStylistStatus } from "@/lib/aura/stylist.functions";
 export const Route = createFileRoute("/stilist")({
   head: () => ({
     meta: [
-      { title: "AI Stilist ✦ AURA" },
-      { name: "description", content: "Sana özel stil danışmanın." },
+      { title: "Kişisel Stilist ✦ AURA" },
+      { name: "description", content: "Bugünün kombini, renk uyumu ve stil önerilerin — AURA stilistinden." },
+      { property: "og:title", content: "Kişisel Stilist ✦ AURA" },
+      { property: "og:description", content: "Bugünün kombini, renk uyumu ve stil önerilerin — AURA stilistinden." },
+      { property: "og:url", content: "https://aura-daily-whispers.lovable.app/stilist" },
+      { property: "og:type", content: "website" },
+      { name: "twitter:title", content: "Kişisel Stilist ✦ AURA" },
+      { name: "twitter:description", content: "Bugünün kombini, renk uyumu ve stil önerilerin — AURA stilistinden." },
     ],
+    links: [{ rel: "canonical", href: "https://aura-daily-whispers.lovable.app/stilist" }],
   }),
   component: StylistPage,
 });

@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as TarotRouteImport } from './routes/tarot'
 import { Route as StilistRouteImport } from './routes/stilist'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as ProfilRouteImport } from './routes/profil'
 import { Route as OzelGunRouteImport } from './routes/ozel-gun'
@@ -39,6 +40,11 @@ const TarotRoute = TarotRouteImport.update({
 const StilistRoute = StilistRouteImport.update({
   id: '/stilist',
   path: '/stilist',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
@@ -155,6 +161,7 @@ export interface FileRoutesByFullPath {
   '/ozel-gun': typeof OzelGunRoute
   '/profil': typeof ProfilRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/stilist': typeof StilistRoute
   '/tarot': typeof TarotRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
@@ -178,6 +185,7 @@ export interface FileRoutesByTo {
   '/ozel-gun': typeof OzelGunRoute
   '/profil': typeof ProfilRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/stilist': typeof StilistRoute
   '/tarot': typeof TarotRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
@@ -202,6 +210,7 @@ export interface FileRoutesById {
   '/ozel-gun': typeof OzelGunRoute
   '/profil': typeof ProfilRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
   '/stilist': typeof StilistRoute
   '/tarot': typeof TarotRoute
   '/lovable/email/auth/preview': typeof LovableEmailAuthPreviewRoute
@@ -227,6 +236,7 @@ export interface FileRouteTypes {
     | '/ozel-gun'
     | '/profil'
     | '/reset-password'
+    | '/sitemap.xml'
     | '/stilist'
     | '/tarot'
     | '/lovable/email/auth/preview'
@@ -250,6 +260,7 @@ export interface FileRouteTypes {
     | '/ozel-gun'
     | '/profil'
     | '/reset-password'
+    | '/sitemap.xml'
     | '/stilist'
     | '/tarot'
     | '/lovable/email/auth/preview'
@@ -273,6 +284,7 @@ export interface FileRouteTypes {
     | '/ozel-gun'
     | '/profil'
     | '/reset-password'
+    | '/sitemap.xml'
     | '/stilist'
     | '/tarot'
     | '/lovable/email/auth/preview'
@@ -297,6 +309,7 @@ export interface RootRouteChildren {
   OzelGunRoute: typeof OzelGunRoute
   ProfilRoute: typeof ProfilRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   StilistRoute: typeof StilistRoute
   TarotRoute: typeof TarotRoute
   LovableEmailAuthPreviewRoute: typeof LovableEmailAuthPreviewRoute
@@ -318,6 +331,13 @@ declare module '@tanstack/react-router' {
       path: '/stilist'
       fullPath: '/stilist'
       preLoaderRoute: typeof StilistRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/reset-password': {
@@ -473,6 +493,7 @@ const rootRouteChildren: RootRouteChildren = {
   OzelGunRoute: OzelGunRoute,
   ProfilRoute: ProfilRoute,
   ResetPasswordRoute: ResetPasswordRoute,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
   StilistRoute: StilistRoute,
   TarotRoute: TarotRoute,
   LovableEmailAuthPreviewRoute: LovableEmailAuthPreviewRoute,

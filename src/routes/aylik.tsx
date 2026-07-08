@@ -10,7 +10,14 @@ export const Route = createFileRoute("/aylik")({
     meta: [
       { title: "Aylık Analiz ✦ AURA" },
       { name: "description", content: "AI ile bu ayın derin analizi: gezegen geçişleri, güçlü günler, ritüeller." },
+      { property: "og:title", content: "Aylık Analiz ✦ AURA" },
+      { property: "og:description", content: "AI ile bu ayın derin analizi: gezegen geçişleri, güçlü günler, ritüeller." },
+      { property: "og:url", content: "https://aura-daily-whispers.lovable.app/aylik" },
+      { property: "og:type", content: "website" },
+      { name: "twitter:title", content: "Aylık Analiz ✦ AURA" },
+      { name: "twitter:description", content: "AI ile bu ayın derin analizi: gezegen geçişleri, güçlü günler, ritüeller." },
     ],
+    links: [{ rel: "canonical", href: "https://aura-daily-whispers.lovable.app/aylik" }],
   }),
   component: AylikPage,
 });
