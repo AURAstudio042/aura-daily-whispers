@@ -19,7 +19,7 @@ export type AdSource = "tarot" | "coffee" | "mystic";
 const SourceEnum = z.enum(["tarot", "coffee", "mystic"]);
 
 const MIN_AD_DURATION_MS = 4000; // anti-fraud: must match client countdown
-const MIN_INTERVAL_MS = 3000; // between grants (any source)
+const MIN_INTERVAL_MS = 60 * 60 * 1000; // 1 credit / hour / user — hard cap since ad completion is client-attested
 
 async function isUnlimitedTier(supabase: any, userId: string): Promise<boolean> {
   const nowIso = new Date().toISOString();
