@@ -36,9 +36,13 @@ function extractIp(): string | null {
     const req = getRequest();
     const h = req?.headers;
     if (!h) return null;
-    const xff = h.get("x-forwarded-for");
-    if (xff) return xff.split(",")[0].trim();
-    return h.get("cf-connecting-ip") || h.get("x-real-ip") || null;
+    // Prefer trusted edge-set headers; x-forwarded-for is client-spoofable
+    // (Cloudflare passes it through) and MUST NOT be trusted for abuse-control.
+    const cf = h.get("cf-connecting-ip");
+    if (cf) return cf.trim();
+    const real = h.get("x-real-ip");
+    if (real) return real.trim();
+    return null;
   } catch {
     return null;
   }
