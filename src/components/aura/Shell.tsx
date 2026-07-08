@@ -21,7 +21,7 @@ export function AuraShell({ children }: { children: ReactNode }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   return (
     <div className="relative mx-auto min-h-screen w-full max-w-md pb-24 text-foreground">
-      <div className="px-5 pt-6">{children}</div>
+      <main className="px-5 pt-6">{children}</main>
       <nav className="fixed bottom-0 left-1/2 z-50 w-full max-w-md -translate-x-1/2 border-t border-[color:var(--border)] bg-[#08060f]/85 backdrop-blur-xl">
         <ul className="grid grid-cols-5">
           {TABS.map((t) => {
@@ -47,11 +47,11 @@ export function AuraShell({ children }: { children: ReactNode }) {
 
 export function SectionLabel({ n, title }: { n: string; title: string }) {
   return (
-    <div className="mb-3 flex items-center gap-3">
-      <span className="text-[10px] tracking-[0.3em] text-[color:var(--aura-muted)]">{n}</span>
-      <span className="h-px flex-1 bg-[color:var(--border)]" />
-      <span className="text-[10px] tracking-[0.3em] uppercase text-[color:var(--aura-lavender)]">{title}</span>
-    </div>
+    <h2 className="mb-3 flex items-center gap-3 text-[10px] font-normal tracking-[0.3em] uppercase">
+      <span className="text-[color:var(--aura-muted)]">{n}</span>
+      <span className="h-px flex-1 bg-[color:var(--border)]" aria-hidden />
+      <span className="text-[color:var(--aura-lavender)]">{title}</span>
+    </h2>
   );
 }
 
