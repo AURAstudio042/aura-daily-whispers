@@ -178,8 +178,9 @@ function fire(title: string, body: string, opts?: { sign?: boolean }) {
 // Plan today's whisper schedule (0/1/2 with weights, random times in 10:00–22:00 window)
 function planTodayWhispers(): number[] {
   const r = Math.random();
-  // 50% zero, 35% one, 15% two
-  const count = r < 0.5 ? 0 : r < 0.85 ? 1 : 2;
+  // Frequency target: 1 whisper every 1–3 days, rarely 2 in one day.
+  // 55% zero, 35% one, 10% two → ~0.55 whisper/day average.
+  const count = r < 0.55 ? 0 : r < 0.9 ? 1 : 2;
   if (count === 0) return [];
   const now = new Date();
   const start = new Date(now); start.setHours(10, 0, 0, 0);
