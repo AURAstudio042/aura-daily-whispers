@@ -7,10 +7,10 @@ const ANTI_REPEAT_MAX = 10;
 const SIGN = "— AURA ✦";
 const STATE_KEY = "aura:notif:v1";
 
-// Humanized whisper pool. Tone: a calm, wise close friend texting you.
-// Structure per message: 1 feeling line + 1 grounding/depth line + (optional) soft closer.
-// Rules: short, everyday Turkish. No motivational clichés, no heavy metaphors, no emojis. Signature added in fire().
+// Humanized whisper pool. Tone: a calm, wise close friend + gentle spiritual guide.
+// Mix of everyday intimacy and deeper "rehberlik" fısıltıları. Signature added in fire().
 export const WHISPERS = [
+  // — Yakın arkadaş tonu (gündelik)
   "Bugün biraz yavaşlasan da olur. Her şeye yetişmek zorunda değilsin.",
   "İçinden geçenleri bastırma. Sadece fark et, yeter şimdilik.",
   "Aklındaki o konu var ya — bugün çözmek zorunda değilsin.",
@@ -23,7 +23,29 @@ export const WHISPERS = [
   "Kendini açıklamak zorunda değilsin. Anlayan zaten anlıyor.",
   "Bugün küçük bir iyilik yap kendine. Listeden değil, içinden geleni.",
   "Bazı günler sadece geçer, bir şey öğretmek zorunda değil.",
+
+  // — Rehberlik / spiritüel derinlik
+  "İçindeki fırtınanın dinmesini bekleme, dalgalarla dans etmeyi öğren. Evren tam şu an seni izliyor.",
+  "Attığın o cesur adımı kimse görmedi sanıyorsun ama yukarısı her şeyin farkında. Devam et.",
+  "Şu an hissettiğin o boşluk, aslında içine dolacak yeni güzellikler için açılan yerdir. Direnmeyi bırak.",
+  "Zihnin oyunlarına gelme; kalbinin derinliklerindeki o sessiz ses sana doğruyu söylüyor, onu dinle.",
+  "Beklediğin o işaret tam olarak bu fısıltı. Kendine güven, her şey olması gerektiği anda gerçekleşiyor.",
+  "Kaybettiğini sandığın şey, aslında seni doğru olana yaklaştırmak için gitti.",
+  "İçindeki o küçük şüphe var ya — onu bugün kalbinin sesiyle değiştir.",
+  "Yolun daralıyor gibi hissediyorsan, bil ki daralan yol seni odaklıyor. Sapma.",
+  "Gecenin en karanlık anı, şafağın en yakın olduğu andır. Sana da bir şey söylüyor bu.",
+  "Bugün taşıdığın yük senin değil; bir kısmını yere bırakabilirsin.",
+  "Sezgin bugün olağandan yüksek. Küçük bir işarete bile dikkat et.",
+  "Kimseye kanıtlamak zorunda değilsin. Sadece bilmek yeter.",
+  "İçinde büyüyen o his boşuna değil — bir şeye doğru yürüyorsun, farkında ol.",
+  "Bugün 'neden ben?' yerine 'neden benim için?' diye sor. Cevap değişecek.",
+  "Bıraktığın her ağırlık, sana yeni bir hafiflik olarak dönecek.",
+  "Kaderin sana bir kapı kapattıysa, penceresini de gösterir. Etrafına bak.",
+  "İçindeki çocuğa bugün nazik ol. O hâlâ orada, seni bekliyor.",
+  "Sabrın bir zayıflık değil, olgunluğun sessiz gücüdür.",
+  "Bugün küçük gördüğün bir an, aslında büyük bir dönüşümün başlangıcı olabilir.",
 ];
+
 
 function readRecentWhispers(): number[] {
   if (typeof window === "undefined") return [];
