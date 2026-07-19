@@ -1,0 +1,28 @@
+// AURA - android/app/build.gradle
+// Bu snippet'i lokalde `npx cap add android` sonrası oluşan
+//   android/app/build.gradle
+// dosyasındaki `android { buildTypes { ... } }` bloğuyla DEĞİŞTİR.
+//
+// R8/ProGuard tamamen KAPALI. Böylece
+//   java.lang.ClassNotFoundException: androidx.core.app.CoreComponentFactory
+// crash'i bir daha oluşmaz (çünkü minifier hiçbir sınıfı silmiyor).
+//
+// Not: APK/AAB biraz daha büyük olur ama Play Console'a yüklenir ve çalışır.
+
+android {
+    // ... mevcut compileSdk, defaultConfig vs. satırlarını OLDUĞU GİBİ bırak ...
+
+    buildTypes {
+        release {
+            minifyEnabled false          // R8 kapalı
+            shrinkResources false        // Kaynak küçültme kapalı
+            // proguardFiles satırını tamamen kaldır ya da yorum satırı yap:
+            // proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
+        }
+        debug {
+            minifyEnabled false
+            shrinkResources false
+        }
+    }
+}
