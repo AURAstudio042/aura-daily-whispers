@@ -1,11 +1,9 @@
-# AURA · Android Kurulum ve Crash Fix
+# AURA · Android Kurulum (R8/ProGuard KAPALI sürüm)
 
 Google Play Console'daki
 `java.lang.ClassNotFoundException: androidx.core.app.CoreComponentFactory`
-hatası **AndroidX bağımlılıklarının R8/ProGuard tarafından strip edilmesi**
-veya `android/gradle.properties` içinde AndroidX'in kapalı olmasından kaynaklanır.
-
-Aşağıdaki adımları **lokal makinende** sırayla uygula.
+crash'inin en garantili çözümü: **R8/ProGuard küçültmesini tamamen kapatmak.**
+Böylece hiçbir AndroidX sınıfı strip edilmez, ProGuard kuralı yazmakla uğraşmazsın.
 
 ---
 
@@ -13,70 +11,52 @@ Aşağıdaki adımları **lokal makinende** sırayla uygula.
 
 ```bash
 npm install
-npm run build          # dist/ üretir (Capacitor webDir)
-npx cap add android    # android/ klasörünü oluşturur
+npm run build
+npx cap add android
 npx cap sync android
 ```
 
-## 2) `android/gradle.properties` — AndroidX + Jetifier açık olsun
-
-Dosya zaten var; şu iki satır **mutlaka** olmalı (Capacitor default ekler,
-yine de doğrula):
+## 2) `android/gradle.properties` — AndroidX açık olsun
 
 ```properties
 android.useAndroidX=true
 android.enableJetifier=true
 ```
 
-## 3) `android/app/build.gradle` — AndroidX core bağımlılığı
+Capacitor bunu default ekler, sadece doğrula.
 
-`dependencies { ... }` bloğuna ekle (eksikse):
+## 3) `android/app/build.gradle` — minify & shrink KAPALI
 
-```gradle
-dependencies {
-    implementation "androidx.core:core:1.13.1"
-    implementation "androidx.core:core-ktx:1.13.1"
-    implementation "androidx.appcompat:appcompat:1.7.0"
-    // Capacitor'ın kendi eklediği satırları OLDUĞU GİBİ bırak.
-}
-```
-
-Aynı dosyada `buildTypes.release` bloğunun ProGuard'ı doğru dosyayı
-kullandığından emin ol:
+`android { buildTypes { ... } }` bloğunu şu şekilde güncelle
+(tam örnek: `android-setup/app-build.gradle.snippet`):
 
 ```gradle
 buildTypes {
     release {
-        minifyEnabled true
-        shrinkResources true
-        proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'),
-                      'proguard-rules.pro'
+        minifyEnabled false
+        shrinkResources false
+        // proguardFiles satırını KALDIR veya yorum satırı yap
+        signingConfig signingConfigs.release
+    }
+    debug {
+        minifyEnabled false
+        shrinkResources false
     }
 }
 ```
 
-## 4) ProGuard kuralları — CoreComponentFactory fix
+Bu ayarla:
+- R8 çalışmıyor → hiçbir sınıf silinmiyor → CoreComponentFactory crash'i imkansız.
+- ProGuard kurallarını (`proguard-rules.pro`) yazmak/güncellemek gerekmiyor.
+- Tek trade-off: APK/AAB birkaç MB daha büyük olur. Play Store için sorun değil.
 
-`android-setup/proguard-rules.pro` içeriğini
-`android/app/proguard-rules.pro` dosyasına ekle (var olanları silme, sona ekle).
+## 4) `AndroidManifest.xml` doğrulama
 
-Kritik satır:
+`android/app/src/main/AndroidManifest.xml` içinde `<application>` etiketinde
+**manuel `android:appComponentFactory` veya `tools:replace` yazma.**
+Capacitor + AndroidX doğrusunu otomatik merge ediyor.
 
-```proguard
--keep class androidx.core.app.CoreComponentFactory { *; }
--keep class androidx.core.** { *; }
--dontwarn androidx.core.**
-```
-
-## 5) `AndroidManifest.xml` doğrulama
-
-`android/app/src/main/AndroidManifest.xml` içinde `<application ...>`
-etiketinde **manuel bir `android:appComponentFactory` override etme**.
-Capacitor / AndroidX zaten doğrusunu (`androidx.core.app.CoreComponentFactory`)
-merge ediyor. Elle eklenmiş bir `tools:replace="android:appComponentFactory"`
-varsa kaldır.
-
-## 6) Temiz build + yeni AAB
+## 5) Temiz build + yeni AAB
 
 ```bash
 npm run build
@@ -86,14 +66,18 @@ cd android
 ./gradlew bundleRelease
 ```
 
-Çıkan `android/app/build/outputs/bundle/release/app-release.aab`
-dosyasını Play Console'a yeni sürüm olarak yükle.
+Çıktı: `android/app/build/outputs/bundle/release/app-release.aab`
+→ Play Console'a yeni sürüm olarak yükle.
 
 ---
 
-## Sık yapılan hatalar
+## Neden bu çözüm?
 
-- **`useAndroidX=false`** → support-library çakışması → CoreComponentFactory bulunamaz. Açık olmalı.
-- **`minifyEnabled true` ama proguard-rules.pro boş** → R8 AndroidX sınıflarını atar → aynı crash. Yukarıdaki -keep kuralları şart.
-- **Custom `appComponentFactory` override** → sistem androidx sınıfını yükleyemez. Manifest'ten kaldır.
-- **Eski build cache** → `./gradlew clean` şart.
+Önceki denemede ProGuard `-keep` kuralları ekledik ama:
+- R8 config'i sürüm sürüm değişiyor,
+- Capacitor plugin'leri yeni sınıflar ekleyince tekrar `-keep` yazman gerekiyor,
+- Her yeni build'de aynı crash farklı sınıfla dönebiliyor.
+
+`minifyEnabled false` bu belirsizliği tamamen kaldırır. İleride uygulaman
+büyürse ve boyut önemli olursa tekrar açıp `proguard-rules.pro`'yu
+yapılandırabilirsin (`android-setup/proguard-rules.pro` referans olarak duruyor).
