@@ -557,16 +557,53 @@ export function dailyScent(mood?: Mood) {
 // ── Quotes (expanded)
 export type Quote = { text: string; author?: string; category: string };
 export const QUOTES: Quote[] = [
-  { text: "Kendi ayakları üzerinde durmayı öğrenen bir kadın, hiçbir ayrılığı felaket olarak görmez.", category: "Güçlü" },
-  { text: "Sessizlik de bir cevaptır.", author: "Sigmund Freud", category: "Gönderme" },
-  { text: "Bugün hiçbir şey yapmadın ama en azından kötü karar da vermedin. ☕", category: "Komik" },
-  { text: "Mutluluk düşüncelerinin kalitesine bağlıdır.", author: "Marcus Aurelius", category: "Felsefi" },
+  // — Mevlânâ / Yunus / Tasavvuf
   { text: "Dünle beraber gitti cancağızım, ne kadar söz varsa düne ait.", author: "Mevlana", category: "Tasavvuf" },
+  { text: "Ya olduğun gibi görün, ya göründüğün gibi ol.", author: "Mevlana", category: "Tasavvuf" },
+  { text: "Sessizlik, Tanrı'nın dilidir; gerisi kötü bir tercümedir.", author: "Mevlana", category: "Tasavvuf" },
+  { text: "Yaranın açıldığı yerden ışık girer.", author: "Mevlana", category: "Tasavvuf" },
+  { text: "Sen ne arıyorsan sen osun; aradığın yerdesin.", author: "Mevlana", category: "Tasavvuf" },
+  { text: "Sabır, acele etmemek değildir; sonuca güvenmektir.", author: "Mevlana", category: "Tasavvuf" },
+  { text: "Sevelim, sevilelim; dünya kimseye kalmaz.", author: "Yunus Emre", category: "Tasavvuf" },
+  { text: "Bir ben vardır bende, benden içerü.", author: "Yunus Emre", category: "Tasavvuf" },
+
+  // — Shakespeare
+  { text: "Kendine sadık ol; gündüzün geceyi izlediği kadar kesin, bu senden kimseye ihanet etmemeni sağlar.", author: "William Shakespeare", category: "Felsefi" },
+  { text: "Bütün dünya bir sahnedir; erkek ve kadınlar da yalnızca birer oyuncu.", author: "William Shakespeare", category: "Felsefi" },
+  { text: "Şüphelerimiz haindir; denemeye korktuğumuz için, kazanabileceğimiz iyi şeyleri kaybettirir.", author: "William Shakespeare", category: "Felsefi" },
+  { text: "Kısa olsun sözlerin; çünkü zekânın ruhu kısalıktır.", author: "William Shakespeare", category: "Bilgelik" },
+
+  // — Victor Hugo
+  { text: "En derin karanlıkta bile, insanın yüreğinde bir sabah vardır.", author: "Victor Hugo", category: "İlham" },
+  { text: "Sevmek, neredeyse inanmaktır.", author: "Victor Hugo", category: "Romantik" },
+  { text: "Gelecek, birçok ismi olan bir şeydir: zayıflar için ulaşılmaz, korkaklar için bilinmez, cesurlar için fırsat.", author: "Victor Hugo", category: "İlham" },
+  { text: "Melankoli, mutlu olmanın mutluluğudur.", author: "Victor Hugo", category: "Şiir" },
+
+  // — Filozof / Bilgelik
+  { text: "Mutluluk düşüncelerinin kalitesine bağlıdır.", author: "Marcus Aurelius", category: "Felsefi" },
+  { text: "İnsanın elinden alınamayacak son özgürlüğü, tavrını seçebilmesidir.", author: "Viktor Frankl", category: "Felsefi" },
+  { text: "Kendini tanımak, tüm bilgeliğin başlangıcıdır.", author: "Aristoteles", category: "Bilgelik" },
+  { text: "Yalnız bildiğim bir şey var, o da hiçbir şey bilmediğimdir.", author: "Sokrates", category: "Felsefi" },
+  { text: "Uçurumun kenarında durmadıkça kanatlarının olduğunu bilemezsin.", category: "Bilgelik" },
+  { text: "Sessizlik de bir cevaptır.", author: "Sigmund Freud", category: "Bilgelik" },
+  { text: "Nehrin akışına karşı yüzen, suyun gücünü bilir.", category: "Bilgelik" },
+
+  // — Şiir / Türk edebiyatı
   { text: "İnsan acısını bile güzel yaşamalı.", author: "Cemal Süreya", category: "Şiir" },
+  { text: "Ne kadar yol gidersen git, kendinden kaçamazsın.", author: "Sabahattin Ali", category: "Şiir" },
+  { text: "Yüreğinde bir yerde saklı tut beni, ansızın vazgeçme.", author: "Attila İlhan", category: "Romantik" },
+  { text: "Bir kişi bile değişse dünya değişmiş demektir.", author: "Nâzım Hikmet", category: "İlham" },
+
+  // — Ana karakter / güç / özgüven
+  { text: "Kendi ayakları üzerinde durmayı öğrenen bir kadın, hiçbir ayrılığı felaket olarak görmez.", category: "Güçlü" },
   { text: "Sahne senin. Rolünü küçültme.", category: "Ana karakter" },
   { text: "Işığını kısmayı reddeden insanlar, bazı gözleri rahatsız eder.", category: "İddialı" },
+  { text: "Hayatının yan karakteri olmaya niyetin var mı? Yoksa sahne senin.", category: "Ana karakter" },
+  { text: "Herkesin seni anlamasına gerek yok. Kendini kaybetmediğin sürece sorun yok.", category: "İddialı" },
   { text: "Önemli olan ne kadar darbe alıp devam edebildiğindir.", author: "Rocky Balboa", category: "Film" },
-  { text: "Bir kapı kapanırsa, başka bir kapı açılır; ama biz çoğu zaman kapanan kapıya o kadar uzun bakarız ki açılanı göremeyiz.", author: "Helen Keller", category: "İlham" },
+
+  // — Sabır / şefkat / yol / dönüşüm
+  { text: "Bir kapı kapanırsa başka bir kapı açılır; ama biz çoğu zaman kapanan kapıya o kadar uzun bakarız ki açılanı göremeyiz.", author: "Helen Keller", category: "İlham" },
   { text: "Yapabileceğine inan, yarı yolu katetmişsin demektir.", author: "Theodore Roosevelt", category: "İlham" },
   { text: "Aşk, görülmediğinde de var olabilen tek şeydir.", category: "Romantik" },
   { text: "Az konuş, çok dinle — kelimelerin değeri böyle artar.", category: "Bilgelik" },
@@ -574,6 +611,16 @@ export const QUOTES: Quote[] = [
   { text: "Kendine zaman ayırmak bencillik değil, ön koşuldur.", category: "Öz Bakım" },
   { text: "Hayat seni nereye götürürse götürsün, kalbini de yanına al.", category: "Yol" },
   { text: "Bekleyişin de bir anlamı var; her şey aynı anda çiçek açmaz.", category: "Sabır" },
+  { text: "İnsan en çok kaçtığı şeyin içinde olgunlaşır.", category: "Bilgelik" },
+  { text: "Bazı kapılar kapanmadı, sadece artık senin kapın değiller.", category: "Yol" },
+  { text: "Kendine karşı en sert eleştirmen olma; o içindeki ses sana ait, ama her söylediği doğru değil.", category: "Şefkat" },
+  { text: "Gösterdiğin çaba, aldığın sonuçtan çok daha değerlidir.", category: "Şefkat" },
+  { text: "Bir şeylerin hemen çözülmesi gerekmiyor; bazı cevaplar zamanla gelir, zorlamayla değil.", category: "Sabır" },
+  { text: "Kendi sesini bastırmayı bıraktığın gün, hayatın gerçekten başlar.", category: "Güçlü" },
+
+  // — Mizah
+  { text: "Bugün hiçbir şey yapmadın ama en azından kötü karar da vermedin. ☕", category: "Komik" },
+  { text: "Hakkımda konuşanlar kadar kendimle meşgul olsaydım, çoktan dünyayı değiştirmiştim.", category: "Komik" },
 ];
 // ── Quote selection: real random + mood-weighted + anti-repeat (14-day buffer)
 // Content (QUOTES array, categories, tone, length) is intentionally unchanged.
