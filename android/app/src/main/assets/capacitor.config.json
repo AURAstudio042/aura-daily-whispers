@@ -1,0 +1,13 @@
+{
+	"appId": "app.lovable.aura",
+	"appName": "AURA",
+	"webDir": "dist",
+	"server": {
+		"url": "https://aura-daily-whispers.lovable.app",
+		"cleartext": false,
+		"androidScheme": "https"
+	},
+	"android": {
+		"allowMixedContent": false
+	}
+}
